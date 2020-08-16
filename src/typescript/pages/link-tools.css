@@ -1,0 +1,35 @@
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* URL encoding                                                                                                       */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#link-tools .url-encoding input {
+    width: 100%;
+    padding: 0.5em;
+}
+
+#link-tools .url-encoding input.invalid {
+    background-color: #ffafaf;
+    border: 1px solid red;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* HAR parser                                                                                                         */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#link-tools .har-parser textarea {
+    width: 100%;
+    height: 12em;
+}
+
+#link-tools .har-parser textarea.invalid {
+    background-color: #ffafaf;
+    border: 1px solid red;
+}
+
+#link-tools .har-parser {
+    margin-bottom: 2em;
+}
+
+#link-tools .har-parser .url {
+    word-break: break-all;
+}

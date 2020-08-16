@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>ShortyCut</ShortName>
+    <Description>Search engine for your own shortcuts</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <!-- =========================================================================================================== -->
+    <!-- Replace the two instances of http://localhost:4171/ below with the domain and path where ShortyCut is       -->
+    <!-- uploaded to, e.g. https://www.my-website.com/shortycut/                                                     -->
+    <!-- =========================================================================================================== -->
+    <Image width="16" height="16" type="image/x-icon">http://localhost:4171/resources/favicon.ico</Image>
+    <Url type="text/html" template="http://localhost:4171/index.html?q={searchTerms}" />
+</OpenSearchDescription>

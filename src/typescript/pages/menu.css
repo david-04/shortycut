@@ -1,0 +1,92 @@
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Burger icon                                                                                                        */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#menu .burger-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.5em 1.5em 0 0;
+    opacity: 0.5;
+}
+
+#menu .burger-icon div {
+    width: 1.44em;
+    height: 0.2em;
+    background-color: #444444;
+    margin-bottom: 0.24em;
+    border-radius: 0.16em;
+}
+
+#menu .burger-icon:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Close icon                                                                                                         */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#menu .close-icon {
+    position: absolute;
+    right: 1.2em;
+    top: 1.3em;
+    width: 1.6em;
+    height: 1.44em;
+    opacity: 0.5;
+    display: none;
+}
+
+#menu .close-icon:before,
+#menu .close-icon:after {
+    position: absolute;
+    top: 0;
+    right: 0.84em;
+    content: ' ';
+    height: 1.44em;
+    width: 0.2em;
+    border-radius: 0.16em;
+    background-color: #444444;
+}
+
+#menu .close-icon:before {
+    transform: rotate(45deg);
+}
+
+#menu .close-icon:after {
+    transform: rotate(-45deg);
+}
+
+#menu .close-icon:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Menu items                                                                                                         */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#menu .items {
+    position: absolute;
+    top: 1em;
+    right: 3.5em;
+    background-color: #eeeeee;
+    border: 1px solid #888888;
+}
+
+#menu .items div {
+    width: 100%;
+    padding: 0.4em;
+    white-space: nowrap;
+}
+
+#menu .items div:first-child {
+    border-bottom: 1px solid #888888;
+    background-color: #dddddd;
+}
+
+#menu .items div:hover {
+    cursor: pointer;
+    background-color: #444444;
+    color: white;
+}

@@ -1,0 +1,68 @@
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Body                                                                                                               */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Tools pages                                                                                                        */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+.utility-page {
+    flex-direction: column;
+    align-content: stretch;
+    align-items: flex-start;
+    width: 45em;
+    min-width: 30em;
+    max-width: 100%;
+    margin: auto;
+    position: relative;
+    top: 5em;
+    padding: 0 1em 3em 1em;
+    line-height: 1.3em;
+}
+
+.utility-page > * {
+    width: 100%;
+}
+
+.utility-page > div:not(:last-child) {
+    margin-bottom: 2em;
+}
+
+.utility-page h1 {
+    width: 100%;
+    font-size: 1em;
+    background: #161616 !important;
+    color: #ffff6c;
+    padding: 0.3em;
+    font-weight: normal;
+    margin-bottom: 1.2em;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Other                                                                                                              */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+.key {
+    border: 1px solid #666666;
+    padding: 0 0.15em 0 0.15em;
+    border-radius: 0.25em;
+    background-color: #dddddd;
+    color: #444444;
+}

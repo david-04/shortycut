@@ -1,0 +1,111 @@
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Page                                                                                                               */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#setup {
+    flex-direction: column;
+    align-content: stretch;
+    align-items: flex-start;
+    width: 45em;
+    min-width: 30em;
+    max-width: 100%;
+    margin: auto;
+    position: relative;
+    padding-left: 2.5em;
+}
+
+#setup>div:first-child {
+    display: flex;
+    height: 10em;
+    width: 100%;
+    flex-direction: row;
+    align-content: flex-end;
+    align-items: flex-end;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Error message                                                                                                      */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#setup .error {
+    border: 1px solid red;
+    padding: 0.5em;
+    box-shadow: 0px 0px 1em red;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Header                                                                                                             */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#setup h1 {
+    font-size: 2em;
+}
+
+#setup h1 img {
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: -1.3em;
+    margin-right: 0.2em;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Instructions                                                                                                       */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#setup .instructions {
+    line-height: 1.5em;
+    max-width: 100%;
+    margin-top: -0.5em;
+}
+
+#setup .instructions .filename {
+    background-color: #f2f2f2;
+    border: 1px solid silver;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+
+#setup .instructions pre {
+    background-color: #f2f2f2;
+    border: 1px solid #cccccc;
+    padding: 0.4em;
+    margin-top: 1.5em;
+}
+
+#setup .instructions .highlight {
+    color: red;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Syntax warning                                                                                                     */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#setup .syntax-warning {
+    margin-top: 1.5em;
+}
+
+#setup .syntax-warning .important {
+    color: red;
+    background-color: yellow;
+    padding: 0.1em;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Button                                                                                                             */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#setup a.button {
+    background: black;
+    border-radius: 0.3em;
+    text-decoration: none;
+    outline: none;
+    padding: 0.3em;
+    padding-right: 0.5em;
+    color: yellow;
+    font-weight: 500;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    display: inline-block;
+}

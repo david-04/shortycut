@@ -1,0 +1,49 @@
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Page and sections                                                                                                  */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#error {
+    flex-direction: column;
+    align-content: stretch;
+    align-items: flex-start;
+    width: 40em;
+    min-width: 30em;
+    max-width: 100%;
+    margin: auto;
+    position: relative;
+    top: 5em;
+}
+
+#error>div {
+    width: 100%;
+    padding: 0.5em;
+    border: 1px solid #ff5b5b;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Row, cursor and content                                                                                            */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#error .title {
+    width: 100%;
+    background-color: #ffafaf;
+    border-bottom: none;
+}
+
+#error .message {
+    margin-bottom: 5em;
+}
+
+#error .errorMessage {
+    color: red;
+    font-weight: bold;
+}
+
+#error .jsonError {
+    color: red;
+    background-color: yellow;
+}
+
+pre {
+    line-height: 1.8em;
+}

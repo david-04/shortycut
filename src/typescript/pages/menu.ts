@@ -1,0 +1,165 @@
+namespace shortycut {
+
+    //------------------------------------------------------------------------------------------------------------------
+    // An error page that displays an error only
+    //------------------------------------------------------------------------------------------------------------------
+
+    export class Menu {
+
+        private readonly dom = {
+            menu: document.querySelector('#menu') as HTMLElement,
+            burgerIcon: document.querySelector('#menu .burger-icon') as HTMLElement,
+            closeIcon: document.querySelector('#menu .close-icon') as HTMLElement,
+            items: document.querySelector('#menu .items') as HTMLElement
+        };
+
+        private onClose?: (() => void);
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Initialize the page
+        //--------------------------------------------------------------------------------------------------------------
+
+        public constructor() {
+
+            this.onClickCloseIcon = this.onClickCloseIcon.bind(this);
+            this.onClickBurgerIcon = this.onClickBurgerIcon.bind(this);
+            this.onClickBody = this.onClickBody.bind(this);
+
+            this.onShortyCut = this.onShortyCut.bind(this);
+            this.onDocumentation = this.onDocumentation.bind(this);
+            this.onLinkTools = this.onLinkTools.bind(this);
+            this.onBrowserIntegration = this.onBrowserIntegration.bind(this);
+            this.onFavicons = this.onFavicons.bind(this);
+
+            this.populateItems();
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Populate the menu items
+        //--------------------------------------------------------------------------------------------------------------
+
+        private populateItems() {
+
+            this.dom.items.innerHTML = '';
+
+            const menuItems: Array<[string, ((event: MouseEvent) => boolean) | (() => boolean)]> = [
+                [`ShortyCut ${getVersionNumber()}`, this.onShortyCut],
+                ['Documentation', this.onDocumentation],
+                ['Link tools', this.onLinkTools],
+                ['Browser integration', this.onBrowserIntegration],
+                ['Favicons', this.onFavicons]
+            ];
+
+            menuItems.forEach(array =>
+                this.dom.items.appendChild(
+                    create('div', array[0], element => element.addEventListener('click', array[1]))
+                )
+            );
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Add and remove event listeners
+        //--------------------------------------------------------------------------------------------------------------
+
+        private addEventListeners() {
+            this.dom.closeIcon.addEventListener('click', this.onClickCloseIcon);
+            this.dom.burgerIcon.addEventListener('click', this.onClickBurgerIcon);
+            document.body.addEventListener('click', this.onClickBody);
+        }
+
+        private removeEventListeners() {
+            this.dom.closeIcon.removeEventListener('click', this.onClickCloseIcon);
+            this.dom.burgerIcon.removeEventListener('click', this.onClickBurgerIcon);
+            document.body.removeEventListener('click', this.onClickBody);
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Show and hide icons and menu items
+        //--------------------------------------------------------------------------------------------------------------
+
+        public showBurgerIcon() {
+            if (this.dom.menu.style.display === 'none') {
+                this.addEventListeners();
+            }
+            this.dom.burgerIcon.style.display = 'block';
+            this.dom.closeIcon.style.display = 'none';
+            this.dom.items.style.display = 'none';
+            this.dom.menu.style.display = 'block';
+        }
+
+        public showCloseIcon(onClose: (() => void)) {
+            this.onClose = onClose;
+            if (this.dom.menu.style.display === 'none') {
+                this.addEventListeners();
+            }
+            this.dom.burgerIcon.style.display = 'none';
+            this.dom.closeIcon.style.display = 'block';
+            this.dom.items.style.display = 'none';
+            this.dom.menu.style.display = 'block';
+        }
+
+        public hide() {
+            this.removeEventListeners();
+            this.dom.menu.style.display = 'none';
+        }
+
+        public closeMenu() {
+            this.dom.items.style.display = 'none';
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Event handlers
+        //--------------------------------------------------------------------------------------------------------------
+
+        public onClickBurgerIcon(event: MouseEvent) {
+            this.dom.items.style.display = 'none' === this.dom.items.style.display ? 'block' : 'none';
+            return this.cancelEvent(event);
+        }
+
+        public onClickCloseIcon(event: MouseEvent) {
+            this.onClose!();
+            return this.cancelEvent(event);
+        }
+
+        public onClickBody() {
+            this.closeMenu();
+            return true;
+        }
+
+        public onShortyCut(event: MouseEvent) {
+            window.location.href = 'https://github.com/david-04/shortycut';
+            return this.cancelEvent(event);
+        }
+
+        public onDocumentation(event: MouseEvent) {
+            this.closeMenu();
+            window.location.href = window.location.href.replace(/[#?].*/, '').replace(/\/?[^\/]+\.[^\/]+$/, '')
+                + '/resources/docs/index.html';
+            return this.cancelEvent(event);
+        }
+
+        public onLinkTools(event: MouseEvent) {
+            this.closeMenu();
+            router.goto(pages.linkTools.populate());
+            return this.cancelEvent(event);
+        }
+
+        public onBrowserIntegration(event: MouseEvent) {
+            this.closeMenu();
+            router.goto(pages.browserIntegration);
+            return this.cancelEvent(event);
+        }
+
+        public onFavicons(event: MouseEvent) {
+            this.closeMenu();
+            router.goto(pages.faviconTools);
+            return this.cancelEvent(event);
+        }
+
+        private cancelEvent(event: Event) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+    }
+}

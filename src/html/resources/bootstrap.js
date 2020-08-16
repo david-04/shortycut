@@ -1,0 +1,1 @@
+shortycut.initialize();

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Multi-link shortcuts - ShortyCut</title>
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link href="css/custom.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Multi-link shortcuts";
+    var mkdocs_page_input_path = "multi-link-shortcuts.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> ShortyCut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Introduction</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="keywords.html">Keywords</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortycut.html">ShortyCut</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Defining shortcuts</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="file-format.html">File format</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortcut-syntax.html">Shortcut syntax</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="multi-link-shortcuts.html">Multi-link shortcuts</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="hotkeys.html">Hotkeys</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="grouping.html">Grouping</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Browser integration</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="browser-integration.html">Overview</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="homepage.html">Homepage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="keyword-query.html">Keyword query</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="web-server.html">Web server</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Miscellaneous</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="favicons.html">Favicons</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">ShortyCut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">ShortyCut</a> &raquo;</li>
+    
+      
+        
+          <li>Defining shortcuts &raquo;</li>
+        
+      
+    
+    <li>Multi-link shortcuts</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="multi-link-shortcuts"><img alt="" src="img/arrow.svg" /> Multi-link shortcuts</h1>
+<p>Sometimes web pages provide similar or complementing information.
+One example are news websites with index pages per category and region.
+Separate keywords can be used to bookmark them individually:</p>
+<pre><code class="text">[news-au]       News » Australia  https://www.theage.com.au/national
+[news-finance]  News » Finance    https://www.reuters.com/finance
+[news-sports]   News » Sports     https://www.msn.com/en-us/sports
+[news-world]    News » World      https://www.bbc.com/news/world
+</code></pre>
+
+<p>As the number of keyword variations grows, it becomes harder to remember them.
+It's usually easier to assign all related pages to the same keyword:</p>
+<pre><code class="text">[news]          News » Australia  https://www.theage.com.au/national
+[news]          News » Finance    https://www.reuters.com/finance
+[news]          News » Sports     https://www.msn.com/en-us/sports
+[news]          News » World      https://www.bbc.com/news/world
+</code></pre>
+
+<p>When entering a keyword with multiple links, ShortyCut shows a list to choose from:</p>
+<p><img alt="" src="img/multi-link-keyword.png" /></p>
+<p>The "Open all" item on top of the list can be used to open all links in new tabs.
+This can also be set as the default behavior in the
+<a href="configuration.html#shortcutformaturlmultilinkindicatordefault">configuration</a>,
+causing ShortyCut to always open new tabs without showing the list first.
+On top of that, each shortcut can override the default behavior and enforce to either show the list or open new tabs.</p>
+<h1 id="show-a-list"><img alt="" src="img/arrow.svg" /> Show a list</h1>
+<p>A question mark (<code>?</code>) in front of links causes the keyword to always show the list:</p>
+<pre><code class="text">[news]  News » Australia  ?https://www.theage.com.au/national
+[news]  News » Finance    ?https://www.reuters.com/finance
+[news]  News » Sports     ?https://www.msn.com/en-us/sports
+[news]  News » World      ?https://www.bbc.com/news/world
+</code></pre>
+
+<p>In this example, the <code>news</code> keyword will always show the list, even if the default behavior is set to open new tabs.</p>
+<h1 id="open-new-tabs"><img alt="" src="img/arrow.svg" /> Open new tabs</h1>
+<p>A caret (<code>^</code>) in front of links causes the keyword to always open new tabs:</p>
+<pre><code class="text">[news]  News » Australia  ^https://www.theage.com.au/national
+[news]  News » Finance    ^https://www.reuters.com/finance
+[news]  News » Sports     ^https://www.msn.com/en-us/sports
+[news]  News » World      ^https://www.bbc.com/news/world
+</code></pre>
+
+<p>In this example, the <code>news</code> keyword will always open new tabs, even if the default behavior is set to show the list.</p>
+<h1 id="ignore-previous-links"><img alt="" src="img/arrow.svg" /> Ignore previous links</h1>
+<p>An equals sign (<code>=</code>) in front of a link causes all previous links to be discarded:</p>
+<pre><code class="text">[news]  News » Australia  ?https://www.theage.com.au/national
+[news]  News » Finance    ?https://www.reuters.com/finance
+[news]  News » Sports     ?https://www.msn.com/en-us/sports
+[news]  News » World      =https://www.bbc.com/news/world
+</code></pre>
+
+<p>In this example, importing the last line will cause ShortyCut to discard all previous links.
+The <code>news</code> keyword is treated as if it had only one link (world news).
+It's the same effect as if the first three lines lines were not there at all.</p>
+<p>Ignoring previous links is rarely needed.
+It can be used to override individual keywords when importing shared shortcut collections.
+It can also be used to temporarily redirect or repurpose a keyword,
+without having to delete (and later restore) the current set of links.</p>
+<h1 id="mixing-behaviors"><img alt="" src="img/arrow.svg" /> Mixing behaviors</h1>
+<p>The equals sign (<code>=</code>) always causes the previous links to be discarded.
+The behavior for the remaining shortcuts is determined only by the last link.</p>
+<pre><code class="text">[news]  News » Australia   https://www.theage.com.au/national
+[news]  News » Finance    =https://www.reuters.com/finance
+[news]  News » Sports     ^https://www.msn.com/en-us/sports
+[news]  News » World      ?https://www.bbc.com/news/world
+</code></pre>
+
+<p>In this example, the equals sign (<code>=</code>) in finance news causes the previous link (Australia news) to be discarded.
+The keyword will eventually have three links (finance, sports and world news).
+A list will be displayed, because the last link (world news) has a question mark (<code>?</code>).
+If it didn't have any indicator, the configured default behavior would apply.
+The caret (<code>^</code>) in front of the sports link is always ignored and can be omitted.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="post-links.html" class="btn btn-neutral float-right" title="POST links">Next  &#x25BA;</a>
+      
+      
+        <a href="shortcut-syntax.html" class="btn btn-neutral" title="Shortcut syntax">&#x25C4;  Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="shortcut-syntax.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="post-links.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

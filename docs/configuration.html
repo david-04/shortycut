@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Configuration - ShortyCut</title>
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link href="css/custom.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Configuration";
+    var mkdocs_page_input_path = "configuration.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> ShortyCut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Introduction</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="keywords.html">Keywords</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortycut.html">ShortyCut</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Defining shortcuts</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="file-format.html">File format</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortcut-syntax.html">Shortcut syntax</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="multi-link-shortcuts.html">Multi-link shortcuts</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="hotkeys.html">Hotkeys</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="grouping.html">Grouping</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Browser integration</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="browser-integration.html">Overview</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="homepage.html">Homepage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="keyword-query.html">Keyword query</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="web-server.html">Web server</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Miscellaneous</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="configuration.html">Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="favicons.html">Favicons</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">ShortyCut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">ShortyCut</a> &raquo;</li>
+    
+      
+        
+          <li>Miscellaneous &raquo;</li>
+        
+      
+    
+    <li>Configuration</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="configuration"><img alt="" src="img/arrow.svg" /> Configuration</h1>
+<p>ShortyCut can be customized through configuration settings.
+They are stored in <code>settings.js</code>, which is located in the <code>data</code> folder:</p>
+<pre><code class="javascript">shortycut.configure({
+    shortcutFormat: {
+        comment: '//',
+        keyword: {
+            caseSensitive: false,
+            openingDelimiter: '[',
+            separator: '|',
+            closingDelimiter: ']',
+        },
+        enableGrouping: false,
+        hotkeyMarker: '',
+        url: {
+            searchTermPlaceholder: '%s',
+            postIndicator: '?POST?',
+            multiLinkIndicator: {
+                replacePrevious: '=',
+                openInNewTab: '^',
+                showMenu: '?',
+                default: 'showMenu'
+            }
+        }
+    },
+    homepage: {
+        keywords: ['?', 'help', 'home', 'homepage', 'sc', 'shortycut'],
+        suggestions: {
+            showKeywords: true,
+            showHotkeys: true,
+            showFavicons: true,
+            faviconFolders: ['favicons'],
+        }
+    },
+    defaultSearchEngine: {
+        keyword: 'defaultsearchengine',
+        useInAddressBar: true,
+        useOnHomepage: true
+    }
+});
+</code></pre>
+
+<p>Settings can be boolean values (<code>true</code> or <code>false</code>) or text, which must be surrounded by single quotes (<code>'</code>).
+Some settings allow to configure multiple values.
+They must be separated by commas (<code>,</code>) and surrounded by square brackets (<code>[</code> and <code>]</code>).</p>
+<p>Text containing certain characters can interfere with the JavaScript syntax and cause problems.
+Try to avoid using the following characters, particularly in the <code>shortcutFormat</code> section:</p>
+<ul>
+<li>backslashes (<code>\</code>)</li>
+<li>backticks (<code>`</code>)</li>
+<li>single quotes (<code>'</code>)</li>
+<li>the dollar symbol followed by a curly bracket <code>(${</code>)</li>
+</ul>
+<p>If <code>settings.js</code> does not contain a specific property, a default value is applied.
+This might happen when upgrading to a newer version of ShortyCut which introduces additional settings.
+When adding new properties to <code>settings.js</code>, make sure to place them at the same location as in the example above.</p>
+<h1 id="shortcutformatcomment"><img alt="" src="img/arrow.svg" /> shortcutFormat.comment</h1>
+<p>This property defines the character(s) which introduce comments within shortcut definitions.
+The default value is the double-slash (<code>//</code>).
+Lines starting with the given sequence are treated as comment and ignored.
+See "<a href="file-format.html">File format</a>" for details.</p>
+<h1 id="shortcutformatkeywordcasesensitive"><img alt="" src="img/arrow.svg" /> shortcutFormat.keyword.caseSensitive</h1>
+<p>This property enables or disables case-sensitivity for keywords.
+The default value is <code>false</code>, meaning that keywords are not case-sensitive.
+A <code>news</code> shortcut could be opened by entering variations like <code>News</code> or <code>NEWS</code>.
+On the other hand, if the property is set to <code>true</code>,
+keywords must be entered exactly as they are defined in <code>shortcuts.js</code>.</p>
+<h1 id="shortcutformatkeywordopeningdelimiter-and-shortcutformatkeywordclosingdelimiter"><img alt="" src="img/arrow.svg" /> shortcutFormat.keyword.openingDelimiter and shortcutFormat.keyword.closingDelimiter</h1>
+<p>These properties define the characters that can be put in front and after keywords in shortcut definitions.
+The default values are the square brackets (<code>[</code> and <code>]</code>).
+It is optional to actually use the delimiters when defining shortcuts.
+See "<a href="shortcut-syntax.html#keyword">Shortcut syntax</a>" for details.</p>
+<h1 id="shortcutformatkeywordseparator"><img alt="" src="img/arrow.svg" /> shortcutFormat.keyword.separator</h1>
+<p>This property defines the character that separates multiple keywords for the same shortcut.
+The default value is the pipe symbol (<code>|</code>).
+See "<a href="shortcut-syntax.html#keyword">Shortcut syntax</a>" for details.</p>
+<h1 id="shortcutformatenablegrouping"><img alt="" src="img/arrow.svg" /> shortcutFormat.enableGrouping</h1>
+<p>This property enables or disables support for organizing shortcuts in groups.
+The default value is <code>false</code>, meaning that grouping is disabled.
+See "<a href="grouping.html">Grouping</a>" for details.</p>
+<h1 id="shortcutformathotkeymarker"><img alt="" src="img/arrow.svg" /> shortcutFormat.hotkeyMarker</h1>
+<p>This property defines the character which marks hotkeys in a shortcut's description.
+The default value is an empty string (<code>''</code>), meaning that hotkey marking is not being used.
+See "<a href="hotkeys.html">Hotkeys</a>" for details.</p>
+<h1 id="shortcutformaturlsearchtermplaceholder"><img alt="" src="img/arrow.svg" /> shortcutFormat.url.searchTermPlaceholder</h1>
+<p>This property defines the placeholder which is used in links to indicate where the search term needs to be inserted.
+The default value is <code>%s</code>.
+See "<a href="shortcut-syntax.html#link">Shortcut syntax</a>" for details.</p>
+<h1 id="shortcutformaturlpostindicator"><img alt="" src="img/arrow.svg" /> shortcutFormat.url.postIndicator</h1>
+<p>This property defines the text that is appended to a link to separate <code>POST</code> data fields.
+The default value is <code>?POST?</code>.
+See "<a href="post-links.html">Post links</a>" for details.</p>
+<h1 id="shortcutformaturlmultilinkindicatorreplaceprevious"><img alt="" src="img/arrow.svg" /> shortcutFormat.url.multiLinkIndicator.replacePrevious</h1>
+<p>This property defines the character(s) that can be put in front of a link
+to force all previous links with the same keyword to be ignored.
+The default value is the equals sign (<code>=</code>).
+See "<a href="multi-link-shortcuts.html#ignore-previous-links">Multi-link shortcuts</a>" for details.</p>
+<h1 id="shortcutformaturlmultilinkindicatoropeninnewtab"><img alt="" src="img/arrow.svg" /> shortcutFormat.url.multiLinkIndicator.openInNewTab</h1>
+<p>This property defines the character that can be put in front of a link
+to open all links with the same keyword in separate tabs.
+The default value is the caret (<code>^</code>).
+See "<a href="multi-link-shortcuts.html#open-new-tabs">Multi-link shortcuts</a>" for details.</p>
+<h1 id="shortcutformaturlmultilinkindicatorshowmenu"><img alt="" src="img/arrow.svg" /> shortcutFormat.url.multiLinkIndicator.showMenu</h1>
+<p>This property defines the character that can be put in front of a link
+to show an interactive list of all links with the same keyword.
+The default value is the question mark (<code>?</code>).
+See "<a href="multi-link-shortcuts.html#show-a-list">Multi-link shortcuts</a>" for details.</p>
+<h1 id="shortcutformaturlmultilinkindicatordefault"><img alt="" src="img/arrow.svg" /> shortcutFormat.url.multiLinkIndicator.default</h1>
+<p>This property defines the default behavior for keywords with multiple links.
+It can be set to <code>replacePrevious</code>, <code>openInNewTab</code> or <code>showMenu</code> (which is the default value).
+See "<a href="multi-link-shortcuts.html">Multi-link shortcuts</a>" for details.</p>
+<h1 id="homepagekeywords"><img alt="" src="img/arrow.svg" /> homepage.keywords</h1>
+<p>This property defines keywords that can be entered in the browser's address bar to open ShortyCut's homepage.
+The default values are <code>?</code>, <code>help</code>, <code>home</code>, <code>homepage</code>, <code>sc</code> and<code>shortycut</code>.
+When entering one of these keywords, the homepage is opened
+(instead of invoking the default <a href="default-search-engine.html">search engine</a>).</p>
+<h1 id="homepagesuggestionsshowkeywords"><img alt="" src="img/arrow.svg" /> homepage.suggestions.showKeywords</h1>
+<p>This property enables or disables the display of keywords as part of suggestions on ShortyCut's homepage.
+The default value is <code>true</code>, meaning that the keywords are displayed in front of the description.
+When <a href="hotkeys.html">hotkeys</a> are used, this is often not necessary and can be disabled by setting the property to <code>false</code>.</p>
+<h1 id="homepagesuggestionsshowhotkeys"><img alt="" src="img/arrow.svg" /> homepage.suggestions.showHotkeys</h1>
+<p>This property enables or disables the highlighting of hotkeys in the description of suggestions.
+The default value is <code>true</code>, meaning that hotkeys are displayed.
+It is only applicable to shortcuts where the description contains all letters of the keyword (in the same order).
+See "<a href="hotkeys.html">Hotkeys</a>" for details.</p>
+<h1 id="homepagesuggestionsshowfavicons"><img alt="" src="img/arrow.svg" /> homepage.suggestions.showFavicons</h1>
+<p>This property enables or disables the display of favicons on ShortyCut's homepage.
+The default value is <code>true</code>, meaning that websites' favicons are displayed as part of the suggestions.
+See "<a href="favicons.html">Favicons</a>" for details.</p>
+<h1 id="homepagesuggestionsfaviconfolders"><img alt="" src="img/arrow.svg" /> homepage.suggestions.faviconFolders</h1>
+<p>This property defines the folder(s) where downloaded favicons are stored.
+The default value is <code>data/favicons</code>.
+Favicons need to be downloaded and stored in this folder manually.
+See "<a href="favicons.html">Favicons</a>" for details.</p>
+<h1 id="defaultsearchenginekeyword"><img alt="" src="img/arrow.svg" /> defaultSearchEngine.keyword</h1>
+<p>This property defines the keyword of the shortcut which serves as the default search engine.
+The default value is <code>defaultsearchengine</code>.
+The shortcut with this keyword is used for all input that does not match any (other) keywords.
+See "<a href="default-search-engine.html">Default search engine</a>" for details.</p>
+<h1 id="defaultsearchengineuseinaddressbar"><img alt="" src="img/arrow.svg" /> defaultSearchEngine.useInAddressBar</h1>
+<p>This property enables or disables the default search engine when ShortyCut is invoked from the browser's address bar.
+The default value is <code>true</code>,
+meaning that all input that does not mach any keyword is forwarded to the default search engine.
+See "<a href="default-search-engine.html">Default search engine</a>" for details.</p>
+<h1 id="defaultsearchengineuseonhomepage"><img alt="" src="img/arrow.svg" /> defaultSearchEngine.useOnHomepage</h1>
+<p>This property enables or disables the default search engine on ShortyCut's homepage.
+The default value is <code>true</code>, meaning that all input that does not mach any keyword
+is forwarded to the default search engine.
+See "<a href="default-search-engine.html">Default search engine</a>" for details.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="favicons.html" class="btn btn-neutral float-right" title="Favicons">Next  &#x25BA;</a>
+      
+      
+        <a href="web-server.html" class="btn btn-neutral" title="Web server">&#x25C4;  Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="web-server.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="favicons.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

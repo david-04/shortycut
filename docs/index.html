@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Home - ShortyCut</title>
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link href="css/custom.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> ShortyCut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="index.html">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Introduction</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="keywords.html">Keywords</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortycut.html">ShortyCut</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Defining shortcuts</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="file-format.html">File format</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortcut-syntax.html">Shortcut syntax</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="multi-link-shortcuts.html">Multi-link shortcuts</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="hotkeys.html">Hotkeys</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="grouping.html">Grouping</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Browser integration</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="browser-integration.html">Overview</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="homepage.html">Homepage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="keyword-query.html">Keyword query</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="web-server.html">Web server</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Miscellaneous</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="favicons.html">Favicons</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">ShortyCut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">ShortyCut</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="shortycut"><img alt="" src="img/arrow.svg" /> ShortyCut</h1>
+<p>ShortyCut is a JavaScript application to quickly navigate to websites using keywords.
+Unlike browser bookmarks, the links and keywords are stored as plain text in a simple file:</p>
+<pre><code class="javascript">shortycut.addShortcuts(`
+
+    [e]    Search eBay      https://www.ebay.com.au/sch/i.html?nkw=%s
+    [ta]   The Age          https://www.theage.com.au/melbourne-news
+    [tc]   TechCrunch       https://techcrunch.com
+    [tg]   Typing Games     https://www.typing.com/student/game/type-a-balloon
+    [tr]   Translate        https://dict.leo.org/ende?lp=ende&amp;lang=de&amp;search=%s
+    [tvg]  TV Guide         https://www.yourtv.com.au/guide/
+`);
+</code></pre>
+
+<p>Links are opened by entering the corresponding keyword (e.g. <code>ta</code> or <code>tr</code>).
+Using ShortyCut's homepage is the easiest way to do this,
+because it works in all browsers and provides suggestions while typing:</p>
+<p><img alt="" src="img/favicons-suggestions.png" /></p>
+<p>ShortyCut can also be set up as the browser's default search engine,
+so that keywords can be entered directly in the address bar:</p>
+<p><img alt="" src="img/web-server-address-bar.png" /></p>
+<p>ShortyCut makes keywords available in all browsers, including those that don't natively support it.
+It enhances their capabilities with additional features like keywords with multiple links,
+support for <code>POST</code> pages and the ability to dynamically generate shortcuts via JavaScript.</p>
+<h2 id="resources"><img alt="" src="img/arrow.svg" /> Resources</h2>
+<p><strong>Visit the GitHub project page:</strong><br>
+<a href="https://github.com/david-04/shortycut">https://github.com/david-04/shortycut</a></p>
+<p><strong>Download the latest release:</strong><br>
+<a href="https://github.com/david-04/shortycut/releases">https://github.com/david-04/shortycut/releases</a></p>
+<p><strong>View the latest release notes:</strong><br>
+<a href="https://david-04.github.io/shortycut/release-notes.html">https://david-04.github.io/shortycut/release-notes.html</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="keywords.html" class="btn btn-neutral float-right" title="Keywords">Next  &#x25BA;</a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+        <span style="margin-left: 15px"><a href="keywords.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

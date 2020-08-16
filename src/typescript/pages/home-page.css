@@ -1,0 +1,269 @@
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Page                                                                                                               */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home {
+    flex-direction: column;
+    align-content: stretch;
+    align-items: flex-start;
+    width: 60em;
+    min-width: 30em;
+    max-width: 100%;
+    margin: auto;
+    position: relative;
+    top: 40%;
+    height: 100%;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Row, cursor and content                                                                                            */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+#home .row .cursor {
+    width: 2.5em;
+    min-width: 2.5em;
+}
+
+#home .row:not(.selected) .cursor {
+    visibility: hidden;
+}
+
+#home .row .cursor img.icon {
+    width: 1.4em;
+    height: 1.4em;
+    padding-top: 0.1em;
+}
+
+#home .row .row-content {
+    width: calc(100% - 2.5em);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Filter                                                                                                             */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .input {
+    font-size: 1.2em;
+    padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+    width: 100%;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #555555;
+}
+
+#home .input.warning {
+    background-color: #fffd75;
+}
+
+#home .input.error {
+    background-color: #ffbcbc;
+}
+
+#home .no-focus.filter-row:not(:focus-within) {
+    opacity: 0.333;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Suggestion rows                                                                                                    */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .suggestions {
+    width: 100%;
+    margin-top: 2em;
+}
+
+#home .suggestions .row-content {
+    padding: 0.4em 0.4em 0.4em 0.4em;
+}
+
+#home .suggestions .row-content:hover {
+    cursor: pointer;
+}
+
+#home .suggestions .row:nth-child(odd) .row-content {
+    background-color: #e5e5e5;
+}
+
+#home .suggestions .row:last-child {
+    margin-bottom: 1em;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Keyword                                                                                                            */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .suggestions .keyword {
+    min-width: 10em;
+    white-space: nowrap;
+}
+
+#home .suggestions .row:nth-child(odd):not(.selected) .keyword .matched {
+    color: #999999;
+}
+
+#home .suggestions .row:nth-child(even):not(.selected) .keyword .matched {
+    color: #aaaaaa;
+}
+
+#home .suggestions .row.selected .keyword .matched {
+    color: #cccccc;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Favicon                                                                                                            */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .suggestions .favicon {
+    margin: 0 0.5em 0 0.5em;
+    min-width: 1.3em;
+}
+
+#home .suggestions .favicon img {
+    width: 1.1em;
+    height: 1.1em;
+    border: none;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Description                                                                                                        */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .suggestions .description {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+}
+
+#home .suggestions .matched-substring {
+    background-color: #ffff7b;
+}
+
+#home .suggestions .row:nth-child(odd):not(.selected):not(.segment) .more-indicator-text {
+    color: #999999;
+}
+
+#home .suggestions .row:nth-child(even):not(.selected):not(.segment) .more-indicator-text {
+    color: #aaaaaa;
+}
+
+#home .suggestions .row:not(.selected) .more-indicator-key {
+    display: none;
+}
+
+#home .suggestions .row.selected .more-indicator-text {
+    display: none;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Hotkeys                                                                                                            */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .suggestions .description .key,
+#home .suggestions .description .hotkey {
+    display: inline-block;
+    min-width: 1.0em;
+    text-align: center;
+    padding: 0 0.1em 0 0.1em;
+    border: 0px solid #666666;
+    border-radius: 0.25em;
+    margin: 0 0.05em 0 0.05em;
+}
+
+#home .suggestions .description .key,
+#home .suggestions .row:not(.selected) .description .hotkey {
+    border: 1px solid #666666;
+    background-color: white;
+    color: black;
+    border: 1px solid #666666;
+}
+
+#home .suggestions .row.selected .description .hotkey {
+    border: 1px solid #aaaaaa;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Highlighted suggestion                                                                                             */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home>.row.selected+.suggestions>.row:nth-child(odd).match .row-content,
+#home .suggestions>.row.selected .row-content {
+    background: #404040 !important;
+    color: white;
+}
+
+#home .suggestions .selected .keyword .matched {
+    color: #dddddd;
+}
+
+#home .suggestions .selected .matched-substring {
+    color: black;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Fade out suggestions at the bottom                                                                                 */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .suggestions.truncated .row:nth-last-child(4) .row-content {
+    opacity: 0.8;
+}
+
+#home .suggestions.truncated .row:nth-last-child(3) .row-content {
+    opacity: 0.6;
+}
+
+#home .suggestions.truncated .row:nth-last-child(2) .row-content {
+    opacity: 0.4;
+}
+
+#home .suggestions.truncated .row:nth-last-child(1) .row-content {
+    opacity: 0.2;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Notifications                                                                                                      */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#home .notification {
+    width: 100%;
+    padding-left: 2.5em;
+}
+
+#home .notification .header {
+    padding: 0.4em;
+    width: 100%;
+    background-color: #ffafaf;
+    border: 1px solid #ff5b5b;
+}
+
+#home .notification .description {
+    padding: 0.4em;
+    width: 100%;
+    border: 1px solid #ff5b5b;
+    border-top: none;
+}
+
+#home .notification .key {
+    color: black;
+}
+
+#home .notification .welcome p.example>.key:first-child {
+    min-width: 7.5em;
+    display: inline-block;
+}
+
+#home .description.spacing {
+    line-height: 1.5em;
+}

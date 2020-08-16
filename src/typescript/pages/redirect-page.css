@@ -1,0 +1,65 @@
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Overall page layout                                                                                                */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#redirect {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    margin: auto;
+    position: relative;
+    top: 30%;
+}
+
+#redirect>div {
+    max-width: 100%;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Animated icon                                                                                                      */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#redirect .icon {
+    width: 3.5em;
+    height: 3.5em;
+}
+
+#redirect .icon img {
+    width: 2.0em;
+    height: 2.0em;
+    margin-top: 0.1em;
+    animation: icon 0.5s linear 0s infinite alternate;
+}
+
+@keyframes icon {
+    000% {
+        margin-left: 0;
+    }
+    100% {
+        margin-left: 0.7em;
+    }
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Description and URL                                                                                                */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+#redirect .text {
+    padding-top: 0.4em;
+}
+
+#redirect .title {
+    font-size: 1.25em;
+    padding-bottom: 0.3em;
+}
+
+#redirect .url {
+    margin-top: 0.75em;
+    font-size: 0.9em;
+    color: #555555;
+    break-before: always;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40em;
+}
