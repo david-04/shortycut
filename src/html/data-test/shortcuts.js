@@ -59,6 +59,8 @@ var shortcuts = [
     '[gsm] Google street map                                                https://www.google.com.au/maps/%s/@-37.8319768,144.945062,3a,75y,219.55h,69.76t/data=!3m7!1e1!3m5!1sEUCpzGHF7P9_ek0mYagaMw!2e0!6s%2F%2Fgeo3.ggpht.com%2Fcbk%3Fpanoid%3DEUCpzGHF7P9_ek0mYagaMw%26output%3Dthumbnail%26cb_client%3Dmaps_sv.tactile.gps%26thumb%3D2%26w%3D203%26h%3D100%26yaw%3D173.61627%26pitch%3D0%26thumbfov%3D100!7i13312!8i6656',
 
     '[defaultsearchengine] Default search engine                            http:// Default search engine %s',
+
+    '[post] post                                                            http:// ?POST?query=%s',
 ];
 
 var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');

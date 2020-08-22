@@ -103,7 +103,7 @@ namespace shortycut {
                 return replaceAll(
                     this._postFields,
                     config.shortcutFormat.url.searchTermPlaceholder,
-                    this.searchTerm,
+                    encodeURIComponent(this.searchTerm),
                     config.shortcutFormat.keyword.caseSensitive
                 )
                     .split('&')
