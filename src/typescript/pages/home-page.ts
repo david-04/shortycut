@@ -15,7 +15,7 @@ namespace shortycut {
             notification: {
                 self: document.querySelector('#home .notification') as HTMLElement,
                 welcome: document.querySelector('#home .notification .welcome') as HTMLElement,
-                parserErrors: document.querySelector('#home .notification .parser-errors') as HTMLElement,
+                applicationErrors: document.querySelector('#home .notification .application-errors') as HTMLElement,
                 noShortcutsNoError: document.querySelector('#home .notification .no-shortcuts-no-error') as HTMLElement,
                 errorWithBacktickSupport: document.querySelector('#home .notification .error-with-backtick-support') as HTMLElement,
                 errorWithoutBacktickSupport: document.querySelector('#home .notification .error-without-backtick-support') as HTMLElement,
@@ -67,17 +67,16 @@ namespace shortycut {
         }
 
         public populateNotification() {
-            if (startupCache.parserErrors.length) {
-                this.dom.notification.parserErrors.innerHTML = create('div.header',
-                    1 == startupCache.parserErrors.length
-                        ? 'An error occurred while loading the shortcuts'
-                        : 'There were errors while loading the shortcuts'
+            if (startupCache.initializationErrors.length) {
+                this.dom.notification.applicationErrors.innerHTML = create('div.header',
+                    1 == startupCache.initializationErrors.length
+                        ? 'An error occurred during initialization'
+                        : 'Errors occurred during initialization'
                 ).outerHTML;
-                startupCache.parserErrors.map(error => create('div.description', [
-                    create('div', error.description, ':'),
-                    create('div', create('tt', error.line))
-                ])).forEach(element => this.dom.notification.parserErrors.appendChild(element));
-                this.dom.notification.parserErrors.style.display = 'block';
+                startupCache.initializationErrors
+                    .map(error => error.toHtml())
+                    .forEach(element => this.dom.notification.applicationErrors.appendChild(element));
+                this.dom.notification.applicationErrors.style.display = 'block';
             } else if (0 == Object.keys(shortcuts).length) {
                 if (startupCache.exceptions.length) {
                     if (supportsBacktickSyntax()) {

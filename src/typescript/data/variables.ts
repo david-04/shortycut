@@ -26,6 +26,7 @@ namespace shortycut {
     export let redirector = null as any as Redirector;
     export let router = null as any as Router;
     export let faviconManager = null as any as FaviconManager;
+    export let javaScriptLoader = null as any as JavaScriptLoader;
 
     //------------------------------------------------------------------------------------------------------------------
     // Pages
@@ -102,7 +103,7 @@ namespace shortycut {
         exceptions: new Array<ErrorEvent>(),
         config: new Array<object>(),
         shortcuts: new Array<string>(),
-        parserErrors: new Array<ParserError>()
+        initializationErrors: new Array<InitializationError>()
     };
 
     //------------------------------------------------------------------------------------------------------------------

@@ -61,10 +61,14 @@ var shortcuts = [
     '[defaultsearchengine] Default search engine                            http:// Default search engine %s',
 ];
 
-var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/test-data/target.html?');
+var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');
 
 for (var index = 0; index < shortcuts.length; index++) {
     shortcuts[index] = shortcuts[index].replace(/http:\/\/\s+/gi, url);
 }
 
 shortycut.addShortcuts(shortcuts);
+
+shortycut.loadJavaScript('../data-test/shortcuts-01.js').andThen('../data-test/shortcuts-02.js');
+shortycut.loadJavaScript('../data-test/shortcuts-01.js').andThen('../data-test/shortcuts-03.js');
+shortycut.loadJavaScript('../data-test/shortcuts-03.js').andThen('../data-test/shortcuts-02.js');

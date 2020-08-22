@@ -21,4 +21,21 @@ namespace shortycut {
             }
         }
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Load JavaScript files
+    //------------------------------------------------------------------------------------------------------------------
+
+    class JavaScriptDependencyBuilder {
+
+        public constructor(public readonly dependencies: JavaScriptFile[]) { }
+
+        public andThen(...files: string[]) {
+            return new JavaScriptDependencyBuilder(files.map(file => javaScriptLoader.add(file, this.dependencies)));
+        }
+    }
+
+    export function loadJavaScript(...files: string[]) {
+        return new JavaScriptDependencyBuilder([]).andThen(...files);
+    }
 }

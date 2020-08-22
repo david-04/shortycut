@@ -1,9 +1,5 @@
 namespace shortycut {
 
-    export class ParserError {
-        constructor(public readonly description: string, public readonly line: string) { }
-    }
-
     //------------------------------------------------------------------------------------------------------------------
     // Internal data structure for intermediate parser results
     //------------------------------------------------------------------------------------------------------------------
@@ -45,7 +41,7 @@ namespace shortycut {
                         this.parseLineAndStoreShortcut(context, shortcuts);
                     } catch (exception) {
                         if (exception instanceof ParserError) {
-                            startupCache.parserErrors.push(exception);
+                            startupCache.initializationErrors.push(exception);
                         } else {
                             throw exception;
                         }

@@ -1,6 +1,5 @@
 namespace shortycut {
 
-
     //------------------------------------------------------------------------------------------------------------------
     // An exception with pre-rendered HTML
     //------------------------------------------------------------------------------------------------------------------
@@ -48,5 +47,35 @@ namespace shortycut {
         }
         pages.hideAllExcept(pages.error);
         pages.error.show();
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Wrappers for initialization errors
+    //------------------------------------------------------------------------------------------------------------------
+
+    export class InitializationError {
+
+        private readonly htmlElements: HTMLElement[];
+
+        public constructor(...htmlElements: HTMLElement[]) {
+            this.htmlElements = htmlElements;
+        };
+
+        public toHtml() {
+            return create('div.description', this.htmlElements);
+        }
+    }
+
+    export class ScriptLoadingError extends InitializationError {
+        constructor(html: string) {
+            super(create('div:html', html))
+        }
+    }
+
+    export class ParserError extends InitializationError {
+        constructor(public readonly description: string, public readonly line: string) {
+            super(create('div', description, ':'),
+            create('div', create('tt', line)))
+         }
     }
 }

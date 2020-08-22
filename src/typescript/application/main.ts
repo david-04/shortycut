@@ -17,7 +17,12 @@ namespace shortycut {
             addLink('search', 'application/opensearchdescription+xml', 'data/search.xml', 'ShortyCut');
         });
 
-        window.addEventListener('load', () => handleExceptions(displayError, startApplication));
+        javaScriptLoader = new JavaScriptLoader();
+
+        window.addEventListener('load', () => handleExceptions(
+            displayError,
+            () => javaScriptLoader.onComplete(startApplication)
+        ));
     }
 
     //------------------------------------------------------------------------------------------------------------------

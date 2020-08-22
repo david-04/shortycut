@@ -1,4 +1,4 @@
-# ![](img/arrow.svg) Shortcut file format
+# ![](img/arrow.svg) File format
 
 Shortcuts are stored in `shortcuts.js`, a file located inside the `data` folder.
 It can be modified with any text editor.
@@ -43,8 +43,8 @@ shortycut.addShortcuts([
 
     // Add your shortcut definitions here...
 
-    '[sunnies] Sunglasses at eBay  https://www.ebay.com.au/sch/i.html?_nkw=sunglasses',
-    '[ebay]    Search eBay         https://www.ebay.com.au/sch/i.html?_nkw=%s',
+    '[sunnies] Sunglasses   https://www.ebay.com.au/sch/i.html?_nkw=sunglasses',
+    '[ebay]    Search eBay  https://www.ebay.com.au/sch/i.html?_nkw=%s'
 
 ]);
 ```

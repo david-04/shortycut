@@ -16,6 +16,7 @@ nav:
       - Hotkeys: hotkeys.md
       - Grouping: grouping.md
       - Default search engine: default-search-engine.md
+      - Loading separate files: loading-separate-files.md
   - Browser integration:
     - Overview: browser-integration.md
     - Homepage: homepage.md
@@ -24,6 +25,7 @@ nav:
   - Miscellaneous:
     - Configuration: configuration.md
     - Favicons: favicons.md
+    - API: api.md
     - License: license.md
     - Release notes: release-notes.md
 
