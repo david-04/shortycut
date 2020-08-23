@@ -63,6 +63,15 @@ namespace shortycut {
             if (result instanceof Exception) {
                 throw result;
             } else {
+                if (queryParameters.facets.newTabs) {
+                    const links = document.getElementsByTagName('a');
+                    for (let index = 0; index < links.length; index++) {
+                        const link = links.item(index);
+                        if (link) {
+                            link.target = '_blank';
+                        }
+                    }
+                }
                 redirector.processQuery();
             }
         }));

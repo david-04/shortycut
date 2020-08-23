@@ -127,14 +127,24 @@ namespace shortycut {
         }
 
         public onShortyCut(event: MouseEvent) {
-            window.location.href = 'https://github.com/david-04/shortycut';
+            this.closeMenu();
+            const url = 'https://github.com/david-04/shortycut';
+            if (queryParameters.facets.newTabs) {
+                window.open(url);
+            } else {
+                window.location.href = url;
+            }
             return this.cancelEvent(event);
         }
 
         public onDocumentation(event: MouseEvent) {
             this.closeMenu();
-            window.location.href = window.location.href.replace(/[#?].*/, '').replace(/\/?[^\/]+\.[^\/]+$/, '')
-                + '/resources/docs/index.html';
+            const url = window.location.href.replace(/[#?].*/, '').replace(/\/?[^\/]+\.[^\/]+$/, '') + '/resources/docs/index.html';
+            if (queryParameters.facets.newTabs) {
+                window.open(url);
+            } else {
+                window.location.href = url;
+            }
             return this.cancelEvent(event);
         }
 
