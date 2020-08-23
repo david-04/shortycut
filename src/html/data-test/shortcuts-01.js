@@ -1,4 +1,3 @@
-console.log('<shortcuts-01>');
-shortycut.addShortcuts('[dummy1] Dummy 1 https://www.dummy.com/');
-// for (let x = ''; x.length < 10000000; x += 'x');
-console.log('</shortcuts-01>');
+// console.log('Start shortcuts-03');
+shortycut.addShortcuts('[included3] Included 1  https://www.included-1.com/');
+// console.log('End shortcuts-03');

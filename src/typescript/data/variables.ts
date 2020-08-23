@@ -27,6 +27,7 @@ namespace shortycut {
     export let router = null as any as Router;
     export let faviconManager = null as any as FaviconManager;
     export let javaScriptLoader = null as any as JavaScriptLoader;
+    export let hotkeySelector = null as any as HotkeySelector;
 
     //------------------------------------------------------------------------------------------------------------------
     // Pages
@@ -116,5 +117,6 @@ namespace shortycut {
         redirector = new Redirector();
         router = new Router();
         faviconManager = new FaviconManager();
+        hotkeySelector = new HotkeySelector();
     }
 }

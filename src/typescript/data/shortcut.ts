@@ -322,31 +322,9 @@ namespace shortycut {
         }
 
         private autoDetectHotkeys(description: string, keyword: string, hotkeysMatched: number) {
-
-            let result = '';
-            let remainingDescription = description;
-            for (let index = 0; index < keyword.length; index++) {
-                let hotkey = keyword.charAt(index);
-                let position = adjustCase(remainingDescription).indexOf(adjustCase(hotkey));
-                if (0 <= position) {
-                    const style = hotkeysMatched <= index ? '.hotkey' : '';
-                    result += remainingDescription.substr(0, position)
-                        + create(`span${style}`, sanitize(remainingDescription.charAt(position))).outerHTML;
-                    remainingDescription = remainingDescription.substr(position + 1);
-                } else {
-                    if (config.homepage.suggestions.showKeywords) {
-                        return sanitize(description);
-                    } else {
-                        result += remainingDescription + ' ';
-                        do {
-                            const style = hotkeysMatched <= index ? '.hotkey' : '';
-                            result += create(`span${style}`, sanitize(keyword.charAt(index))).outerHTML;
-                        } while (++index < keyword.length);
-                        return result;
-                    }
-                }
-            }
-            return result + remainingDescription;
+            return hotkeySelector.selectHotkeys(keyword, description, hotkeysMatched)
+                .map(item => item.isHotkey ? create('span.hotkey', item.text).outerHTML : sanitize(item.text))
+                .join('');
         }
     }
 

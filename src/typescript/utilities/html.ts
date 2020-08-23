@@ -25,9 +25,6 @@ namespace shortycut {
 
         const properties = ElementProperties.of(type);
         const element = document.createElement(properties.tag);
-        // if ('img' === properties.tag) {
-        //     (element as HTMLImageElement).src = 'resources/arrow.svg';
-        // }
         element.className = properties.className;
         return applyCreateProperties(!element.classList.contains('html'), element, ...args);
     }
