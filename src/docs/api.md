@@ -2,7 +2,7 @@
 
 ShortyCut provides functions that can be used to interact with it through JavaScript code.
 
-# ![](img/arrow.svg) addShortcuts()
+## ![](img/arrow.svg) addShortcuts()
 
 This function is used to add shortcut definitions.
 They can be passed as a multi-line string with one shortcut per line:
@@ -27,7 +27,7 @@ shortycut.addShortcuts([
 
 See "[File format](file-format.md)" and "[Shortcut syntax](shortcut-syntax.md)" for further details.
 
-# ![](img/arrow.svg) configure()
+## ![](img/arrow.svg) configure()
 
 This function is used to override (some or all of) ShortyCut's built-in default settings:
 
@@ -45,7 +45,7 @@ The supported options are described in "[Configuration](configuration.md)".
 It is not necessary to pass all of them and the function can be called multiple times.
 When modifying the same settings, subsequent calls override previous ones.
 
-# ![](img/arrow.svg) loadJavaScript()
+## ![](img/arrow.svg) loadJavaScript()
 
 This function is used to load additional JavaScript files.
 It can be called repeatedly and accepts multiple files as well.
@@ -61,3 +61,27 @@ shortycut.loadJavaScript('shared-shortcuts.js', 'tools.js')
 Files are loaded from (or relative to) ShortyCut's `data` folder,
 unless a complete URL (including a protocol like `https://` or `file://`) is passed.
 See "[Loading separate files](loading-separate-files.md)" for further details.
+
+## ![](img/arrow.svg) toUrl()
+
+This function is used to register a dynamic link function.
+It returns a virtual link that can be used like any other URL when defining shortcuts:
+
+```javascript
+function mkDocsIssues(searchTerm) {
+    if (searchTerm.trim().match(/^[0-9]+$/)) {
+        return 'https://github.com/mkdocs/mkdocs/issues/%s';
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+    }
+}
+
+var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
+
+shortycut.addShortcuts(`
+    [mkdi]  MkDocs » Issues  ${ mkDocsIssuesUrl }
+`);
+```
+
+When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.
+See "[Dynamic links](dynamic-links.md)" for details.

@@ -10,7 +10,7 @@ For example, if the shortcut `e` performs a product search on eBay, then a searc
 The dedicated keyword for ShortyCut allows it to be used on a case-by-case basis when needed,
 while preserving the address bar's default behavior for everything else.
 
-# ![](img/arrow.svg) Firefox
+## ![](img/arrow.svg) Firefox
 
 To create a keyword query in Firefox, open the browser integration page via the homepage's menu:
 
@@ -31,7 +31,7 @@ create a new bookmark and assign the keyword there:
 
 The keyword can also be changed later in the properties' dialog when editing the bookmark.
 
-# ![](img/arrow.svg) Chrome
+## ![](img/arrow.svg) Chrome
 
 To create a keyword query in Chrome, open the browser integration page via the homepage's menu:
 

@@ -20,7 +20,7 @@ shortycut
 After renaming the folder, open `index.html` in your browser (e.g. by double-clicking on it).
 If you see ShortyCut's homepage, the installation is complete.
 
-# ![](img/arrow.svg) Customization
+## ![](img/arrow.svg) Customization
 
 After installing ShortyCut, you need to add your own links and keywords.
 This is done by editing `shortcuts.js` in the `data` folder.
@@ -37,7 +37,7 @@ See "[Configuration](configuration.md)" for details.
 Finally, browse through the other pages of the manual.
 They cover a variety of different aspects that will help you to make the most of ShortyCut.
 
-# ![](img/arrow.svg) Upgrading
+## ![](img/arrow.svg) Upgrading
 
 When upgrading to a newer version, your shortcuts and settings are preserved.
 However, in case something does go wrong, it's always advisable to create a backup copy of the `data` folder first.

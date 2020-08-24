@@ -4,12 +4,14 @@
 
 - Added the ability to [load additional JavaScript files](loading-separate-files.md),
   so that large shortcut collections can be spread across multiple files
+- Added support for [dynamic links](dynamic-links.md),
+  which allow keywords to redirect to different pages based on the search term
 - Improved the way how [hotkeys](hotkeys.md) are selected,
   favoring letters that are uppercase or appear at the beginning of words
-- Improved the homepage's ["pinned tab"](homepage.md) behavior
+- Improved the homepage's ability to lock itself to a [pinned browser tab](homepage.md)
   by opening links to the manual in new tabs
 - Fixed an issue that could cause [POST links](post-links.md) to fail or send wrong data
-  if the search term contained special characters (like `&` or `%`)
+  if the search term contained special characters like `&` or `%`
 
 ## Version 1.0 / 2020-08-16
 

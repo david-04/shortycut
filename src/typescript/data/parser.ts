@@ -15,6 +15,7 @@ namespace shortycut {
         public isStandardProtocol: boolean = false;
         public onMultiLink: OnMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
         public postFields?: string;
+        public linkGeneratorFunction?: LinkGeneratorFunction;
 
         // re-usable components (garbage collection performance tuning)
         public combination = new Array<number>();
@@ -25,6 +26,9 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export class ShortcutParser {
+
+        private KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', linkGeneratorFunctionProtocol];
+        private KNOWN_PROTOCOLS_REGEXP = new RegExp(`(${this.KNOWN_PROTOCOLS.join('|')})://.*\$`, 'i');
 
         //--------------------------------------------------------------------------------------------------------------
         // Parse all shortcut definitions
@@ -82,9 +86,23 @@ namespace shortycut {
                 if (keyword) {
                     const sections = keywords[keyword];
                     if (shortcuts[keyword]) {
-                        shortcuts[keyword].addLink(keyword, sections, context.onMultiLink, context.url, context.postFields)
+                        shortcuts[keyword].addLink(
+                            keyword,
+                            sections,
+                            context.onMultiLink,
+                            context.url,
+                            context.postFields,
+                            context.linkGeneratorFunction
+                        );
                     } else {
-                        shortcuts[keyword] = new Shortcut(keyword, sections, context.onMultiLink, context.url, context.postFields);
+                        shortcuts[keyword] = new Shortcut(
+                            keyword,
+                            sections,
+                            context.onMultiLink,
+                            context.url,
+                            context.postFields,
+                            context.linkGeneratorFunction
+                        );
                     }
                     if (keyword === config.defaultSearchEngine.keyword) {
                         defaultSearchEngine = shortcuts[keyword];
@@ -106,7 +124,7 @@ namespace shortycut {
 
         private splitDescriptionAndUrl(context: ParserContext) {
 
-            let url = context.line.match(/(file|ftp|http|https):\/\/.*$/i);
+            let url = context.line.match(this.KNOWN_PROTOCOLS_REGEXP);
             context.isStandardProtocol = !!url;
             url = url || context.line.match(/[a-z]+:\/\/.*$/i);
             if (!url) {
@@ -115,8 +133,20 @@ namespace shortycut {
                     context.line
                 );
             }
-            context.url = url[0];
+            context.url = url[0].trim();
             context.description = context.line.substr(0, context.line.length - url[0].length);
+
+            if (0 === context.url.indexOf(linkGeneratorFunctionProtocol)) {
+                context.linkGeneratorFunction = startupCache.linkGeneratorFunctions[context.url]
+                if (!context.linkGeneratorFunction) {
+                    throw new ParserError(
+                        'The function link created via shortycut.toUrl() must be at the end of the line',
+                        context.line
+                    );
+                }
+            } else {
+                context.linkGeneratorFunction = undefined;
+            }
         }
 
         //--------------------------------------------------------------------------------------------------------------

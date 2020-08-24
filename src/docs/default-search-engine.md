@@ -4,7 +4,7 @@ ShortyCut's primary purpose is to open bookmarked pages through the use of keywo
 But it also serves as an entry point for general web searches.
 Input that does not match any keyword is forwarded to a search engine.
 
-# ![](img/arrow.svg) Changing the search engine
+## ![](img/arrow.svg) Changing the search engine
 
 By default, ShortyCut uses DuckDuckGo for web searches.
 It can be switched to any other search engine by adding a shortcut with the keyword `defaultsearchengine`.
@@ -36,7 +36,7 @@ shortycut.configure({
 
 In this example, the shortcut with the keyword `g` (Google) is set up as the default search engine.
 
-# ![](img/arrow.svg) Disabling the search engine
+## ![](img/arrow.svg) Disabling the search engine
 
 The default search engine can be disabled to enforce the use of keywords at all times.
 This can be done individually for the browser's address bar and ShortyCut's homepage

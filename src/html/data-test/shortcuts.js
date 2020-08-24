@@ -1,4 +1,29 @@
+function dynamicLink(searchTerm) {
+    var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');
+    if (searchTerm.match(/^[0-9]+$/)) {
+        return url + 'Dynamic: Numbers only';
+    } else if (searchTerm.match(/^[a-z]+$/i)) {
+        return url + 'Dynamic: Letters only';
+    } else {
+        return url + 'Dynamic: Mixed content';
+    }
+}
+
+function mkDocsIssues(searchTerm) {
+    if (searchTerm.match(/^[0-9]+$/)) {
+        return 'https://github.com/mkdocs/mkdocs/issues/%s';
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+    }
+}
+
+var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
+
 var shortcuts = [
+
+    '[d] Dynamic                                                        ' + shortycut.toUrl(dynamicLink),
+    '[mkdi] MkDocs issues                                                   http:// MkDocs Issues listing',
+    '[mkdi] MkDocs issues                                               ' + mkDocsIssuesUrl,
 
     '[s] Search                                                             http:// Search (%s)',
     '[s] Search [m] Map                                                     http:// Search map (%s)',

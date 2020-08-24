@@ -43,9 +43,11 @@ namespace shortycut {
             public readonly segments: Segments,
             public readonly onMultiLink: OnMultiLink,
             private _url: string,
-            private _postFields?: string
+            private _postFields?: string,
+            private readonly linkGeneratorFunction?: LinkGeneratorFunction
         ) {
-            if (0 <= adjustCase(this._url).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
+            if (linkGeneratorFunction
+                || 0 <= adjustCase(this._url).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
                 || 0 <= adjustCase(this._postFields ?? '').indexOf(config.shortcutFormat.url.searchTermPlaceholder)) {
                 this.type = 'query';
             } else {
@@ -55,7 +57,7 @@ namespace shortycut {
 
         public get url() {
             return replaceAll(
-                this._url,
+                this.linkGeneratorFunction ? this.linkGeneratorFunction(this.searchTerm) : this._url,
                 config.shortcutFormat.url.searchTermPlaceholder,
                 encodeURIComponent(this.searchTerm || ''),
                 config.shortcutFormat.keyword.caseSensitive
@@ -89,7 +91,7 @@ namespace shortycut {
                     + `&${QueryParameters.INDEX}=${this.index}`;
             } else {
                 return replaceAll(
-                    this._url,
+                    this.linkGeneratorFunction ? this.linkGeneratorFunction(this.searchTerm) : this._url,
                     config.shortcutFormat.url.searchTermPlaceholder,
                     encodeURIComponent(searchTerm),
                     config.shortcutFormat.keyword.caseSensitive
@@ -355,13 +357,29 @@ namespace shortycut {
             segments: Segment[],
             onMultiLink: OnMultiLink,
             url: string,
-            postParameters?: string
+            postParameters?: string,
+            linkGeneratorFunction?: LinkGeneratorFunction
         ) {
-            this.addLink(keyword, segments, onMultiLink, url, postParameters);
+            this.addLink(keyword, segments, onMultiLink, url, postParameters, linkGeneratorFunction);
         }
 
-        public addLink(keyword: string, segments: Segment[], onMultiLink: OnMultiLink, url: string, postParameters?: string) {
-            const link = new Link(keyword, this.all.length, new Segments(segments), onMultiLink, url, postParameters);
+        public addLink(
+            keyword: string,
+            segments: Segment[],
+            onMultiLink: OnMultiLink,
+            url: string,
+            postParameters?: string,
+            linkGeneratorFunction?: LinkGeneratorFunction
+        ) {
+            const link = new Link(
+                keyword,
+                this.all.length,
+                new Segments(segments),
+                onMultiLink,
+                url,
+                postParameters,
+                linkGeneratorFunction
+            );
             if ('query' === link.type) {
                 this._queries = this.createOrAdd(link, this._queries);
             } else {

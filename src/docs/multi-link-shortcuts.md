@@ -31,7 +31,7 @@ This can also be set as the default behavior in the
 causing ShortyCut to always open new tabs without showing the list first.
 On top of that, each shortcut can override the default behavior and enforce to either show the list or open new tabs.
 
-# ![](img/arrow.svg) Show a list
+## ![](img/arrow.svg) Show a list
 
 A question mark (`?`) in front of links causes the keyword to always show the list:
 
@@ -44,7 +44,7 @@ A question mark (`?`) in front of links causes the keyword to always show the li
 
 In this example, the `news` keyword will always show the list, even if the default behavior is set to open new tabs.
 
-# ![](img/arrow.svg) Open new tabs
+## ![](img/arrow.svg) Open new tabs
 
 A caret (`^`) in front of links causes the keyword to always open new tabs:
 
@@ -57,7 +57,7 @@ A caret (`^`) in front of links causes the keyword to always open new tabs:
 
 In this example, the `news` keyword will always open new tabs, even if the default behavior is set to show the list.
 
-# ![](img/arrow.svg) Ignore previous links
+## ![](img/arrow.svg) Ignore previous links
 
 An equals sign (`=`) in front of a link causes all previous links to be discarded:
 
@@ -77,7 +77,7 @@ It can be used to override individual keywords when importing shared shortcut co
 It can also be used to temporarily redirect or repurpose a keyword,
 without having to delete (and later restore) the current set of links.
 
-# ![](img/arrow.svg) Mixing behaviors
+## ![](img/arrow.svg) Mixing behaviors
 
 The equals sign (`=`) always causes the previous links to be discarded.
 The behavior for the remaining shortcuts is determined only by the last link.

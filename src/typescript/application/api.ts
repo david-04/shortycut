@@ -13,6 +13,7 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function addShortcuts(...shortcuts: (string | string[])[]) {
+
         for (let item of shortcuts) {
             if (Array.isArray(item)) {
                 item.forEach(item => startupCache.shortcuts.push(item));
@@ -20,6 +21,18 @@ namespace shortycut {
                 startupCache.shortcuts.push(item);
             }
         }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Create a virtual URL that points to a function which dynamically generates the actual link at runtime
+    //------------------------------------------------------------------------------------------------------------------
+
+    export function toUrl(linkGeneratorFunction: LinkGeneratorFunction) {
+
+        const index = Object.keys(startupCache.linkGeneratorFunctions).length + 1;
+        const key = `${linkGeneratorFunctionProtocol}://${index}-${Math.random()}`;
+        startupCache.linkGeneratorFunctions[key] = linkGeneratorFunction;
+        return key;
     }
 
     //------------------------------------------------------------------------------------------------------------------
