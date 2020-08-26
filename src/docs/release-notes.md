@@ -12,6 +12,8 @@
   by opening links to the manual in new tabs
 - Fixed an issue that could cause [POST links](post-links.md) to fail or send wrong data
   if the search term contained special characters like `&` or `%`
+- Fixed an issue with the homepage's [no-focus mode](homepage.md)
+  where control keys like `Alt` and `Ctrl` would still put the focus on the input field
 
 ## Version 1.0 / 2020-08-16
 

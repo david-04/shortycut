@@ -160,11 +160,17 @@ namespace shortycut {
                     || 'segment' === this.suggestions[this.selectedIndex].type
                 );
 
-            this.dom.filter.focus();
+            if (!queryParameters.facets.noFocus) {
+                this.dom.filter.focus();
+            }
 
             if ('Escape' === event.key || 'Esc' === event.key) {
                 if (queryParameters.facets.noFocus) {
-                    this.removeFocus();
+                    if (this.dom.filter.value) {
+                        this.clearFilter();
+                    } else {
+                        this.removeFocus();
+                    }
                 } else {
                     this.clearFilter();
                 }
