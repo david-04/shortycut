@@ -242,6 +242,13 @@ release : build/$(SHORTYCUT_ZIP)
 	mv docs/demo/resources/docs/* docs/
 	rm -r $(patsubst %, docs/demo/%, resources/docs data/favicons)
 	rm $(patsubst %, docs/demo/%, resources/web-server.bat resources/web-server.jar)
+	echo docs/demo/data/settings.s
+	cat docs/demo/data/settings.js \
+		| tr '\n' '\a' \
+		| sed "s|faviconFolders\s*:\s*\[[^]]*\]|faviconFolders: []|g" \
+		| tr '\a' '\n' \
+		> docs/demo/data/settings.js.tmp
+	mv -f docs/demo/data/settings.js.tmp docs/demo/data/settings.js
 	echo docs/demo/resources/shortycut.js
 	cat docs/demo/resources/shortycut.js \
 		| sed "s|resources/docs|..|g" \

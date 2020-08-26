@@ -30,7 +30,7 @@ shortycut.configure({
             showKeywords: true,
             showHotkeys: true,
             showFavicons: true,
-            faviconFolders: ['data/favicons'],
+            faviconFolders: ['data/favicons']
         }
     },
     defaultSearchEngine: {
