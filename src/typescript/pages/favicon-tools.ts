@@ -41,7 +41,7 @@ namespace shortycut {
 
             for (const keyword of Object.keys(shortcuts)) {
                 for (const link of shortcuts[keyword].all.map(item => item.link)) {
-                    const { protocol, domain } = FaviconManager.extractProtocolAndDomain(link.url);
+                    const { protocol, domain } = FaviconManager.extractProtocolAndDomain(link.urlForFavicon);
                     if ('file' !== protocol && 'https' !== this.domains.pending[domain]) {
                         this.domains.pending[domain] = protocol;
                     }

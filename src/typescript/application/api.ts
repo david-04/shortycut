@@ -27,12 +27,50 @@ namespace shortycut {
     // Create a virtual URL that points to a function which dynamically generates the actual link at runtime
     //------------------------------------------------------------------------------------------------------------------
 
-    export function toUrl(linkGeneratorFunction: LinkGeneratorFunction) {
+    export function toUrl(dynamicLinkFunction: DynamicLinkFunction) {
 
-        const index = Object.keys(startupCache.linkGeneratorFunctions).length + 1;
-        const key = `${linkGeneratorFunctionProtocol}://${index}-${Math.random()}`;
-        startupCache.linkGeneratorFunctions[key] = linkGeneratorFunction;
+        if ('function' !== typeof dynamicLinkFunction) {
+            startupCache.initializationErrors.push(new InitializationError(
+                create('div', 'The parameter passed to shortycut.toUrl() is not a function:'),
+                create('div', create('tt', `${dynamicLinkFunction}`)))
+            );
+        }
+
+        const key = `${dynamicLinkProtocol}://${Object.keys(startupCache.dynamicLinks).length}-${Math.random()}`;
+        startupCache.dynamicLinks[key] = {
+            generator: dynamicLinkFunction,
+            urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
+        };
         return key;
+    }
+
+    function getUrlForFavicon(dynamicLinkFunction: DynamicLinkFunction) {
+
+        let invalidUrl: string | undefined = undefined;
+
+        for (let searchTerm of [undefined, null, '', '1']) {
+            try {
+                const url = dynamicLinkFunction(searchTerm as any)?.trim();
+                if (url) {
+                    if (isUrl(url)) {
+                        return url;
+                    } else if (!invalidUrl) {
+                        invalidUrl = `${(dynamicLinkFunction as any)?.name || 'function'}(${
+                            undefined === searchTerm || null === searchTerm ? `${searchTerm}` : `'${searchTerm}'`
+                            }) => ${url}`;
+                    }
+                }
+            } catch (ignored) { }
+        }
+
+        if (invalidUrl) {
+            startupCache.initializationErrors.push(new InitializationError(
+                create('div', 'The dynamic link function returned an invalid URL.'),
+                create('div', create('tt', invalidUrl)))
+            );
+        }
+
+        return 'file:///';
     }
 
     //------------------------------------------------------------------------------------------------------------------

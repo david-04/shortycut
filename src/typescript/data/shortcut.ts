@@ -3,6 +3,9 @@ namespace shortycut {
     export type LinkType = 'query' | 'bookmark';
     export type ShortcutType = LinkType | 'both';
 
+    export type DynamicLinkFunction = (searchTerm: string) => string;
+    export type DynamicLink = { generator: DynamicLinkFunction, urlForFavicon: string };
+
     //------------------------------------------------------------------------------------------------------------------
     // Action to be taken if a keyword has multiple links
     //------------------------------------------------------------------------------------------------------------------
@@ -42,12 +45,11 @@ namespace shortycut {
             public readonly index: number,
             public readonly segments: Segments,
             public readonly onMultiLink: OnMultiLink,
-            private _url: string,
-            private _postFields?: string,
-            private readonly linkGeneratorFunction?: LinkGeneratorFunction
+            private urlOrDynamicLink: string | DynamicLink,
+            private _postFields?: string
         ) {
-            if (linkGeneratorFunction
-                || 0 <= adjustCase(this._url).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
+            if ('string' !== typeof this.urlOrDynamicLink
+                || 0 <= adjustCase(this.urlOrDynamicLink).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
                 || 0 <= adjustCase(this._postFields ?? '').indexOf(config.shortcutFormat.url.searchTermPlaceholder)) {
                 this.type = 'query';
             } else {
@@ -57,11 +59,19 @@ namespace shortycut {
 
         public get url() {
             return replaceAll(
-                this.linkGeneratorFunction ? this.linkGeneratorFunction(this.searchTerm) : this._url,
+                'string' === typeof this.urlOrDynamicLink
+                    ? this.urlOrDynamicLink
+                    : this.urlOrDynamicLink.generator(this.searchTerm),
                 config.shortcutFormat.url.searchTermPlaceholder,
                 encodeURIComponent(this.searchTerm || ''),
                 config.shortcutFormat.keyword.caseSensitive
             );
+        }
+
+        public get urlForFavicon() {
+            return 'string' === typeof (this.urlOrDynamicLink)
+                ? this.urlOrDynamicLink
+                : this.urlOrDynamicLink.urlForFavicon;
         }
 
         public get overridden() {
@@ -90,12 +100,7 @@ namespace shortycut {
                     + `?${QueryParameters.QUERY}=${query}`
                     + `&${QueryParameters.INDEX}=${this.index}`;
             } else {
-                return replaceAll(
-                    this.linkGeneratorFunction ? this.linkGeneratorFunction(this.searchTerm) : this._url,
-                    config.shortcutFormat.url.searchTermPlaceholder,
-                    encodeURIComponent(searchTerm),
-                    config.shortcutFormat.keyword.caseSensitive
-                );
+                return this.url;
             }
         }
 
@@ -356,29 +361,26 @@ namespace shortycut {
             public readonly keyword: string,
             segments: Segment[],
             onMultiLink: OnMultiLink,
-            url: string,
-            postParameters?: string,
-            linkGeneratorFunction?: LinkGeneratorFunction
+            urlOrDynamicLink: string | DynamicLink,
+            postParameters?: string
         ) {
-            this.addLink(keyword, segments, onMultiLink, url, postParameters, linkGeneratorFunction);
+            this.addLink(keyword, segments, onMultiLink, urlOrDynamicLink, postParameters);
         }
 
         public addLink(
             keyword: string,
             segments: Segment[],
             onMultiLink: OnMultiLink,
-            url: string,
-            postParameters?: string,
-            linkGeneratorFunction?: LinkGeneratorFunction
+            urlOrDynamicLink: string | DynamicLink,
+            postParameters?: string
         ) {
             const link = new Link(
                 keyword,
                 this.all.length,
                 new Segments(segments),
                 onMultiLink,
-                url,
-                postParameters,
-                linkGeneratorFunction
+                urlOrDynamicLink,
+                postParameters
             );
             if ('query' === link.type) {
                 this._queries = this.createOrAdd(link, this._queries);

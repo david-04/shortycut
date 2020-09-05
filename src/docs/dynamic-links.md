@@ -103,5 +103,45 @@ shortycut.addShortcuts([
 ]);
 ```
 
-With these shortcuts in place, there's only keyword to be remembered.
+With these shortcuts in place, there's only keyword to remember.
 Depending on the search term (if any), it opens the right page straight away.
+
+## ![](img/arrow.svg) Favicons
+
+ShortyCut shows favicons on its homepage, if the configuration property
+[showFavicons](configuration.md#homepagesuggestionsshowfavicons) is set to `true`:
+
+![](img/favicons-suggestions.png)
+
+For dynamic links, ShortyCut selects the favicon based on a sample URL,
+which it retrieves by passing the following search terms to the dynamic link function:
+
+- `undefined`
+- `null`
+- `''` (empty string)
+- `'1'` (as a string)
+
+Exceptions are discarded silently and the first valid URL returned is used to determine the favicon.
+Although usually not needed, a preferred domain can be nominated by returning a corresponding link
+when the search term is `null` or `undefined`:
+
+```javascript
+function mkDocsIssues(searchTerm) {
+
+    if (undefined === searchTerm) {
+        return 'https://www.mkdocs.org/';
+    }
+
+    if (searchTerm.trim().match(/^[0-9]+$/)) {
+        return 'https://github.com/mkdocs/mkdocs/issues/%s';
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+    }
+}
+```
+
+This dynamic link redirects all queries to one of two GitHub pages,
+but uses the favicon of MkDoc's homepage (rather than the one from GibHub).
+
+There is no need to map the search term `null` or `undefined` to a dedicated URL,
+unless the favicon of the links returned by the function anyway (GitHub in the example above) are unsuitable.

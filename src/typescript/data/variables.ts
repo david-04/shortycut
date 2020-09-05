@@ -100,15 +100,14 @@ namespace shortycut {
     // Data collected during the start-up phase
     //------------------------------------------------------------------------------------------------------------------
 
-    export type LinkGeneratorFunction = (searchTerm: string) => string;
-    export const linkGeneratorFunctionProtocol = 'function';
+    export const dynamicLinkProtocol = 'function';
 
     export const startupCache = {
         exceptions: new Array<ErrorEvent>(),
         config: new Array<object>(),
         shortcuts: new Array<string>(),
         initializationErrors: new Array<InitializationError>(),
-        linkGeneratorFunctions: {} as {[index : string] : LinkGeneratorFunction}
+        dynamicLinks: {} as { [index: string]: DynamicLink }
     };
 
     //------------------------------------------------------------------------------------------------------------------

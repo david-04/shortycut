@@ -308,7 +308,7 @@ namespace shortycut {
                             ? create('div.keyword:html', suggestion.keywordHtml)
                             : '',
                         config.homepage.suggestions.showFavicons
-                            ? faviconManager.createFavicon(suggestion.shortcut.all[0].link.url)
+                            ? faviconManager.createFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
                             : '',
                         create('div.description:html', this.getDescription(suggestion))
                     ], rowContent => rowContent.addEventListener('click', (event: MouseEvent) => {

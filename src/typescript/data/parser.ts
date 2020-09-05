@@ -11,11 +11,10 @@ namespace shortycut {
 
         // extracted components
         public description: string = '';
-        public url: string = '';
+        public urlOrDynamicLink: string | DynamicLink = '';
         public isStandardProtocol: boolean = false;
         public onMultiLink: OnMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
         public postFields?: string;
-        public linkGeneratorFunction?: LinkGeneratorFunction;
 
         // re-usable components (garbage collection performance tuning)
         public combination = new Array<number>();
@@ -27,7 +26,7 @@ namespace shortycut {
 
     export class ShortcutParser {
 
-        private KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', linkGeneratorFunctionProtocol];
+        private KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', dynamicLinkProtocol];
         private KNOWN_PROTOCOLS_REGEXP = new RegExp(`(${this.KNOWN_PROTOCOLS.join('|')})://.*\$`, 'i');
 
         //--------------------------------------------------------------------------------------------------------------
@@ -90,18 +89,16 @@ namespace shortycut {
                             keyword,
                             sections,
                             context.onMultiLink,
-                            context.url,
-                            context.postFields,
-                            context.linkGeneratorFunction
+                            context.urlOrDynamicLink,
+                            context.postFields
                         );
                     } else {
                         shortcuts[keyword] = new Shortcut(
                             keyword,
                             sections,
                             context.onMultiLink,
-                            context.url,
-                            context.postFields,
-                            context.linkGeneratorFunction
+                            context.urlOrDynamicLink,
+                            context.postFields
                         );
                     }
                     if (keyword === config.defaultSearchEngine.keyword) {
@@ -133,19 +130,18 @@ namespace shortycut {
                     context.line
                 );
             }
-            context.url = url[0].trim();
+
+            context.urlOrDynamicLink = url[0].trim();
             context.description = context.line.substr(0, context.line.length - url[0].length);
 
-            if (0 === context.url.indexOf(linkGeneratorFunctionProtocol)) {
-                context.linkGeneratorFunction = startupCache.linkGeneratorFunctions[context.url]
-                if (!context.linkGeneratorFunction) {
+            if (0 === context.urlOrDynamicLink.indexOf(dynamicLinkProtocol)) {
+                context.urlOrDynamicLink = startupCache.dynamicLinks[context.urlOrDynamicLink]
+                if (!context.urlOrDynamicLink) {
                     throw new ParserError(
-                        'The function link created via shortycut.toUrl() must be at the end of the line',
+                        'The dynamic link created via shortycut.toUrl() must be at the end of the line',
                         context.line
                     );
                 }
-            } else {
-                context.linkGeneratorFunction = undefined;
             }
         }
 
@@ -160,9 +156,11 @@ namespace shortycut {
             for (let pass = 0; pass < 2; pass++) {
                 for (const onMultiLink of OnMultiLink.values) {
                     let symbol = (multiLinkIndicator as any)[onMultiLink.key] as string;
-                    if (!pass && context.isStandardProtocol && startsWith(context.url, symbol)) {
+                    if (!pass && context.isStandardProtocol
+                        && 'string' === typeof context.urlOrDynamicLink
+                        && startsWith(context.urlOrDynamicLink, symbol)) {
                         context.onMultiLink = onMultiLink;
-                        context.url = context.url.substr(symbol.length).trim();
+                        context.urlOrDynamicLink = context.urlOrDynamicLink.substr(symbol.length).trim();
                         return;
                     } else if (pass && endsWith(context.description, symbol)) {
                         context.description = context.description.substr(0, context.description.length - symbol.length).trim();
@@ -181,13 +179,15 @@ namespace shortycut {
 
         private parsePostFields(context: ParserContext) {
 
-            const separator = config.shortcutFormat.url.postIndicator;
-            let index = separator ? adjustCase(context.url).indexOf(separator) : -1;
-            if (separator && 0 <= index) {
-                context.postFields = context.url.substr(index + separator.length);
-                context.url = context.url.substr(0, index);
-            } else {
-                context.postFields = undefined;
+            context.postFields = undefined;
+
+            if ('string' === typeof context.urlOrDynamicLink) {
+                const separator = config.shortcutFormat.url.postIndicator;
+                let index = separator ? adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
+                if (separator && 0 <= index) {
+                    context.postFields = context.urlOrDynamicLink.substr(index + separator.length);
+                    context.urlOrDynamicLink = context.urlOrDynamicLink.substr(0, index);
+                }
             }
         }
 

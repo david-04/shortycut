@@ -4,8 +4,7 @@ ShortyCut provides functions that can be used to interact with it through JavaSc
 
 ## ![](img/arrow.svg) addShortcuts()
 
-This function is used to add shortcut definitions.
-They can be passed as a multi-line string with one shortcut per line:
+Add shortcut definitions, for example as a multi-line string with one shortcut per line:
 
 ```javascript
 shortycut.addShortcuts(`
@@ -29,7 +28,7 @@ See "[File format](file-format.md)" and "[Shortcut syntax](shortcut-syntax.md)" 
 
 ## ![](img/arrow.svg) configure()
 
-This function is used to override (some or all of) ShortyCut's built-in default settings:
+Override (some or all of) ShortyCut's built-in default settings:
 
 ```javascript
 shortycut.configure({
@@ -47,9 +46,9 @@ When modifying the same settings, subsequent calls override previous ones.
 
 ## ![](img/arrow.svg) loadJavaScript()
 
-This function is used to load additional JavaScript files.
-It can be called repeatedly and accepts multiple files as well.
-They are all loaded in parallel, i.e. the order is unpredictable.
+Load additional JavaScript files.
+This function can be called repeatedly and accepts multiple files.
+All files - including separate calls to `loadJavaScript()` - are loaded in parallel, i.e. the order is unpredictable.
 This can be changed by using `andThen()` to model dependencies:
 
 ```
@@ -64,8 +63,8 @@ See "[Loading separate files](loading-separate-files.md)" for further details.
 
 ## ![](img/arrow.svg) toUrl()
 
-This function is used to register a dynamic link function.
-It returns a virtual link that can be used like any other URL when defining shortcuts:
+Register a function that generates dynamic links based on the current search term.
+The call to `toUrl()` returns a virtual link that can be used like any other URL when defining shortcuts:
 
 ```javascript
 function mkDocsIssues(searchTerm) {
@@ -78,9 +77,7 @@ function mkDocsIssues(searchTerm) {
 
 var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
 
-shortycut.addShortcuts(`
-    [mkdi]  MkDocs » Issues  ${ mkDocsIssuesUrl }
-`);
+shortycut.addShortcuts('[mkdi] MkDocs Issues ' + mkDocsIssuesUrl`);
 ```
 
 When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.
