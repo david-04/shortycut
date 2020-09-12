@@ -193,6 +193,8 @@ namespace shortycut {
                 }
                 event.preventDefault();
                 return false;
+            } else if ('q' === event.key && event.ctrlKey) {
+                this.dom.filter.focus();
             }
             return true;
         }
@@ -232,11 +234,11 @@ namespace shortycut {
 
         private clearFilter() {
 
-            this.dom.filter.value = '';
-            this.applyFilter();
-            if (!queryParameters.facets.noFocus) {
+            if (!queryParameters.facets.noFocus || this.dom.filter.value) {
                 this.dom.filter.focus();
             }
+            this.dom.filter.value = '';
+            this.applyFilter();
         }
 
         private applyFilter(autoSelectFirstRow: boolean = false) {
