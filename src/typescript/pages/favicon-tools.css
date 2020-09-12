@@ -29,6 +29,7 @@
 #favicon-tools .missing .row,
 #favicon-tools .offline .row {
     width: 100%;
+    white-space: nowrap;
 }
 
 #favicon-tools .online .row .icon,

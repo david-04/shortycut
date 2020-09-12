@@ -88,9 +88,11 @@ namespace shortycut {
         // Event handlers
         //--------------------------------------------------------------------------------------------------------------
 
-        private showCurlCommands() {
+        private showCurlCommands(event: MouseEvent) {
             this.dom.curlLink.style.display = 'none';
             this.dom.curlTextarea.style.display = 'block';
+            event.preventDefault();
+            return false;
         }
 
         private selectAllCurlCommands() {
