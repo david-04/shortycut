@@ -15,7 +15,7 @@ namespace shortycut {
         public readonly setup?: string;
         public readonly facets = {
             newTabs: false,
-            noFocus: true
+            noFocus: false
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -33,15 +33,25 @@ namespace shortycut {
                 ? parseInt(this.queryParameters[QueryParameters.INDEX])
                 : undefined;
             this.setup = this.queryParameters[QueryParameters.SETUP];
-            this.facets.newTabs = this.hasFacet('new-tabs');
-            this.facets.noFocus = this.hasFacet('no-focus');
+            (this.queryParameters[QueryParameters.FACETS] || '')
+                .split(',')
+                .map(facet => facet.trim().toLowerCase())
+                .filter(facet => facet)
+                .forEach(facet => this.applyFacet(facet));
         }
 
-        private hasFacet(name: string) {
-            return !!(this.queryParameters[QueryParameters.FACETS] || '')
-                .split(',')
-                .filter(facet => name === facet.toLowerCase())
-                .length;
+        private applyFacet(facet: string) {
+            if ('new-tabs' === facet) {
+                this.facets.newTabs = true;
+            } else if ('no-focus' === facet) {
+                this.facets.noFocus = true;
+            } else {
+                startupCache.initializationErrors.push(
+                    new InitializationError(
+                        create('div', 'Facet ', create('tt', facet), ' (in this page\'s address) is not supported')
+                    )
+                );
+            }
         }
 
         //--------------------------------------------------------------------------------------------------------------
