@@ -63,7 +63,7 @@ namespace shortycut {
     class FaviconDiscoveryJob {
 
         private static readonly EXTENSIONS = ['ico', 'png', 'jpg', 'svg', 'jpeg'];
-        private readonly FOLDERS = config.homepage.suggestions.faviconFolders ?? ['favicons'];
+        private readonly FOLDERS = config.homepage.suggestions.faviconFolders ?? [];
 
         public readonly domains = new Array<string>();
         private folder = 0;
@@ -117,25 +117,29 @@ namespace shortycut {
         public switchToNextUrl() {
 
             if (this.isLocal) {
-                if (++this.extension < FaviconDiscoveryJob.EXTENSIONS.length) {
-                    return true;
-                } else {
+
+                if (FaviconDiscoveryJob.EXTENSIONS.length <= ++this.extension) {
                     this.extension = 0;
-                    if (++this.folder < this.FOLDERS.length) {
-                        return true;
-                    } else {
-                        this.domains.splice(1);
-                        return true;
+                    if (this.FOLDERS.length <= ++this.folder) {
+                        if (this.domains[this.domains.length - 1].match(/^[^.]+\.[^.]/)) {
+                            this.folder = 0;
+                            this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
+                        } else {
+                            this.domains.length = 1;
+                        }
                     }
                 }
-            }
+                return true;
 
-            if (this.domains[0].match(/.*\.[0-9]+$/)) {
-                return false;
-            }
+            } else {
 
-            this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
-            return this.domains[this.domains.length - 2] !== this.domains[this.domains.length - 1];
+                if (this.domains[0].match(/.*\.[0-9]+$/)) {
+                    return false;
+                }
+
+                this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
+                return this.domains[this.domains.length - 2] !== this.domains[this.domains.length - 1];
+            }
         }
     }
 
