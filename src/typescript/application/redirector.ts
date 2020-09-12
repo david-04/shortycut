@@ -59,7 +59,9 @@ namespace shortycut {
                         ? queryParameters.fullQuery.replace(/^\s*[^\s]+/, '').trim()
                         : queryParameters.fullQuery
                 ));
-                // router.goto(pages.browserIntegration);
+                if (queryParameters.facets.noFocus) {
+                    pages.home.removeFocus();
+                }
             } else {
                 defaultSearchEngine.replacePlaceholders(queryParameters.fullQuery);
                 const links = defaultSearchEngine.queries?.current || defaultSearchEngine.bookmarks?.current;
