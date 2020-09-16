@@ -466,6 +466,9 @@ namespace shortycut {
             } else if (defaultSearchEngine?.queries && config.defaultSearchEngine.useOnHomepage) {
                 defaultSearchEngine.replacePlaceholders(input);
                 redirector.redirect(defaultSearchEngine.queries.current, defaultSearchEngine.queries.onMultiLink, input, mode);
+            } else if (this.suggestions.length) {
+                this.selectedIndex = 0;
+                this.applySuggestion(mode, false);
             }
         }
 
