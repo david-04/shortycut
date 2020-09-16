@@ -14,7 +14,10 @@ namespace shortycut {
             rows: new Array<HTMLElement>(),
             notification: {
                 self: document.querySelector('#home .notification') as HTMLElement,
-                welcome: document.querySelector('#home .notification .welcome') as HTMLElement,
+                welcome: {
+                    self: document.querySelector('#home .notification .welcome') as HTMLElement,
+                    newTabs: document.querySelector('#home .notification .welcome .new-tabs') as HTMLElement,
+                },
                 applicationErrors: document.querySelector('#home .notification .application-errors') as HTMLElement,
                 noShortcutsNoError: document.querySelector('#home .notification .no-shortcuts-no-error') as HTMLElement,
                 errorWithBacktickSupport: document.querySelector('#home .notification .error-with-backtick-support') as HTMLElement,
@@ -87,8 +90,9 @@ namespace shortycut {
                 } else {
                     this.dom.notification.noShortcutsNoError.style.display = 'block';
                 }
-            } else if (usesDefaultTemplateShortcuts()) {
-                this.dom.notification.welcome.style.display = 'block';
+            } else if (isDemoMode()) {
+                this.dom.notification.welcome.newTabs.style.display = queryParameters.facets.newTabs ? 'none' : 'block';
+                this.dom.notification.welcome.self.style.display = 'block';
             }
         }
 

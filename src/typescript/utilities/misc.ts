@@ -43,7 +43,7 @@ namespace shortycut {
     // Check if we're running with the default (template) shortcuts
     //------------------------------------------------------------------------------------------------------------------
 
-    export function usesDefaultTemplateShortcuts() {
+    export function isDemoMode() {
         const keywords = ['tm', 'tz', 'tp', 'tt', 'tr', 'e', 'news'];
         return Object.keys(shortcuts).length == keywords.length
             && keywords.filter(keyword => shortcuts[keyword]).length === keywords.length;
