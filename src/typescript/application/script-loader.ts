@@ -21,7 +21,11 @@ namespace shortycut {
     export class JavaScriptLoader {
 
         private onCompleteHandler?: () => void;
-        private readonly files: { [index: string]: JavaScriptFile } = {};
+
+        private get files() {
+            window['shortycut.JavaScriptLoader.files' as any] = window['shortycut.JavaScriptLoader.files' as any] ?? {};
+            return window['shortycut.JavaScriptLoader.files' as any] as any as { [index: string]: JavaScriptFile };
+        }
 
         //--------------------------------------------------------------------------------------------------------------
         // Add a file and start loading it (if possible)
