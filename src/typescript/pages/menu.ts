@@ -24,6 +24,7 @@ namespace shortycut {
             this.onClickCloseIcon = this.onClickCloseIcon.bind(this);
             this.onClickBurgerIcon = this.onClickBurgerIcon.bind(this);
             this.onClickBody = this.onClickBody.bind(this);
+            this.onKeyDown = this.onKeyDown.bind(this);
 
             this.onShortyCut = this.onShortyCut.bind(this);
             this.onDocumentation = this.onDocumentation.bind(this);
@@ -52,7 +53,7 @@ namespace shortycut {
 
             menuItems.forEach(array =>
                 this.dom.items.appendChild(
-                    create('div', array[0], element => element.addEventListener('click', array[1]))
+                    create('a', array[0], element => element.addEventListener('click', array[1]))
                 )
             );
         }
@@ -65,12 +66,14 @@ namespace shortycut {
             this.dom.closeIcon.addEventListener('click', this.onClickCloseIcon);
             this.dom.burgerIcon.addEventListener('click', this.onClickBurgerIcon);
             document.body.addEventListener('click', this.onClickBody);
+            document.body.addEventListener('keydown', this.onKeyDown);
         }
 
         private removeEventListeners() {
             this.dom.closeIcon.removeEventListener('click', this.onClickCloseIcon);
             this.dom.burgerIcon.removeEventListener('click', this.onClickBurgerIcon);
             document.body.removeEventListener('click', this.onClickBody);
+            document.body.removeEventListener('keydown', this.onKeyDown);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -170,6 +173,17 @@ namespace shortycut {
             event.preventDefault();
             event.stopPropagation();
             return false;
+        }
+
+        private onKeyDown(event: KeyboardEvent) {
+            if (('Escape' === event.key || 'Esc' === event.key)) {
+                if (this.dom.items.style.display !== 'none') {
+                    this.closeMenu();
+                    event.preventDefault();
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

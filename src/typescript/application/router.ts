@@ -10,9 +10,12 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public constructor() {
+            this.goBackOrHome = this.goBackOrHome.bind(this);
             this.goHome = this.goHome.bind(this);
             this.onHashChange = this.onHashChange.bind(this);
+            this.onKeyDown = this.onKeyDown.bind(this);
             window.addEventListener('hashchange', this.onHashChange);
+            document.addEventListener('keydown', this.onKeyDown);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -32,6 +35,14 @@ namespace shortycut {
 
         public goHome() {
             this.goto(pages.home);
+        }
+
+        public goBackOrHome() {
+            if (1 < this.history.length && 0 < this.getCurrentHistoryIndex()) {
+                window.history.go(-1);
+            } else if (this.history[this.getCurrentHistoryIndex()] !== pages.home) {
+                this.goto(pages.home);
+            }
         }
 
         public goBackToAndResetHomepage() {
@@ -68,12 +79,23 @@ namespace shortycut {
                     if (page === pages.home) {
                         this.menu.showBurgerIcon();
                     } else {
-                        this.menu.showCloseIcon(this.goHome)
+                        this.menu.showCloseIcon(this.goBackOrHome)
                     }
                 } else {
                     this.menu.hide();
                 }
             }
+        }
+
+        private onKeyDown(event: KeyboardEvent) {
+            if (('Escape' === event.key || 'Esc' === event.key)) {
+                if (this.history[this.history.length - 1] !== pages.home) {
+                    this.goBackOrHome();
+                    event.preventDefault();
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

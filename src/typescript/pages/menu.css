@@ -2,6 +2,12 @@
 /* Burger icon                                                                                                        */
 /* ------------------------------------------------------------------------------------------------------------------ */
 
+#menu a {
+    text-decoration: none;
+    color: inherit;
+    outline: none;
+}
+
 #menu .burger-icon {
     position: absolute;
     top: 0;
@@ -74,18 +80,22 @@
     border: 1px solid #888888;
 }
 
-#menu .items div {
+#menu .items a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    outline: none;
     width: 100%;
     padding: 0.4em;
     white-space: nowrap;
 }
 
-#menu .items div:first-child {
+#menu .items a:first-child {
     border-bottom: 1px solid #888888;
     background-color: #dddddd;
 }
 
-#menu .items div:hover {
+#menu .items a:hover {
     cursor: pointer;
     background-color: #444444;
     color: white;

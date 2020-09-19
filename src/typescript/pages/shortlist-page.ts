@@ -129,10 +129,6 @@ namespace shortycut {
                     }
                     return false;
                 }
-            } else if ('Escape' === event.key) {
-                this.focusIndex = current;
-                setTimeout(() => router.goHome(), 0);
-                return false;
             }
             this.focusIndex = this.getTargetIndex(event.key, current);
             setTimeout(() => this.dom.listItems[this.focusIndex].focus(), 1);
