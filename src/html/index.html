@@ -160,16 +160,22 @@
                 from the folder's name):
             </p>
             <pre><span class="root-path">shortycut</span>
-                +-- data-template  <span class="highlight">&lt;--- rename this folder from: data-template</span>
-                +-- resources                                <span class="highlight">to: data</span>
+                +-- data-template<span class="highlight"><span class="arrow">&#x25C0;</span> Rename this folder from: data-template</span>
+                +-- resources    <span class="arrow">&nbsp;</span>                      <span class="highlight">to: data</span>
                 +-- index.html</pre>
-            <p class="syntax-warning" style="display:none">
-                The <span class="filename">data</span> folder contains a file named
-                <span class="filename">shortcuts.js</span> which uses ShortyCut's standard format.
-                It looks like <span class="important">this format is not supported by your browser</span>.
-                Please follow the instructions in the <a href="resources/docs/file-format.html">manual</a>
-                to switch it to the legacy format instead.
-            </p>
+            <div class="syntax-warning" style="display:none">
+                <p>
+                    The <span class="filename">data</span> folder contains a file named
+                    <span class="filename">shortcuts.js</span> which uses ShortyCut's standard format.
+                </p>
+                <p  class="important">
+                    It looks like this format is not supported by your browser.
+                </p>
+                <p>
+                    Please follow the instructions in the <a href="resources/docs/file-format.html">manual</a>
+                    to use the legacy format instead.
+                </p>
+            </div>
             <p>
                 <a href="self://?setup=validate" class="button">Done</a>
             </p>

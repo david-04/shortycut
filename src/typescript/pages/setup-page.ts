@@ -15,7 +15,7 @@ namespace shortycut {
             rootPath: document.querySelector('#setup .root-path') as HTMLElement,
             header: document.querySelector('#setup h1') as HTMLElement,
             pre: document.querySelector('#setup pre') as HTMLPreElement,
-            syntaxWarning: document.querySelector('#setup .syntax-warning') as HTMLPreElement
+            syntaxWarning: document.querySelector('#setup .syntax-warning') as HTMLElement
         };
 
         public hasMenu() {
