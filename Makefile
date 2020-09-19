@@ -229,7 +229,7 @@ build/shortycut/LICENSE : src/docs/license.md
 		> $@
 
 #-----------------------------------------------------------------------------------------------------------------------
-#
+# docs/demo
 #-----------------------------------------------------------------------------------------------------------------------
 
 release : build/$(SHORTYCUT_ZIP)
@@ -249,6 +249,14 @@ release : build/$(SHORTYCUT_ZIP)
 		| tr '\a' '\n' \
 		> docs/demo/data/settings.js.tmp
 	mv -f docs/demo/data/settings.js.tmp docs/demo/data/settings.js
+	echo docs/demo/data/shortcuts.s
+	cat docs/demo/data/shortcuts.js \
+		| grep -E "^\\s*(//|\\[)" \
+		| sed "s/'/\\\\'/g" \
+		| sed "s/^/'/g;s/$$/',/g" \
+		| gawk 'BEGIN {print "shortycut.addShortcuts(["} {print} END {print "]);"}' \
+		> docs/demo/data/shortcuts.js.tmp
+	mv -f docs/demo/data/shortcuts.js.tmp docs/demo/data/shortcuts.js
 	echo docs/demo/resources/shortycut.js
 	cat docs/demo/resources/shortycut.js \
 		| sed "s|resources/docs|..|g" \
