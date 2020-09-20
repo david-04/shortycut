@@ -124,7 +124,7 @@ namespace shortycut {
                         this.searchTerm,
                         event.ctrlKey ? RedirectMode.NEW_TAB : RedirectMode.PRESERVE_HISTORY
                     );
-                    if (event.ctrlKey) {
+                    if (event.ctrlKey || queryParameters.facets.newTabs) {
                         event.preventDefault();
                     }
                     return false;

@@ -46,14 +46,10 @@ namespace shortycut {
         }
 
         public goBackToAndResetHomepage() {
-            this.history.length = 0;
-            this.history.push(pages.home.populate());
-            if (window.location.hash) {
-                window.location.hash = '';
-            }
-            this.showIndex(0);
+            pages.home.populate();
+            this.goBackOrHome();
             if (queryParameters.facets.noFocus) {
-                pages.home.removeFocus();
+                setTimeout(() => pages.home.removeFocus(), 1);
             }
         }
 
