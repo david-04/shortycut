@@ -41,7 +41,7 @@ namespace shortycut {
                     index + 1,
                     link.getHref(this.searchTerm),
                     link.segments.descriptionHtml,
-                    index + 2 === this.links.length ? () => false : undefined,
+                    (event) => this.openSelected(event, index + 1),
                     sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, ''))
                 ))
             ];
@@ -57,20 +57,26 @@ namespace shortycut {
             return this.createLink(0, 'javascript:void(0)', 'Open all', this.openAll);
         }
 
-        private createLink(index: number, href: string, title: string, onClick?: () => boolean, subtitle?: string) {
+        private createLink(
+            index: number,
+            href: string,
+            title: string,
+            onClick: (event: MouseEvent) => void,
+            subtitle?: string
+        ) {
 
             const a = document.createElement('a');
             a.href = href;
             a.id = `shortlist${index}`;
             a.innerHTML = create('div.row', [
-                create('div.icon', create('img', element => (element as HTMLImageElement).src = 'resources/arrow.svg')),
+                create('div.icon', createImage('resources/arrow.svg')),
                 create('div.text', [
                     create('div.title', title),
                     subtitle ? create('div.url', subtitle) : ''
                 ])
             ]).outerHTML;
 
-            a.onclick = onClick || null;
+            a.addEventListener('click', onClick);
             return a;
         }
 
@@ -116,33 +122,39 @@ namespace shortycut {
 
             if ('Enter' === event.key) {
                 if (0 === current) {
-                    return this.openAll();
+                    return this.openAll(event);
                 } else if (current < this.links.length) {
-                    redirector.redirect(
-                        [this.links[current]],
-                        OnMultiLink.OPEN_IN_NEW_TAB,
-                        this.searchTerm,
-                        event.ctrlKey ? RedirectMode.NEW_TAB : RedirectMode.PRESERVE_HISTORY
-                    );
-                    if (event.ctrlKey || queryParameters.facets.newTabs) {
-                        event.preventDefault();
-                    }
+                    return this.openSelected(event, current);
+                } else {
+                    event.preventDefault();
                     return false;
                 }
+            } else {
+                this.focusIndex = this.getTargetIndex(event.key, current);
+                this.dom.listItems[this.focusIndex].focus();
+                return true;
             }
-            this.focusIndex = this.getTargetIndex(event.key, current);
-            setTimeout(() => this.dom.listItems[this.focusIndex].focus(), 1);
-            return true;
         }
 
-        private openAll() {
-            this.hide();
+        private openSelected(event: KeyboardEvent | MouseEvent, current: number) {
+            redirector.redirect(
+                [this.links[current]],
+                OnMultiLink.OPEN_IN_NEW_TAB,
+                this.searchTerm,
+                queryParameters.facets.newTabs ? RedirectMode.NEW_TAB : RedirectMode.PRESERVE_HISTORY
+            );
+            event.preventDefault();
+            return false;
+        }
+
+        private openAll(event: KeyboardEvent | MouseEvent) {
             redirector.redirect(
                 this.links.slice(1),
                 OnMultiLink.OPEN_IN_NEW_TAB,
                 this.searchTerm,
                 RedirectMode.PRESERVE_HISTORY
             );
+            event.preventDefault();
             return false;
         }
 
