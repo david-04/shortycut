@@ -285,7 +285,9 @@ namespace shortycut {
                 this.dom.headerRow.classList.add('selected');
             }
 
-            this.dom.notification.self.style.display = 0 < this.suggestions.length ? 'none' : 'block';
+            this.dom.notification.self.style.display = 0 < this.suggestions.length || this.dom.filter.value.trim().length
+                ? 'none'
+                : 'block';
             this.updateInputFieldHighlight();
         }
 
