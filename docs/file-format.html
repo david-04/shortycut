@@ -67,11 +67,15 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
                     </li>
+                    <li class="toctree-l1"><a class="reference internal" href="dynamic-links.html">Dynamic links</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="hotkeys.html">Hotkeys</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="grouping.html">Grouping</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="loading-separate-files.html">Loading separate files</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Browser integration</span></p>
@@ -90,6 +94,8 @@
                     <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="favicons.html">Favicons</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api.html">API</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
                     </li>
@@ -132,7 +138,7 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="shortcut-file-format"><img alt="" src="img/arrow.svg" /> Shortcut file format</h1>
+                <h1 id="file-format"><img alt="" src="img/arrow.svg" /> File format</h1>
 <p>Shortcuts are stored in <code>shortcuts.js</code>, a file located inside the <code>data</code> folder.
 It can be modified with any text editor.</p>
 <h2 id="standard-format"><img alt="" src="img/arrow.svg" /> Standard format</h2>
@@ -167,8 +173,8 @@ A slightly different format is required to use ShortyCut with those browsers, to
 
     // Add your shortcut definitions here...
 
-    '[sunnies] Sunglasses at eBay  https://www.ebay.com.au/sch/i.html?_nkw=sunglasses',
-    '[ebay]    Search eBay         https://www.ebay.com.au/sch/i.html?_nkw=%s',
+    '[sunnies] Sunglasses   https://www.ebay.com.au/sch/i.html?_nkw=sunglasses',
+    '[ebay]    Search eBay  https://www.ebay.com.au/sch/i.html?_nkw=%s'
 
 ]);
 </code></pre>

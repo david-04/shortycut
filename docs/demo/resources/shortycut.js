@@ -1,4 +1,4 @@
-var __SHORTYCUT_BODY_INNER_HTML = '\n\n    \n    \n    \n\n    <div id="home" style="display:none">\n        <div class="row selected filter-row">\n            <div class="cursor">\n                <img src="resources/arrow.svg" class="icon">\n            </div>\n            <div class="row-content">\n                <input type="text" placeholder="" class="input" />\n            </div>\n        </div>\n        <div class="suggestions">\n        </div>\n        <div class="notification">\n            <div class="welcome" style="display:none">\n                <p>\n                    This is ShortyCut\'s homepage. Enter a keyword above, for example:\n                </p>\n                <p class="example">\n                    <span class="key">t</span> ... to explore keywords starting with a &quot;t&quot;\n                </p>\n                <p class="example">\n                    <span class="key">e sunglasses</span> ... to search for sunglasses on eBay\n                </p>\n                <p class="example">\n                    <span class="key">news</span> ... to try out keywords with multiple links\n                </p>\n                <p>\n                    <br>\n                    Then add your own links to <span class="key">shortcut.js</span> in the <span class="key">data</span> folder.\n                    See the <a href="../shortcut-syntax.html">manual</a> for details.\n                </p>\n            </div>\n            <div class="application-errors" style="display:none">\n            </div>\n            <div class="no-shortcuts-no-error" style="display:none">\n                <div class="header">Failed to load shortcuts</div>\n                <div class="description spacing">\n                    No shortcuts have been defined in shortcut.js.\n                </div>\n            </div>\n            <div class="error-with-backtick-support" style="display:none">\n                <div class="header">Failed to load shortcuts</div>\n                <div class="description spacing">\n                    JavaScript errors have occurred while trying to load the shortcuts.\n                    <br>Make sure to avoid\n                    <a href="../file-format.html">unsupported symbols</a> in shortcuts.js.\n                </div>\n            </div>\n            <div class="error-without-backtick-support" style="display:none">\n                <div class="header">Failed to load shortcuts</div>\n                <div class="description spacing">\n                    JavaScript errors have occurred while trying to load the shortcuts.\n                    <br>It also appears that your browser does not support the backtick syntax.\n                    <br>Make sure to use the <a href="../file-format.html#legacy-format">legacy format</a>\n                     and avoid any unsupported symbols.\n                </div>\n\n            </div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="menu" style="display:none">\n        <div class="burger-icon">\n            <div></div>\n            <div></div>\n            <div></div>\n        </div>\n        <div class="close-icon">\n        </div>\n        <div class="items">\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="error" style="display:none">\n        <div class="title">\n        </div>\n        <div class="message">\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="shortlist" style="display:none">\n    </div>\n\n    \n    \n    \n\n    <div id="redirect" style="display:none">\n        <div class="icon">\n            <img src="resources/arrow.svg">\n        </div>\n        <div class="text">\n            <div class="title"></div>\n            <div class="url"></div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="setup" style="display:none">\n        <div>\n            <div class="error" style="display:none">\n                That didn\'t work. Please double-check the folder name and try again.\n            </div>\n            <h1>\n                <img src="resources/arrow.svg">\n                <span class="title">Welcome</span>\n            </h1>\n        </div>\n        <div class="instructions">\n            <p>\n                It looks like you\'ve just installed ShortyCut.\n                To complete the setup, rename the <span class="filename">data-template</span> folder to\n                <span class="filename">data</span> (i.e. remove <span class="filename">-template</span>\n                from the folder\'s name):\n            </p>\n            <pre><span class="root-path">shortycut</span>\n                +-- data-template  <span class="highlight">&lt;--- rename this folder from: data-template</span>\n                +-- resources                                <span class="highlight">to: data</span>\n                +-- index.html</pre>\n            <p class="syntax-warning" style="display:none">\n                The <span class="filename">data</span> folder contains a file named\n                <span class="filename">shortcuts.js</span> which uses ShortyCut\'s standard format.\n                It looks like <span class="important">this format is not supported by your browser</span>.\n                Please follow the instructions in the <a href="../file-format.html">manual</a>\n                to switch it to the legacy format instead.\n            </p>\n            <p>\n                <a href="self://?setup=validate" class="button">Done</a>\n            </p>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="link-tools" style="display:none" class="utility-page">\n        <div class="url-encoding">\n            <h1>URL-Encoding</h1>\n            <p>\n                Link parameters (like filters and settings) need to be URL-encoded.\n                <br>Enter text into any of the fields below to encode or decode it.\n            </p>\n            <p>\n                Plain text\n                <br><input class="decoded" />\n            </p>\n            <p>\n                URL-encoded\n                <br><input class="encoded" />\n            </p>\n        </div>\n        <div class="har-parser">\n            <h1>Extract POST links</h1>\n            <p>\n                Web pages using the POST method don\'t contain settings and filters in their address.\n                <br>Using an HTTP Archive (HAR file) is the easiest way to extract their ShortyCut link.\n                <br>Refer to the <a href="./../post-links.html#extracting-post-links">documentation</a>\n                on how to obtain the HAR file.\n                <br>Paste the HAR file into the field below to extract all POST pages.\n            </p>\n            <p>\n                <textarea class="input" placeholder="Paste the HAR file in here"></textarea>\n            </p>\n            <div class="output">\n\n            </div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="favicon-tools" style="display:none" class="utility-page">\n        <div class="config-warning" style="display:none">\n            Favicons are disabled. To enable them, set the config property\n            <a href="../configuration.html#shortcutformathomepagesuggestionsshowfavicons">showFavicons</a>\n            to true.\n        </div>\n        <h1>Favicons</h1>\n        <div>\n            ShortyCut\'s homepage displays website\'s favicons as part of suggestions.\n            <br>It\'s recommended to download them for quicker access.\n            See the <a href="../favicons.html">manual</a> for details.\n        </div>\n        <div class="pending" style="display:none">\n            <h1>Analysis in progress...</h1>\n            Scanning the below websites for favicons. Please wait...\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n        <div class="online" style="display:none">\n            <h1>Ready for download</h1>\n            The following icons are available for download.\n            See the <a href="../favicons.html#downloadable-favicons">manual</a> for details.\n            <br>If you\'re familiar with the command line, you can batch-download all at once:\n            <br>\n            <br><a href="javascript:" class="curl">Click here to show &quot;curl&quot; commands<br></a>\n            <textarea class="curl" wrap="off" readonly style="display:none"></textarea>\n            <br>Otherwise right-click on each icon and save the image file.\n            <br>Then rename it to the filename displayed next to the icon:\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n        <div class="missing" style="display:none">\n            <h1>Missing favicons</h1>\n            The following websites have no standard favicon.\n            <br>Consider downloading suitable icons from elsewhere.\n            <br>See the <a href="../favicons.html#missing-favicons">manual</a> for details.\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n        <div class="offline" style="display:none">\n            <h1>Already downloaded</h1>\n            The following icons have already been downloaded:\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="browser-integration" style="display:none" class="utility-page">\n        <h1>Browser integration</h1>\n        <div>\n            This page contains links and tools for integrating ShortyCut with your browser.\n            See the <a href="../browser-integration.html">manual</a>\n            for a description of all methods.\n        </div>\n        <h1>Homepage</h1>\n        <div>\n            ShortyCut has settings to tweak the behavior of its homepage\n            when used as the browser\'s start page or as a pinned tab.\n            Activate them as required by ticking the checkboxes below:\n            <br>\n            <br>\n            <table border="0" cellpadding="0">\n                <tr>\n                    <td>\n                        <input type="checkbox" class="new-tabs"/>\n                    </td>\n                    <td>\n                        &nbsp;\n                    </td>\n                    <td>\n                        <b>Open all links in new tabs</b>\n                    </td>\n                </tr>\n                <tr>\n                    <td colspan="2">\n                    </td>\n                    <td>\n                        Lock ShortyCut\'s homepage to the browser tab and never navigate away.\n                        As the tab sticks around, it can be reused for entering more keywords later.\n                        <br>&nbsp;\n                    </td>\n                </tr>\n                <tr>\n                    <td>\n                        <input type="checkbox" class="no-focus"/>\n                    </td>\n                    <td>\n                        &nbsp;\n                    </td>\n                    <td>\n                        <b>Don\'t focus on the input field</b>\n                    </td>\n                </tr>\n                <tr>\n                    <td colspan="2">\n                    </td>\n                    <td>\n                        Tick this checkbox when using an add-on like Vimium,\n                        which allows to operate the browser via keyboard shortcuts.\n                        <br>&nbsp;\n                    </td>\n                </tr>\n            </table>\n            Set your browser\'s start page or the pinned tab to the following address:\n            <br>\n            <br><a class="homepage"></a>\n        </div>\n        <h1>Keyword query</h1>\n        <div>\n            If supported by your browser, you can create a keyword query.\n            See the <a href="../keyword-query.html">manual</a> for details how it works.\n            In Firefox, the keyword query can be created via the context menu:\n            <br>\n            <br>\n            <form class="form"><input name="q" readonly\n                    value="Right-click here and select &quot;Add a keyword for this search...&quot;"></form>\n            <br>In other browsers, manually create the keyword with the following address:\n            <br>\n            <br><a onclick="return false" class="keyword"></a>\n        </div>\n        <h1>Search engine</h1>\n        <div class="web-server-required" style="display:none">\n            To add ShortyCut as a search engine, it must be access through a web server.\n            Follow the instructions in the <a href="../web-server.html">manual</a> to set it up.\n            Once the web server is up and running, access ShortyCut through this link:\n            <br>\n            <br><a href="http://localhost:4171/index.html">http://localhost:4171/index.html</a>\n            <br>\n            <br>For browsers like Edge, which require an encrypted connection, use this link instead:\n            <br>\n            <br><a href="https://localhost:4172/index.html">https://localhost:4172/index.html</a>\n            <br>\n            <br>This will produce a security warning. Confirm it to open ShortyCut.\n        </div>\n        <div class="search-engine" style="display:none">\n            ShortyCut should be discovered as a search engine automatically.\n            <br>Please check your browser\'s th search box.\n            <br>If ShortyCut doesn\'t show up, try clicking on the following link:\n            <br>\n            <br><a class="open-search"></a>\n        </div>\n        <h1>Pop-up blocker</h1>\n        <div>\n            ShortyCut allows multiple links / bookmarks to have the same keyword.\n            <br>Depending on the configuration, it can open all of them in separate tabs.\n            <br>To use this feature, you need to disable the browser\'s pop-up blocker.\n            <br>Test if the blocker is currently active by clicking on this button:\n            <br>\n            <br><input type="button" class="pop-up" value="Open 2 pop-up windows" />\n            <br>\n            <br>If pop-ups are blocked, it\'s usually indicated in the browser\'s address bar.\n            <br>You should be able to allow pop-ups for ShortyCut there as well.\n\n        </div>\n    </div>\n\n</body>\n\n</html>\n';
+var __SHORTYCUT_BODY_INNER_HTML = '\n\n    \n    \n    \n\n    <div id="home" style="display:none">\n        <div class="row selected filter-row">\n            <div class="cursor">\n                <img src="resources/arrow.svg" class="icon">\n            </div>\n            <div class="row-content">\n                <input type="text" placeholder="" class="input" />\n            </div>\n        </div>\n        <div class="suggestions">\n        </div>\n        <div class="notification">\n            <div class="welcome" style="display:none">\n                <p>\n                    This is ShortyCut\'s homepage. Enter a keyword above, for example:\n                </p>\n                <p class="example">\n                    <span class="key">t</span> ... to explore keywords starting with a &quot;t&quot;\n                </p>\n                <p class="example">\n                    <span class="key">e sunglasses</span> ... to search for sunglasses on eBay\n                </p>\n                <p class="example">\n                    <span class="key">news</span> ... to try out multi-link keywords\n                    <br>\n                    <br>\n                </p>\n                <p class=\'new-tabs\'>\n                    To keep ShortyCut permanently open in this tab,\n                    <a href="self://?facets=new-tabs">click here to open all links in new tabs</a>.\n                </p>\n                <p>\n                    Then add your own links to <span class="key">shortcut.js</span> in the <span class="key">data</span>\n                    folder. See the <a href="../shortcut-syntax.html">manual</a> for details.\n                </p>\n            </div>\n            <div class="application-errors" style="display:none">\n            </div>\n            <div class="no-shortcuts-no-error" style="display:none">\n                <div class="header">Failed to load shortcuts</div>\n                <div class="description spacing">\n                    No shortcuts have been defined in shortcut.js.\n                </div>\n            </div>\n            <div class="error-with-backtick-support" style="display:none">\n                <div class="header">Failed to load shortcuts</div>\n                <div class="description spacing">\n                    JavaScript errors have occurred while trying to load the shortcuts.\n                    <br>Make sure to avoid\n                    <a href="../file-format.html">unsupported symbols</a> in shortcuts.js.\n                </div>\n            </div>\n            <div class="error-without-backtick-support" style="display:none">\n                <div class="header">Failed to load shortcuts</div>\n                <div class="description spacing">\n                    JavaScript errors have occurred while trying to load the shortcuts.\n                    <br>It also appears that your browser does not support the backtick syntax.\n                    <br>Make sure to use the <a href="../file-format.html#legacy-format">legacy format</a>\n                    and avoid any unsupported symbols.\n                </div>\n\n            </div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="menu" style="display:none">\n        <a class="burger-icon">\n            <div></div>\n            <div></div>\n            <div></div>\n        </a>\n        <a class="close-icon">\n        </a>\n        <div class="items">\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="error" style="display:none">\n        <div class="title">\n        </div>\n        <div class="message">\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="shortlist" style="display:none">\n    </div>\n\n    \n    \n    \n\n    <div id="redirect" style="display:none">\n        <div class="icon">\n            <img src="resources/arrow.svg">\n        </div>\n        <div class="text">\n            <div class="title"></div>\n            <div class="url"></div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="setup" style="display:none">\n        <div>\n            <div class="error" style="display:none">\n                That didn\'t work. Please double-check the folder name and try again.\n            </div>\n            <h1>\n                <img src="resources/arrow.svg">\n                <span class="title">Welcome</span>\n            </h1>\n        </div>\n        <div class="instructions">\n            <p>\n                It looks like you\'ve just installed ShortyCut.\n                To complete the setup, rename the <span class="filename">data-template</span> folder to\n                <span class="filename">data</span> (i.e. remove <span class="filename">-template</span>\n                from the folder\'s name):\n            </p>\n            <pre><span class="root-path">shortycut</span>\n                +-- data-template<span class="highlight"><span class="arrow">&#x25C0;</span> Rename this folder from: data-template</span>\n                +-- resources    <span class="arrow">&nbsp;</span>                      <span class="highlight">to: data</span>\n                +-- index.html</pre>\n            <div class="syntax-warning" style="display:none">\n                <p>\n                    The <span class="filename">data</span> folder contains a file named\n                    <span class="filename">shortcuts.js</span> which uses ShortyCut\'s standard format.\n                </p>\n                <p  class="important">\n                    It looks like this format is not supported by your browser.\n                </p>\n                <p>\n                    Please follow the instructions in the <a href="../file-format.html">manual</a>\n                    to use the legacy format instead.\n                </p>\n            </div>\n            <p>\n                <a href="self://?setup=validate" class="button">Done</a>\n            </p>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="link-tools" style="display:none" class="utility-page">\n        <div class="url-encoding">\n            <h1>URL-Encoding</h1>\n            <p>\n                Link parameters (like filters and settings) need to be URL-encoded.\n                <br>Enter text into any of the fields below to encode or decode it.\n            </p>\n            <p>\n                Plain text\n                <br><input class="decoded" />\n            </p>\n            <p>\n                URL-encoded\n                <br><input class="encoded" />\n            </p>\n        </div>\n        <div class="har-parser">\n            <h1>Extract POST links</h1>\n            <p>\n                Web pages using the POST method don\'t contain settings and filters in their address.\n                <br>Using an HTTP Archive (HAR file) is the easiest way to extract their ShortyCut link.\n                <br>Refer to the <a href="./../post-links.html#extracting-post-links">documentation</a>\n                on how to obtain the HAR file.\n                <br>Paste the HAR file into the field below to extract all POST pages.\n            </p>\n            <p>\n                <textarea class="input" placeholder="Paste the HAR file in here"></textarea>\n            </p>\n            <div class="output">\n\n            </div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="favicon-tools" style="display:none" class="utility-page">\n        <div class="config-warning" style="display:none">\n            Favicons are disabled. To enable them, set the config property\n            <a href="../configuration.html#shortcutformathomepagesuggestionsshowfavicons">showFavicons</a>\n            to true.\n        </div>\n        <h1>Favicons</h1>\n        <div>\n            ShortyCut\'s homepage displays website\'s favicons as part of suggestions.\n            <br>It\'s recommended to download them for quicker access.\n            See the <a href="../favicons.html">manual</a> for details.\n        </div>\n        <div class="pending" style="display:none">\n            <h1>Analysis in progress...</h1>\n            Scanning the below websites for favicons. Please wait...\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n        <div class="online" style="display:none">\n            <h1>Ready for download</h1>\n            The following icons are available for download.\n            See the <a href="../favicons.html#downloadable-favicons">manual</a> for details.\n            <br>If you\'re familiar with the command line, you can batch-download all at once:\n            <br>\n            <br><a href="" class="curl">Click here to show &quot;curl&quot; commands<br></a>\n            <textarea class="curl" wrap="off" readonly style="display:none"></textarea>\n            <br>Otherwise right-click on each icon and save the image file.\n            <br>Then rename it to the filename displayed next to the icon:\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n        <div class="missing" style="display:none">\n            <h1>Missing favicons</h1>\n            The following websites have no standard favicon.\n            <br>Consider downloading suitable icons from elsewhere.\n            <br>See the <a href="../favicons.html#missing-favicons">manual</a> for details.\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n        <div class="offline" style="display:none">\n            <h1>Already downloaded</h1>\n            The following icons have already been downloaded:\n            <br>\n            <br>\n            <div class="listing"></div>\n        </div>\n    </div>\n\n    \n    \n    \n\n    <div id="browser-integration" style="display:none" class="utility-page">\n        <h1>Browser integration</h1>\n        <div>\n            This page contains links and tools for integrating ShortyCut with your browser.\n            See the <a href="../browser-integration.html">manual</a>\n            for a description of all methods.\n        </div>\n        <h1>Homepage</h1>\n        <div>\n            ShortyCut has settings to tweak the behavior of its homepage\n            when used as the browser\'s start page or as a pinned tab.\n            Activate them as required by ticking the checkboxes below:\n            <br>\n            <br>\n            <table border="0" cellpadding="0">\n                <tr>\n                    <td>\n                        <input type="checkbox" class="new-tabs" />\n                    </td>\n                    <td>\n                        &nbsp;\n                    </td>\n                    <td>\n                        <b>Open all links in new tabs</b>\n                    </td>\n                </tr>\n                <tr>\n                    <td colspan="2">\n                    </td>\n                    <td>\n                        Lock ShortyCut\'s homepage to the browser tab and never navigate away.\n                        As the tab sticks around, it can be reused for entering more keywords later.\n                        <br>&nbsp;\n                    </td>\n                </tr>\n                <tr>\n                    <td>\n                        <input type="checkbox" class="no-focus" />\n                    </td>\n                    <td>\n                        &nbsp;\n                    </td>\n                    <td>\n                        <b>Don\'t focus on the input field</b>\n                    </td>\n                </tr>\n                <tr>\n                    <td colspan="2">\n                    </td>\n                    <td>\n                        Tick this checkbox when using an add-on like Vimium,\n                        which allows to operate the browser via keyboard shortcuts.\n                        <br>&nbsp;\n                    </td>\n                </tr>\n            </table>\n            Set your browser\'s start page or the pinned tab to the following address:\n            <br>\n            <br><a class="homepage"></a>\n        </div>\n        <h1>Keyword query</h1>\n        <div>\n            If supported by your browser, you can create a keyword query.\n            See the <a href="../keyword-query.html">manual</a> for details how it works.\n            In Firefox, the keyword query can be created via the context menu:\n            <br>\n            <br>\n            <form class="form"><input name="q" readonly\n                    value="Right-click here and select &quot;Add a keyword for this search...&quot;"></form>\n            <br>In other browsers, manually create the keyword with the following address:\n            <br>\n            <br><a onclick="return false" class="keyword"></a>\n        </div>\n        <h1>Search engine</h1>\n        <div class="web-server-required" style="display:none">\n            To add ShortyCut as a search engine, it must be access through a web server.\n            Follow the instructions in the <a href="../web-server.html">manual</a> to set it up.\n            Once the web server is up and running, access ShortyCut through this link:\n            <br>\n            <br><a href="http://localhost:4171/index.html">http://localhost:4171/index.html</a>\n            <br>\n            <br>For browsers which require an encrypted connection, use this link instead:\n            <br>\n            <br><a href="https://localhost:4172/index.html">https://localhost:4172/index.html</a>\n            <br>\n            <br>This will produce a security warning. Confirm it to open ShortyCut.\n        </div>\n        <div class="search-engine" style="display:none">\n            ShortyCut should be discovered as a search engine automatically.\n            <br>Please check your browser\'s th search box.\n            <br>If ShortyCut doesn\'t show up, try clicking on the following link:\n            <br>\n            <br><a class="open-search"></a>\n        </div>\n        <h1>Pop-up blocker</h1>\n        <div>\n            ShortyCut allows multiple links / bookmarks to have the same keyword.\n            <br>Depending on the configuration, it can open all of them in separate tabs.\n            <br>To use this feature, you need to disable the browser\'s pop-up blocker.\n            <br>Test if the blocker is currently active by clicking on this button:\n            <br>\n            <br><input type="button" class="pop-up" value="Open 2 pop-up windows" />\n            <br>\n            <br>If pop-ups are blocked, it\'s usually indicated in the browser\'s address bar.\n            <br>You should be able to allow pop-ups for ShortyCut there as well.\n\n        </div>\n    </div>\n\n</body>\n\n</html>\n';
 "use strict";
 var shortycut;
 (function (shortycut) {
@@ -22,13 +22,41 @@ var shortycut;
         }
     }
     shortycut.addShortcuts = addShortcuts;
-    function toUrl(linkGeneratorFunction) {
-        var index = Object.keys(shortycut.startupCache.linkGeneratorFunctions).length + 1;
-        var key = shortycut.linkGeneratorFunctionProtocol + "://" + index + "-" + Math.random();
-        shortycut.startupCache.linkGeneratorFunctions[key] = linkGeneratorFunction;
+    function toUrl(dynamicLinkFunction) {
+        if ('function' !== typeof dynamicLinkFunction) {
+            shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create('div', 'The parameter passed to shortycut.toUrl() is not a function:'), shortycut.create('div', shortycut.create('tt', "" + dynamicLinkFunction))));
+        }
+        var key = shortycut.dynamicLinkProtocol + "://" + Object.keys(shortycut.startupCache.dynamicLinks).length + "-" + Math.random();
+        shortycut.startupCache.dynamicLinks[key] = {
+            generator: dynamicLinkFunction,
+            urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
+        };
         return key;
     }
     shortycut.toUrl = toUrl;
+    function getUrlForFavicon(dynamicLinkFunction) {
+        var _a, _b;
+        var invalidUrl = undefined;
+        for (var _i = 0, _c = [undefined, null, '', '1']; _i < _c.length; _i++) {
+            var searchTerm = _c[_i];
+            try {
+                var url = (_a = dynamicLinkFunction(searchTerm)) === null || _a === void 0 ? void 0 : _a.trim();
+                if (url) {
+                    if (shortycut.isUrl(url)) {
+                        return url;
+                    }
+                    else if (!invalidUrl) {
+                        invalidUrl = (((_b = dynamicLinkFunction) === null || _b === void 0 ? void 0 : _b.name) || 'function') + "(" + (undefined === searchTerm || null === searchTerm ? "" + searchTerm : "'" + searchTerm + "'") + ") => " + url;
+                    }
+                }
+            }
+            catch (ignored) { }
+        }
+        if (invalidUrl) {
+            shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create('div', 'The dynamic link function returned an invalid URL.'), shortycut.create('div', shortycut.create('tt', invalidUrl))));
+        }
+        return 'file:///';
+    }
     var JavaScriptDependencyBuilder = (function () {
         function JavaScriptDependencyBuilder(dependencies) {
             this.dependencies = dependencies;
@@ -150,6 +178,9 @@ var shortycut;
                 shortycut.router.goto(shortycut.pages.home.populate(isHomepageKeyword
                     ? shortycut.queryParameters.fullQuery.replace(/^\s*[^\s]+/, '').trim()
                     : shortycut.queryParameters.fullQuery));
+                if (shortycut.queryParameters.facets.noFocus) {
+                    shortycut.pages.home.removeFocus();
+                }
             }
             else {
                 shortycut.defaultSearchEngine.replacePlaceholders(shortycut.queryParameters.fullQuery);
@@ -237,9 +268,12 @@ var shortycut;
         function Router() {
             this.menu = new shortycut.Menu();
             this.history = new Array();
+            this.goBackOrHome = this.goBackOrHome.bind(this);
             this.goHome = this.goHome.bind(this);
             this.onHashChange = this.onHashChange.bind(this);
+            this.onKeyDown = this.onKeyDown.bind(this);
             window.addEventListener('hashchange', this.onHashChange);
+            document.addEventListener('keydown', this.onKeyDown);
         }
         Router.prototype.goto = function (page) {
             this.history.length = this.getCurrentHistoryIndex() + 1;
@@ -255,15 +289,19 @@ var shortycut;
         Router.prototype.goHome = function () {
             this.goto(shortycut.pages.home);
         };
-        Router.prototype.goBackToAndResetHomepage = function () {
-            this.history.length = 0;
-            this.history.push(shortycut.pages.home.populate());
-            if (window.location.hash) {
-                window.location.hash = '';
+        Router.prototype.goBackOrHome = function () {
+            if (1 < this.history.length && 0 < this.getCurrentHistoryIndex()) {
+                window.history.go(-1);
             }
-            this.showIndex(0);
+            else if (this.history[this.getCurrentHistoryIndex()] !== shortycut.pages.home) {
+                this.goto(shortycut.pages.home);
+            }
+        };
+        Router.prototype.goBackToAndResetHomepage = function () {
+            shortycut.pages.home.populate();
+            this.goBackOrHome();
             if (shortycut.queryParameters.facets.noFocus) {
-                shortycut.pages.home.removeFocus();
+                setTimeout(function () { return shortycut.pages.home.removeFocus(); }, 1);
             }
         };
         Router.prototype.onHashChange = function () {
@@ -283,13 +321,23 @@ var shortycut;
                         this.menu.showBurgerIcon();
                     }
                     else {
-                        this.menu.showCloseIcon(this.goHome);
+                        this.menu.showCloseIcon(this.goBackOrHome);
                     }
                 }
                 else {
                     this.menu.hide();
                 }
             }
+        };
+        Router.prototype.onKeyDown = function (event) {
+            if (('Escape' === event.key || 'Esc' === event.key)) {
+                if (this.history[this.history.length - 1] !== shortycut.pages.home) {
+                    this.goBackOrHome();
+                    event.preventDefault();
+                    return false;
+                }
+            }
+            return true;
         };
         return Router;
     }());
@@ -310,8 +358,16 @@ var shortycut;
     shortycut.JavaScriptFile = JavaScriptFile;
     var JavaScriptLoader = (function () {
         function JavaScriptLoader() {
-            this.files = {};
         }
+        Object.defineProperty(JavaScriptLoader.prototype, "files", {
+            get: function () {
+                var _a;
+                window['shortycut.JavaScriptLoader.files'] = (_a = window['shortycut.JavaScriptLoader.files']) !== null && _a !== void 0 ? _a : {};
+                return window['shortycut.JavaScriptLoader.files'];
+            },
+            enumerable: false,
+            configurable: true
+        });
         JavaScriptLoader.prototype.add = function (url, dependencies) {
             var _a;
             var file = this.files[url] = (_a = this.files[url]) !== null && _a !== void 0 ? _a : new JavaScriptFile(url, []);
@@ -813,7 +869,7 @@ var shortycut;
         function ParserContext() {
             this.line = '';
             this.description = '';
-            this.url = '';
+            this.urlOrDynamicLink = '';
             this.isStandardProtocol = false;
             this.onMultiLink = shortycut.OnMultiLink.OPEN_IN_NEW_TAB;
             this.combination = new Array();
@@ -822,7 +878,7 @@ var shortycut;
     }());
     var ShortcutParser = (function () {
         function ShortcutParser() {
-            this.KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', shortycut.linkGeneratorFunctionProtocol];
+            this.KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', shortycut.dynamicLinkProtocol];
             this.KNOWN_PROTOCOLS_REGEXP = new RegExp("(" + this.KNOWN_PROTOCOLS.join('|') + ")://.*$", 'i');
         }
         ShortcutParser.prototype.parseLines = function (lines, startIndex, endIndex, shortcuts) {
@@ -864,10 +920,10 @@ var shortycut;
                 if (keyword) {
                     var sections = keywords[keyword];
                     if (shortcuts[keyword]) {
-                        shortcuts[keyword].addLink(keyword, sections, context.onMultiLink, context.url, context.postFields, context.linkGeneratorFunction);
+                        shortcuts[keyword].addLink(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields);
                     }
                     else {
-                        shortcuts[keyword] = new shortycut.Shortcut(keyword, sections, context.onMultiLink, context.url, context.postFields, context.linkGeneratorFunction);
+                        shortcuts[keyword] = new shortycut.Shortcut(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields);
                     }
                     if (keyword === shortycut.config.defaultSearchEngine.keyword) {
                         shortycut.defaultSearchEngine = shortcuts[keyword];
@@ -887,16 +943,13 @@ var shortycut;
             if (!url) {
                 throw new shortycut.ParserError('Unable to retrieve the link (make sure it starts with a protocol like https://)', context.line);
             }
-            context.url = url[0].trim();
+            context.urlOrDynamicLink = url[0].trim();
             context.description = context.line.substr(0, context.line.length - url[0].length);
-            if (0 === context.url.indexOf(shortycut.linkGeneratorFunctionProtocol)) {
-                context.linkGeneratorFunction = shortycut.startupCache.linkGeneratorFunctions[context.url];
-                if (!context.linkGeneratorFunction) {
-                    throw new shortycut.ParserError('The function link created via shortycut.toUrl() must be at the end of the line', context.line);
+            if (0 === context.urlOrDynamicLink.indexOf(shortycut.dynamicLinkProtocol)) {
+                context.urlOrDynamicLink = shortycut.startupCache.dynamicLinks[context.urlOrDynamicLink];
+                if (!context.urlOrDynamicLink) {
+                    throw new shortycut.ParserError('The dynamic link created via shortycut.toUrl() must be at the end of the line', context.line);
                 }
-            }
-            else {
-                context.linkGeneratorFunction = undefined;
             }
         };
         ShortcutParser.prototype.parseOnMultiLink = function (context) {
@@ -905,9 +958,11 @@ var shortycut;
                 for (var _i = 0, _a = shortycut.OnMultiLink.values; _i < _a.length; _i++) {
                     var onMultiLink = _a[_i];
                     var symbol = multiLinkIndicator[onMultiLink.key];
-                    if (!pass && context.isStandardProtocol && shortycut.startsWith(context.url, symbol)) {
+                    if (!pass && context.isStandardProtocol
+                        && 'string' === typeof context.urlOrDynamicLink
+                        && shortycut.startsWith(context.urlOrDynamicLink, symbol)) {
                         context.onMultiLink = onMultiLink;
-                        context.url = context.url.substr(symbol.length).trim();
+                        context.urlOrDynamicLink = context.urlOrDynamicLink.substr(symbol.length).trim();
                         return;
                     }
                     else if (pass && shortycut.endsWith(context.description, symbol)) {
@@ -920,14 +975,14 @@ var shortycut;
             context.onMultiLink = shortycut.OnMultiLink.getDefault();
         };
         ShortcutParser.prototype.parsePostFields = function (context) {
-            var separator = shortycut.config.shortcutFormat.url.postIndicator;
-            var index = separator ? shortycut.adjustCase(context.url).indexOf(separator) : -1;
-            if (separator && 0 <= index) {
-                context.postFields = context.url.substr(index + separator.length);
-                context.url = context.url.substr(0, index);
-            }
-            else {
-                context.postFields = undefined;
+            context.postFields = undefined;
+            if ('string' === typeof context.urlOrDynamicLink) {
+                var separator = shortycut.config.shortcutFormat.url.postIndicator;
+                var index = separator ? shortycut.adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
+                if (separator && 0 <= index) {
+                    context.postFields = context.urlOrDynamicLink.substr(index + separator.length);
+                    context.urlOrDynamicLink = context.urlOrDynamicLink.substr(0, index);
+                }
             }
         };
         ShortcutParser.prototype.parseKeywordsAndDescription = function (context) {
@@ -1048,9 +1103,10 @@ var shortycut;
 (function (shortycut) {
     var QueryParameters = (function () {
         function QueryParameters() {
+            var _this = this;
             this.facets = {
                 newTabs: false,
-                noFocus: true
+                noFocus: false
             };
             this.queryParameters = this.getQueryParameters();
             this.fullQuery = (this.queryParameters[QueryParameters.QUERY] || '').replace(/\+/g, ' ');
@@ -1060,14 +1116,22 @@ var shortycut;
                 ? parseInt(this.queryParameters[QueryParameters.INDEX])
                 : undefined;
             this.setup = this.queryParameters[QueryParameters.SETUP];
-            this.facets.newTabs = this.hasFacet('new-tabs');
-            this.facets.noFocus = this.hasFacet('no-focus');
-        }
-        QueryParameters.prototype.hasFacet = function (name) {
-            return !!(this.queryParameters[QueryParameters.FACETS] || '')
+            (this.queryParameters[QueryParameters.FACETS] || '')
                 .split(',')
-                .filter(function (facet) { return name === facet.toLowerCase(); })
-                .length;
+                .map(function (facet) { return facet.trim().toLowerCase(); })
+                .filter(function (facet) { return facet; })
+                .forEach(function (facet) { return _this.applyFacet(facet); });
+        }
+        QueryParameters.prototype.applyFacet = function (facet) {
+            if ('new-tabs' === facet) {
+                this.facets.newTabs = true;
+            }
+            else if ('no-focus' === facet) {
+                this.facets.noFocus = true;
+            }
+            else {
+                shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create('div', 'Facet ', shortycut.create('tt', facet), ' (in this page\'s address) is not supported')));
+            }
         };
         QueryParameters.prototype.getQueryParameters = function () {
             var result = {};
@@ -1131,19 +1195,18 @@ var shortycut;
     }());
     shortycut.OnMultiLink = OnMultiLink;
     var Link = (function () {
-        function Link(keyword, index, segments, onMultiLink, _url, _postFields, linkGeneratorFunction) {
+        function Link(keyword, index, segments, onMultiLink, urlOrDynamicLink, _postFields) {
             var _a;
             this.keyword = keyword;
             this.index = index;
             this.segments = segments;
             this.onMultiLink = onMultiLink;
-            this._url = _url;
+            this.urlOrDynamicLink = urlOrDynamicLink;
             this._postFields = _postFields;
-            this.linkGeneratorFunction = linkGeneratorFunction;
             this._overridden = false;
             this.searchTerm = '';
-            if (linkGeneratorFunction
-                || 0 <= shortycut.adjustCase(this._url).indexOf(shortycut.config.shortcutFormat.url.searchTermPlaceholder)
+            if ('string' !== typeof this.urlOrDynamicLink
+                || 0 <= shortycut.adjustCase(this.urlOrDynamicLink).indexOf(shortycut.config.shortcutFormat.url.searchTermPlaceholder)
                 || 0 <= shortycut.adjustCase((_a = this._postFields) !== null && _a !== void 0 ? _a : '').indexOf(shortycut.config.shortcutFormat.url.searchTermPlaceholder)) {
                 this.type = 'query';
             }
@@ -1153,7 +1216,18 @@ var shortycut;
         }
         Object.defineProperty(Link.prototype, "url", {
             get: function () {
-                return shortycut.replaceAll(this.linkGeneratorFunction ? this.linkGeneratorFunction(this.searchTerm) : this._url, shortycut.config.shortcutFormat.url.searchTermPlaceholder, encodeURIComponent(this.searchTerm || ''), shortycut.config.shortcutFormat.keyword.caseSensitive);
+                return shortycut.replaceAll('string' === typeof this.urlOrDynamicLink
+                    ? this.urlOrDynamicLink
+                    : this.urlOrDynamicLink.generator(this.searchTerm), shortycut.config.shortcutFormat.url.searchTermPlaceholder, encodeURIComponent(this.searchTerm || ''), shortycut.config.shortcutFormat.keyword.caseSensitive);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Link.prototype, "urlForFavicon", {
+            get: function () {
+                return 'string' === typeof (this.urlOrDynamicLink)
+                    ? this.urlOrDynamicLink
+                    : this.urlOrDynamicLink.urlForFavicon;
             },
             enumerable: false,
             configurable: true
@@ -1189,7 +1263,7 @@ var shortycut;
                     + ("&" + shortycut.QueryParameters.INDEX + "=" + this.index);
             }
             else {
-                return shortycut.replaceAll(this.linkGeneratorFunction ? this.linkGeneratorFunction(this.searchTerm) : this._url, shortycut.config.shortcutFormat.url.searchTermPlaceholder, encodeURIComponent(searchTerm), shortycut.config.shortcutFormat.keyword.caseSensitive);
+                return this.url;
             }
         };
         Object.defineProperty(Link.prototype, "postFields", {
@@ -1426,10 +1500,10 @@ var shortycut;
     }());
     shortycut.MatchingSegment = MatchingSegment;
     var Shortcut = (function () {
-        function Shortcut(keyword, segments, onMultiLink, url, postParameters, linkGeneratorFunction) {
+        function Shortcut(keyword, segments, onMultiLink, urlOrDynamicLink, postParameters) {
             this.keyword = keyword;
             this.all = new Array();
-            this.addLink(keyword, segments, onMultiLink, url, postParameters, linkGeneratorFunction);
+            this.addLink(keyword, segments, onMultiLink, urlOrDynamicLink, postParameters);
         }
         Object.defineProperty(Shortcut.prototype, "bookmarks", {
             get: function () {
@@ -1452,8 +1526,8 @@ var shortycut;
             enumerable: false,
             configurable: true
         });
-        Shortcut.prototype.addLink = function (keyword, segments, onMultiLink, url, postParameters, linkGeneratorFunction) {
-            var link = new Link(keyword, this.all.length, new Segments(segments), onMultiLink, url, postParameters, linkGeneratorFunction);
+        Shortcut.prototype.addLink = function (keyword, segments, onMultiLink, urlOrDynamicLink, postParameters) {
+            var link = new Link(keyword, this.all.length, new Segments(segments), onMultiLink, urlOrDynamicLink, postParameters);
             if ('query' === link.type) {
                 this._queries = this.createOrAdd(link, this._queries);
             }
@@ -1589,13 +1663,13 @@ var shortycut;
         return Pages;
     }());
     shortycut.pages = new Pages();
-    shortycut.linkGeneratorFunctionProtocol = 'function';
+    shortycut.dynamicLinkProtocol = 'function';
     shortycut.startupCache = {
         exceptions: new Array(),
         config: new Array(),
         shortcuts: new Array(),
         initializationErrors: new Array(),
-        linkGeneratorFunctions: {}
+        dynamicLinks: {}
     };
     function initializeVariables() {
         shortycut.config = shortycut.DEFAULT_CONFIG;
@@ -1777,7 +1851,7 @@ var shortycut;
         function FaviconDiscoveryJob(protocol, domain) {
             var _a;
             this.protocol = protocol;
-            this.FOLDERS = (_a = shortycut.config.homepage.suggestions.faviconFolders) !== null && _a !== void 0 ? _a : ['favicons'];
+            this.FOLDERS = (_a = shortycut.config.homepage.suggestions.faviconFolders) !== null && _a !== void 0 ? _a : [];
             this.domains = new Array();
             this.folder = 0;
             this.extension = 0;
@@ -1816,25 +1890,27 @@ var shortycut;
         });
         FaviconDiscoveryJob.prototype.switchToNextUrl = function () {
             if (this.isLocal) {
-                if (++this.extension < FaviconDiscoveryJob.EXTENSIONS.length) {
-                    return true;
-                }
-                else {
+                if (FaviconDiscoveryJob.EXTENSIONS.length <= ++this.extension) {
                     this.extension = 0;
-                    if (++this.folder < this.FOLDERS.length) {
-                        return true;
-                    }
-                    else {
-                        this.domains.splice(1);
-                        return true;
+                    if (this.FOLDERS.length <= ++this.folder) {
+                        if (this.domains[this.domains.length - 1].match(/^[^.]+\.[^.]/)) {
+                            this.folder = 0;
+                            this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
+                        }
+                        else {
+                            this.domains.length = 1;
+                        }
                     }
                 }
+                return true;
             }
-            if (this.domains[0].match(/.*\.[0-9]+$/)) {
-                return false;
+            else {
+                if (this.domains[0].match(/.*\.[0-9]+$/)) {
+                    return false;
+                }
+                this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
+                return this.domains[this.domains.length - 2] !== this.domains[this.domains.length - 1];
             }
-            this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
-            return this.domains[this.domains.length - 2] !== this.domains[this.domains.length - 1];
         };
         FaviconDiscoveryJob.EXTENSIONS = ['ico', 'png', 'jpg', 'svg', 'jpeg'];
         return FaviconDiscoveryJob;
@@ -1996,7 +2072,7 @@ var shortycut;
                 var keyword = _a[_i];
                 for (var _b = 0, _c = shortycut.shortcuts[keyword].all.map(function (item) { return item.link; }); _b < _c.length; _b++) {
                     var link = _c[_b];
-                    var _d = shortycut.FaviconManager.extractProtocolAndDomain(link.url), protocol = _d.protocol, domain = _d.domain;
+                    var _d = shortycut.FaviconManager.extractProtocolAndDomain(link.urlForFavicon), protocol = _d.protocol, domain = _d.domain;
                     if ('file' !== protocol && 'https' !== this.domains.pending[domain]) {
                         this.domains.pending[domain] = protocol;
                     }
@@ -2028,9 +2104,11 @@ var shortycut;
             this.dom.curlLink.removeEventListener('click', this.showCurlCommands);
             this.dom.curlTextarea.addEventListener('focus', this.selectAllCurlCommands);
         };
-        FaviconToolsPage.prototype.showCurlCommands = function () {
+        FaviconToolsPage.prototype.showCurlCommands = function (event) {
             this.dom.curlLink.style.display = 'none';
             this.dom.curlTextarea.style.display = 'block';
+            event.preventDefault();
+            return false;
         };
         FaviconToolsPage.prototype.selectAllCurlCommands = function () {
             this.dom.curlTextarea.select();
@@ -2130,7 +2208,10 @@ var shortycut;
                 rows: new Array(),
                 notification: {
                     self: document.querySelector('#home .notification'),
-                    welcome: document.querySelector('#home .notification .welcome'),
+                    welcome: {
+                        self: document.querySelector('#home .notification .welcome'),
+                        newTabs: document.querySelector('#home .notification .welcome .new-tabs'),
+                    },
                     applicationErrors: document.querySelector('#home .notification .application-errors'),
                     noShortcutsNoError: document.querySelector('#home .notification .no-shortcuts-no-error'),
                     errorWithBacktickSupport: document.querySelector('#home .notification .error-with-backtick-support'),
@@ -2189,8 +2270,9 @@ var shortycut;
                     this.dom.notification.noShortcutsNoError.style.display = 'block';
                 }
             }
-            else if (shortycut.usesDefaultTemplateShortcuts()) {
-                this.dom.notification.welcome.style.display = 'block';
+            else if (shortycut.isDemoMode()) {
+                this.dom.notification.welcome.newTabs.style.display = shortycut.queryParameters.facets.newTabs ? 'none' : 'block';
+                this.dom.notification.welcome.self.style.display = 'block';
             }
         };
         HomePage.prototype.show = function () {
@@ -2282,6 +2364,9 @@ var shortycut;
                 event.preventDefault();
                 return false;
             }
+            else if ('q' === event.key && event.ctrlKey) {
+                this.dom.filter.focus();
+            }
             return true;
         };
         HomePage.prototype.onFilterChanged = function () {
@@ -2310,11 +2395,11 @@ var shortycut;
             }
         };
         HomePage.prototype.clearFilter = function () {
-            this.dom.filter.value = '';
-            this.applyFilter();
-            if (!shortycut.queryParameters.facets.noFocus) {
+            if (!shortycut.queryParameters.facets.noFocus || this.dom.filter.value) {
                 this.dom.filter.focus();
             }
+            this.dom.filter.value = '';
+            this.applyFilter();
         };
         HomePage.prototype.applyFilter = function (autoSelectFirstRow) {
             var _a, _b;
@@ -2356,7 +2441,9 @@ var shortycut;
                 this.selectedIndex = -1;
                 this.dom.headerRow.classList.add('selected');
             }
-            this.dom.notification.self.style.display = 0 < this.suggestions.length ? 'none' : 'block';
+            this.dom.notification.self.style.display = 0 < this.suggestions.length || this.dom.filter.value.trim().length
+                ? 'none'
+                : 'block';
             this.updateInputFieldHighlight();
         };
         HomePage.prototype.createSuggestion = function (shortcut, type, shortcutType) {
@@ -2381,7 +2468,7 @@ var shortycut;
                             ? shortycut.create('div.keyword:html', suggestion.keywordHtml)
                             : '',
                         shortycut.config.homepage.suggestions.showFavicons
-                            ? shortycut.faviconManager.createFavicon(suggestion.shortcut.all[0].link.url)
+                            ? shortycut.faviconManager.createFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
                             : '',
                         shortycut.create('div.description:html', _this.getDescription(suggestion))
                     ], function (rowContent) { return rowContent.addEventListener('click', function (event) {
@@ -2517,6 +2604,10 @@ var shortycut;
                 shortycut.defaultSearchEngine.replacePlaceholders(input);
                 shortycut.redirector.redirect(shortycut.defaultSearchEngine.queries.current, shortycut.defaultSearchEngine.queries.onMultiLink, input, mode);
             }
+            else if (this.suggestions.length) {
+                this.selectedIndex = 0;
+                this.applySuggestion(mode, false);
+            }
         };
         HomePage.prototype.removeFocus = function () {
             var _this = this;
@@ -2650,6 +2741,7 @@ var shortycut;
             this.onClickCloseIcon = this.onClickCloseIcon.bind(this);
             this.onClickBurgerIcon = this.onClickBurgerIcon.bind(this);
             this.onClickBody = this.onClickBody.bind(this);
+            this.onKeyDown = this.onKeyDown.bind(this);
             this.onShortyCut = this.onShortyCut.bind(this);
             this.onDocumentation = this.onDocumentation.bind(this);
             this.onLinkTools = this.onLinkTools.bind(this);
@@ -2668,18 +2760,20 @@ var shortycut;
                 ['Favicons', this.onFavicons]
             ];
             menuItems.forEach(function (array) {
-                return _this.dom.items.appendChild(shortycut.create('div', array[0], function (element) { return element.addEventListener('click', array[1]); }));
+                return _this.dom.items.appendChild(shortycut.create('a', array[0], function (element) { return element.addEventListener('click', array[1]); }));
             });
         };
         Menu.prototype.addEventListeners = function () {
             this.dom.closeIcon.addEventListener('click', this.onClickCloseIcon);
             this.dom.burgerIcon.addEventListener('click', this.onClickBurgerIcon);
             document.body.addEventListener('click', this.onClickBody);
+            document.body.addEventListener('keydown', this.onKeyDown);
         };
         Menu.prototype.removeEventListeners = function () {
             this.dom.closeIcon.removeEventListener('click', this.onClickCloseIcon);
             this.dom.burgerIcon.removeEventListener('click', this.onClickBurgerIcon);
             document.body.removeEventListener('click', this.onClickBody);
+            document.body.removeEventListener('keydown', this.onKeyDown);
         };
         Menu.prototype.showBurgerIcon = function () {
             if (this.dom.menu.style.display === 'none') {
@@ -2760,6 +2854,16 @@ var shortycut;
             event.preventDefault();
             event.stopPropagation();
             return false;
+        };
+        Menu.prototype.onKeyDown = function (event) {
+            if (('Escape' === event.key || 'Esc' === event.key)) {
+                if (this.dom.items.style.display !== 'none') {
+                    this.closeMenu();
+                    event.preventDefault();
+                    return false;
+                }
+            }
+            return true;
         };
         return Menu;
     }());
@@ -2869,7 +2973,7 @@ var shortycut;
             this.searchTerm = searchTerm;
             this.dom.listItems = __spreadArrays([
                 this.createHeader()
-            ], this.links.slice(1).map(function (link, index) { return _this.createLink(index + 1, link.getHref(_this.searchTerm), link.segments.descriptionHtml, index + 2 === _this.links.length ? function () { return false; } : undefined, shortycut.sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, ''))); }));
+            ], this.links.slice(1).map(function (link, index) { return _this.createLink(index + 1, link.getHref(_this.searchTerm), link.segments.descriptionHtml, function (event) { return _this.openSelected(event, index + 1); }, shortycut.sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, ''))); }));
             this.dom.shortlist.innerHTML = '';
             this.dom.listItems.forEach(function (href) { return _this.dom.shortlist.appendChild(href); });
             this.focusIndex = 0;
@@ -2883,13 +2987,13 @@ var shortycut;
             a.href = href;
             a.id = "shortlist" + index;
             a.innerHTML = shortycut.create('div.row', [
-                shortycut.create('div.icon', shortycut.create('img', function (element) { return element.src = 'resources/arrow.svg'; })),
+                shortycut.create('div.icon', shortycut.createImage('resources/arrow.svg')),
                 shortycut.create('div.text', [
                     shortycut.create('div.title', title),
                     subtitle ? shortycut.create('div.url', subtitle) : ''
                 ])
             ]).outerHTML;
-            a.onclick = onClick || null;
+            a.addEventListener('click', onClick);
             return a;
         };
         ShortlistPage.prototype.show = function () {
@@ -2910,7 +3014,6 @@ var shortycut;
             ['keyup', 'keydown'].forEach(function (event) { return document.removeEventListener(event, _this.onKey); });
         };
         ShortlistPage.prototype.onKey = function (event) {
-            var _this = this;
             var _a;
             if ('keyup' === event.type) {
                 return false;
@@ -2919,28 +3022,30 @@ var shortycut;
             var current = id.match(/^shortlist[0-9]+$/) ? parseInt(id.replace(/shortlist/, '')) : -1;
             if ('Enter' === event.key) {
                 if (0 === current) {
-                    return this.openAll();
+                    return this.openAll(event);
                 }
                 else if (current < this.links.length) {
-                    shortycut.redirector.redirect([this.links[current]], shortycut.OnMultiLink.OPEN_IN_NEW_TAB, this.searchTerm, event.ctrlKey ? shortycut.RedirectMode.NEW_TAB : shortycut.RedirectMode.PRESERVE_HISTORY);
-                    if (event.ctrlKey) {
-                        event.preventDefault();
-                    }
+                    return this.openSelected(event, current);
+                }
+                else {
+                    event.preventDefault();
                     return false;
                 }
             }
-            else if ('Escape' === event.key) {
-                this.focusIndex = current;
-                setTimeout(function () { return shortycut.router.goHome(); }, 0);
-                return false;
+            else {
+                this.focusIndex = this.getTargetIndex(event.key, current);
+                this.dom.listItems[this.focusIndex].focus();
+                return true;
             }
-            this.focusIndex = this.getTargetIndex(event.key, current);
-            setTimeout(function () { return _this.dom.listItems[_this.focusIndex].focus(); }, 1);
-            return true;
         };
-        ShortlistPage.prototype.openAll = function () {
-            this.hide();
+        ShortlistPage.prototype.openSelected = function (event, current) {
+            shortycut.redirector.redirect([this.links[current]], shortycut.OnMultiLink.OPEN_IN_NEW_TAB, this.searchTerm, shortycut.queryParameters.facets.newTabs ? shortycut.RedirectMode.NEW_TAB : shortycut.RedirectMode.PRESERVE_HISTORY);
+            event.preventDefault();
+            return false;
+        };
+        ShortlistPage.prototype.openAll = function (event) {
             shortycut.redirector.redirect(this.links.slice(1), shortycut.OnMultiLink.OPEN_IN_NEW_TAB, this.searchTerm, shortycut.RedirectMode.PRESERVE_HISTORY);
+            event.preventDefault();
             return false;
         };
         ShortlistPage.prototype.getTargetIndex = function (key, current) {
@@ -2971,7 +3076,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -3272,7 +3377,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return '1.1-dev'.replace(/^##.*/, '');
+        return '1.1'.replace(/^##.*/, '');
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {
@@ -3287,12 +3392,12 @@ var shortycut;
         return supportsBacktickSyntax;
     }
     shortycut.supportsBacktickSyntax = supportsBacktickSyntax;
-    function usesDefaultTemplateShortcuts() {
+    function isDemoMode() {
         var keywords = ['tm', 'tz', 'tp', 'tt', 'tr', 'e', 'news'];
         return Object.keys(shortycut.shortcuts).length == keywords.length
             && keywords.filter(function (keyword) { return shortycut.shortcuts[keyword]; }).length === keywords.length;
     }
-    shortycut.usesDefaultTemplateShortcuts = usesDefaultTemplateShortcuts;
+    shortycut.isDemoMode = isDemoMode;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {

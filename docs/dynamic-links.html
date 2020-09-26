@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Dynamic links - ShortyCut</title>
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link href="css/custom.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Dynamic links";
+    var mkdocs_page_input_path = "dynamic-links.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> ShortyCut</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Introduction</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="keywords.html">Keywords</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortycut.html">ShortyCut</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Defining shortcuts</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="file-format.html">File format</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="shortcut-syntax.html">Shortcut syntax</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="multi-link-shortcuts.html">Multi-link shortcuts</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="dynamic-links.html">Dynamic links</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="hotkeys.html">Hotkeys</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="grouping.html">Grouping</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="loading-separate-files.html">Loading separate files</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Browser integration</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="browser-integration.html">Overview</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="homepage.html">Homepage</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="keyword-query.html">Keyword query</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="web-server.html">Web server</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Miscellaneous</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="favicons.html">Favicons</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api.html">API</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">ShortyCut</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">ShortyCut</a> &raquo;</li>
+    
+      
+        
+          <li>Defining shortcuts &raquo;</li>
+        
+      
+    
+    <li>Dynamic links</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="dynamic-links"><img alt="" src="img/arrow.svg" /> Dynamic links</h1>
+<p>ShortyCut allows to dynamically open different links based on the current search term.
+This is an advanced technique that requires JavaScript code to be written.
+It helps to reduce the overall number of keywords by reusing preexisting ones for similar queries.</p>
+<h2 id="use-case"><img alt="" src="img/arrow.svg" /> Use case</h2>
+<p>Sometimes there are different ways how information can be accessed and searched.
+One example are the MkDocs issues reported on GitHub.
+They can be accessed by...</p>
+<ul>
+<li>Listing all issues<br>
+  <a href="https://github.com/mkdocs/mkdocs/issues">https://github.com/mkdocs/mkdocs/issues</a></li>
+<li>Performing a full-text search<br>
+  <a href="https://github.com/mkdocs/mkdocs/issues?q=style">https://github.com/mkdocs/mkdocs/issues?q=style</a></li>
+<li>Opening one specific issue<br>
+  <a href="https://github.com/mkdocs/mkdocs/issues/2163">https://github.com/mkdocs/mkdocs/issues/2163</a></li>
+</ul>
+<p>Creating separate keywords allows to quickly navigate to the most suitable page on a case-by-case basis:</p>
+<pre><code class="javascript">shortycut.addShortcuts(`
+
+    [mkdli] MkDocs » List issues    https://github.com/mkdocs/mkdocs/issues
+    [mkdsi] MkDocs » Search issues  https://github.com/mkdocs/mkdocs/issues?q=%s
+    [mkdgi] MkDocs » Goto issue     https://github.com/mkdocs/mkdocs/issues/%s
+`);
+</code></pre>
+
+<p>This provides great flexibility, but also increases the number of keywords.
+From a usability point of view, it would be better to have only one keyword for all links:</p>
+<pre><code class="javascript">shortycut.addShortcuts(`
+
+    [mkdi]  MkDocs » Issues         https://github.com/mkdocs/mkdocs/issues
+    [mkdi]  MkDocs » Search issues  https://github.com/mkdocs/mkdocs/issues?q=%s
+    [mkdi]  MkDocs » Goto issue     https://github.com/mkdocs/mkdocs/issues/%s
+`);
+</code></pre>
+
+<p>ShortyCut distinguishes between bookmarks and queries.
+Bookmarks are static links like the issue listing - they always open the same page.
+Queries, on the other hand, contain the <code>%s</code> placeholder and require a search term.
+Both types can share the same keyword.
+If entered on its own, ShortyCut would use the bookmark.
+If the keyword is accompanied by a search term, the query would be used instead.</p>
+<p>In the above example, using only <code>mkdi</code> would open the issue listing, because that's the only bookmark for the keyword.
+But if a search term was entered as well, two queries (search issues and goto issue) would match.
+Depending on the configuration,
+ShortyCut would either open both links in separate tabs or display a list to manually choose from.</p>
+<p>Dynamic links avoid opening multiple tabs or having to choose from a list.
+They analyse the search term and automatically select the most suitable target page.</p>
+<h2 id="creating-dynamic-links"><img alt="" src="img/arrow.svg" /> Creating dynamic links</h2>
+<p>Dynamic links are simple JavaScript functions.
+They receive the search term as a parameter and return the applicable link as the result:</p>
+<pre><code class="javascript">function mkDocsIssues(searchTerm) {
+
+    if (searchTerm.trim().match(/^[0-9]+$/)) {
+        return 'https://github.com/mkdocs/mkdocs/issues/%s';
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+    }
+}
+</code></pre>
+
+<p>The search term is passed in as regular text (i.e. not URL-encoded).
+Prior to embedding it into a link, it needs to be be passed through <code>encodeURIComponent()</code>.
+However, it's easier to just return a link with the <code>%s</code> placeholder and let ShortyCut insert the search term.</p>
+<p>The next step is to register the function:</p>
+<pre><code class="javascript">var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
+</code></pre>
+
+<p>This generates a virtual link, which can be used like any other link when defining shortcuts:</p>
+<pre><code class="javascript">shortycut.addShortcuts(`
+
+    [mkdi]  MkDocs » Issues  https://github.com/mkdocs/mkdocs/issues
+    [mkdi]  MkDocs » Issues  ${ mkDocsIssuesUrl }
+`);
+</code></pre>
+
+<p>Interpolation with <code>${</code> and <code>}</code> only works for backtick (multi-line) strings.
+When using the legacy syntax for older browsers, the variable must be appended instead:</p>
+<pre><code class="javascript">shortycut.addShortcuts([
+
+    '[mkdi]  MkDocs » Issues    https://github.com/mkdocs/mkdocs/issues',
+    '[mkdi]  MkDocs » Issues' + mkDocsIssuesUrl
+]);
+</code></pre>
+
+<p>With these shortcuts in place, there's only keyword to remember.
+Depending on the search term (if any), it opens the right page straight away.</p>
+<h2 id="favicons"><img alt="" src="img/arrow.svg" /> Favicons</h2>
+<p>ShortyCut shows favicons on its homepage, if the configuration property
+<a href="configuration.html#homepagesuggestionsshowfavicons">showFavicons</a> is set to <code>true</code>:</p>
+<p><img alt="" src="img/favicons-suggestions.png" /></p>
+<p>For dynamic links, ShortyCut selects the favicon based on a sample URL,
+which it retrieves by passing the following search terms to the dynamic link function:</p>
+<ul>
+<li><code>undefined</code></li>
+<li><code>null</code></li>
+<li><code>''</code> (empty string)</li>
+<li><code>'1'</code> (as a string)</li>
+</ul>
+<p>Exceptions are discarded silently and the first valid URL returned is used to determine the favicon.
+Although usually not needed, a preferred domain can be nominated by returning a corresponding link
+when the search term is <code>null</code> or <code>undefined</code>:</p>
+<pre><code class="javascript">function mkDocsIssues(searchTerm) {
+
+    if (undefined === searchTerm) {
+        return 'https://www.mkdocs.org/';
+    }
+
+    if (searchTerm.trim().match(/^[0-9]+$/)) {
+        return 'https://github.com/mkdocs/mkdocs/issues/%s';
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+    }
+}
+</code></pre>
+
+<p>This dynamic link redirects all queries to one of two GitHub pages,
+but uses the favicon of MkDoc's homepage (rather than the one from GibHub).</p>
+<p>There is no need to map the search term <code>null</code> or <code>undefined</code> to a dedicated URL,
+unless the favicon of the links returned by the function anyway (GitHub in the example above) are unsuitable.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="hotkeys.html" class="btn btn-neutral float-right" title="Hotkeys">Next  &#x25BA;</a>
+      
+      
+        <a href="post-links.html" class="btn btn-neutral" title="POST links">&#x25C4;  Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="post-links.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="hotkeys.html" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

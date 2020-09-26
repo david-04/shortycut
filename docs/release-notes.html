@@ -67,11 +67,15 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
                     </li>
+                    <li class="toctree-l1"><a class="reference internal" href="dynamic-links.html">Dynamic links</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="hotkeys.html">Hotkeys</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="grouping.html">Grouping</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="loading-separate-files.html">Loading separate files</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Browser integration</span></p>
@@ -90,6 +94,8 @@
                     <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="favicons.html">Favicons</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api.html">API</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
                     </li>
@@ -133,6 +139,23 @@
             <div class="section">
               
                 <h1 id="release-notes"><img alt="" src="img/arrow.svg" /> Release notes</h1>
+<h2 id="version-11-2020-09-26">Version 1.1 / 2020-09-26</h2>
+<ul>
+<li>Added the ability to <a href="loading-separate-files.html">load additional JavaScript files</a>,
+  so that large shortcut collections can be spread across multiple files</li>
+<li>Added support for <a href="dynamic-links.html">dynamic links</a>,
+  which allow keywords to redirect to different pages based on the search term</li>
+<li>Improved the way how <a href="hotkeys.html">hotkeys</a> are selected,
+  favoring letters that are uppercase or appear at the beginning of words</li>
+<li>Improved the homepage's ability to lock itself to a <a href="homepage.html">pinned browser tab</a>
+  by opening links to the manual in new tabs</li>
+<li>Improved the accessibility of the menu through the keyboard
+  when using a browser extensions like Vimium</li>
+<li>Fixed an issue that could cause <a href="post-links.html">POST links</a> to fail or send wrong data
+  if the search term contained special characters like <code>&amp;</code> or <code>%</code></li>
+<li>Fixed an issue with the homepage's <a href="homepage.html">no-focus mode</a>
+  where control keys like <code>Alt</code> and <code>Ctrl</code> would still put the focus on the input field</li>
+</ul>
 <h2 id="version-10-2020-08-16">Version 1.0 / 2020-08-16</h2>
 <ul>
 <li>Initial release</li>

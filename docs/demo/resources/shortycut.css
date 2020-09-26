@@ -73,6 +73,7 @@ pre {
 #favicon-tools .missing .row,
 #favicon-tools .offline .row {
     width: 100%;
+    white-space: nowrap;
 }
 #favicon-tools .online .row .icon,
 #favicon-tools .offline .row .icon {
@@ -111,7 +112,6 @@ pre {
     margin: auto;
     position: relative;
     top: 40%;
-    height: 100%;
     padding-left: 1em;
     padding-right: 1em;
 }
@@ -345,6 +345,11 @@ pre {
 /* ------------------------------------------------------------------------------------------------------------------ */
 /* Burger icon                                                                                                        */
 /* ------------------------------------------------------------------------------------------------------------------ */
+#menu a {
+    text-decoration: none;
+    color: inherit;
+    outline: none;
+}
 #menu .burger-icon {
     position: absolute;
     top: 0;
@@ -406,16 +411,20 @@ pre {
     background-color: #eeeeee;
     border: 1px solid #888888;
 }
-#menu .items div {
+#menu .items a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    outline: none;
     width: 100%;
     padding: 0.4em;
     white-space: nowrap;
 }
-#menu .items div:first-child {
+#menu .items a:first-child {
     border-bottom: 1px solid #888888;
     background-color: #dddddd;
 }
-#menu .items div:hover {
+#menu .items a:hover {
     cursor: pointer;
     background-color: #444444;
     color: white;
@@ -539,8 +548,13 @@ pre {
     padding: 0.4em;
     margin-top: 1.5em;
 }
-#setup .instructions .highlight {
+#setup .instructions pre .highlight {
     color: red;
+}
+#setup .instructions pre .arrow {
+    display: inline-block;
+    width: 2em;
+    text-align: right;
 }
 /* ------------------------------------------------------------------------------------------------------------------ */
 /* Syntax warning                                                                                                     */
@@ -550,8 +564,10 @@ pre {
 }
 #setup .syntax-warning .important {
     color: red;
-    background-color: yellow;
-    padding: 0.1em;
+    background-color: #ffff6b;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+    padding: 0.25em 0 0.25em 0;
 }
 /* ------------------------------------------------------------------------------------------------------------------ */
 /* Button                                                                                                             */

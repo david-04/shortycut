@@ -67,11 +67,15 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
                     </li>
+                    <li class="toctree-l1"><a class="reference internal" href="dynamic-links.html">Dynamic links</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="hotkeys.html">Hotkeys</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="grouping.html">Grouping</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="loading-separate-files.html">Loading separate files</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Browser integration</span></p>
@@ -90,6 +94,8 @@
                     <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="favicons.html">Favicons</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api.html">API</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
                     </li>
@@ -157,7 +163,7 @@ This can also be set as the default behavior in the
 <a href="configuration.html#shortcutformaturlmultilinkindicatordefault">configuration</a>,
 causing ShortyCut to always open new tabs without showing the list first.
 On top of that, each shortcut can override the default behavior and enforce to either show the list or open new tabs.</p>
-<h1 id="show-a-list"><img alt="" src="img/arrow.svg" /> Show a list</h1>
+<h2 id="show-a-list"><img alt="" src="img/arrow.svg" /> Show a list</h2>
 <p>A question mark (<code>?</code>) in front of links causes the keyword to always show the list:</p>
 <pre><code class="text">[news]  News » Australia  ?https://www.theage.com.au/national
 [news]  News » Finance    ?https://www.reuters.com/finance
@@ -166,7 +172,7 @@ On top of that, each shortcut can override the default behavior and enforce to e
 </code></pre>
 
 <p>In this example, the <code>news</code> keyword will always show the list, even if the default behavior is set to open new tabs.</p>
-<h1 id="open-new-tabs"><img alt="" src="img/arrow.svg" /> Open new tabs</h1>
+<h2 id="open-new-tabs"><img alt="" src="img/arrow.svg" /> Open new tabs</h2>
 <p>A caret (<code>^</code>) in front of links causes the keyword to always open new tabs:</p>
 <pre><code class="text">[news]  News » Australia  ^https://www.theage.com.au/national
 [news]  News » Finance    ^https://www.reuters.com/finance
@@ -175,7 +181,7 @@ On top of that, each shortcut can override the default behavior and enforce to e
 </code></pre>
 
 <p>In this example, the <code>news</code> keyword will always open new tabs, even if the default behavior is set to show the list.</p>
-<h1 id="ignore-previous-links"><img alt="" src="img/arrow.svg" /> Ignore previous links</h1>
+<h2 id="ignore-previous-links"><img alt="" src="img/arrow.svg" /> Ignore previous links</h2>
 <p>An equals sign (<code>=</code>) in front of a link causes all previous links to be discarded:</p>
 <pre><code class="text">[news]  News » Australia  ?https://www.theage.com.au/national
 [news]  News » Finance    ?https://www.reuters.com/finance
@@ -190,7 +196,7 @@ It's the same effect as if the first three lines lines were not there at all.</p
 It can be used to override individual keywords when importing shared shortcut collections.
 It can also be used to temporarily redirect or repurpose a keyword,
 without having to delete (and later restore) the current set of links.</p>
-<h1 id="mixing-behaviors"><img alt="" src="img/arrow.svg" /> Mixing behaviors</h1>
+<h2 id="mixing-behaviors"><img alt="" src="img/arrow.svg" /> Mixing behaviors</h2>
 <p>The equals sign (<code>=</code>) always causes the previous links to be discarded.
 The behavior for the remaining shortcuts is determined only by the last link.</p>
 <pre><code class="text">[news]  News » Australia   https://www.theage.com.au/national

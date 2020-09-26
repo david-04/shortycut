@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="img/favicon.ico">
-  <title>POST links - ShortyCut</title>
+  <title>Loading separate files - ShortyCut</title>
 
   <link rel="stylesheet" href="css/theme.css" />
   <link rel="stylesheet" href="css/theme_extra.css" />
@@ -17,8 +17,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "POST links";
-    var mkdocs_page_input_path = "post-links.md";
+    var mkdocs_page_name = "Loading separate files";
+    var mkdocs_page_input_path = "loading-separate-files.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -65,7 +65,7 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="multi-link-shortcuts.html">Multi-link shortcuts</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="post-links.html">POST links</a>
+                    <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="dynamic-links.html">Dynamic links</a>
                     </li>
@@ -75,7 +75,7 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="default-search-engine.html">Default search engine</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="loading-separate-files.html">Loading separate files</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="loading-separate-files.html">Loading separate files</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Browser integration</span></p>
@@ -127,7 +127,7 @@
         
       
     
-    <li>POST links</li>
+    <li>Loading separate files</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -138,66 +138,92 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="post-links"><img alt="" src="img/arrow.svg" /> POST links</h1>
-<p>Some pages transmit data via the <code>POST</code> method,
-which prevents filters and settings from showing up in the browser's address bar.
-It's often used for sensitive input like usernames and passwords.
-As a side effect, these pages can't (and often shouldn't) be bookmarked.
-But in some cases it's safe and handy to create a shortcut nevertheless.</p>
-<h2 id="link-syntax"><img alt="" src="img/arrow.svg" /> Link syntax</h2>
-<p>A regular link becomes a <code>POST</code> link by appending <code>?POST?</code> followed by the data to be transmitted:</p>
-<pre><code class="text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=secret
+                <h1 id="loading-separate-files"><img alt="" src="img/arrow.svg" /> Loading separate files</h1>
+<p>Shortcuts can become hard to maintain if too many of them accumulate in <code>shortcuts.js</code>.
+It's better to organize large collections in separate files.</p>
+<h2 id="loading-additional-files"><img alt="" src="img/arrow.svg" /> Loading additional files</h2>
+<p>A common scenario is to have personal and work-related shortcuts.
+Instead of putting all of them into <code>shortcuts.js</code>, separate files can be created:</p>
+<pre><code class="javascript">// File: shortcuts-personal.js
+
+shortycut.addShortcuts(`
+    [cv]  Cat videos    https://www.youtube.com/results?search_query=cats
+    [tv]  TV Guide      https://www.yourtv.com.au/guide/
+`);
 </code></pre>
 
-<p>In this example, the username <code>shortycut</code> and the password <code>secret</code> would be transmitted
-without showing up in the browser's address bar.
-The fields must be in <code>key=value</code> format and separated by an ampersand (<code>&amp;</code>).
-The placeholder <code>%s</code> can be used like in any other link:</p>
-<pre><code class="text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=%s
+<pre><code class="javascript">// File: shortcuts-work.js
+
+shortycut.addShortcuts(`
+    [cm]  Canteen menu  https://www.my-company.com/canteen/menu
+    [ts]  Timesheets    https://www.my-company.com/timesheet
+`);
 </code></pre>
 
-<p>In this example, the password needs to be entered alongside the keyword.
-Typing <code>ebay secret</code> in the browser's address bar would attempt to log in user <code>shortycut</code> with the password <code>secret</code>.</p>
-<h2 id="url-encoding"><img alt="" src="img/arrow.svg" /> URL-Encoding</h2>
-<p>All keys and values (except for the <code>%s</code> placeholder) must be URL-encoded.
-This means that most characters apart from letters and digits can't be used directly.
-One example is the <code>@</code> symbol, which needs to be written as <code>%40</code> instead.
-If the username was <code>me@gmail.com</code>, the login link would look like this:</p>
-<pre><code class="text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=me%40gmail.com&amp;password=%s
+<p>When stored in ShortyCut's <code>data</code> folder, these files can be loaded from <code>shortcuts.js</code>:</p>
+<pre><code class="javascript">// File: shortcuts.js
+
+shortycut.loadJavaScript(
+    'shortcuts-personal.js',
+    'shortcuts-work.js'
+);
 </code></pre>
 
-<p>ShortyCut includes link tools, which can be used to quickly encode any text.
-It's accessed via the burger icon on the upper right-hand side of the homepage:</p>
-<p><img alt="" src="img/menu-link-tools.png" /></p>
-<p>The section for URL-encoding contains two fields, one for the plain text and one for the URL-encoded version.
-Everything typed into the plain text field is encoded immediately.
-The result is displayed in the field below:</p>
-<p><img alt="" src="img/url-encoding.png" /></p>
-<p>Text that is already encoded can also be decoded by entering it into the URL-encoded field.</p>
-<h2 id="extracting-post-links"><img alt="" src="img/arrow.svg" /> Extracting POST links</h2>
-<p>Preparing a <code>POST</code> link can be a bit of a  scavenger hunt.
-The field names can't be seen in the browser's address bar and usually need to be extracted from the page's source code.
-An easier way is to automatically extract the links from the network traffic recorded by the browser.
-The instructions below are based on Chrome, but it works similarly in most other browsers as well.</p>
-<p>The first step is to open the page and populate the form fields.
-Before clicking the submit button, right-click anywhere on the page and select "Inspect":</p>
-<p><img alt="" src="img/har-01-inspect.png" /></p>
-<p>This will open the browser's developer tools on the side or at the bottom of the window.
-Switch to the "Network" tab and tick the "preserve log" checkbox.
-In some browsers this might be hidden in the menu and have a different name (e.g. "persist log"):</p>
-<p><img alt="" src="img/har-02-dev-tools.png" /></p>
-<p>Now submit the form (in this example by clicking on "Log in &amp; check e-mails").
-The browser will record and display all network traffic in the "Network" tab:</p>
-<p><img alt="" src="img/har-03-submit.png" /></p>
-<p>Once the page has been loaded, right-click on the network traffic
-and copy (or save) all requests as HAR (HTTP archive):</p>
-<p><img alt="" src="img/har-04-copy.png" /></p>
-<p>Then open ShortyCut's link tools via the burger icon on the homepage:</p>
-<p><img alt="" src="img/menu-link-tools.png" /></p>
-<p>Scroll down to the section for extracting <code>POST</code> links and paste the HTTP archive (HAR) data into the text field:</p>
-<p><img alt="" src="img/har-05-extract.png" /></p>
-<p>ShortyCut will extract all <code>POST</code> requests and display the matching links below the input field.
-The links are already URL-encoded and can be modified as required (e.g. by replacing a value with the <code>%s</code> placeholder).</p>
+<p>Spreading shortcuts across multiple files also allows to easily hide and restore some of them
+by adding or removing the respective files from the <code>loadJavaScript</code> command.</p>
+<h2 id="relative-and-absolute-paths"><img alt="" src="img/arrow.svg" /> Relative and absolute paths</h2>
+<p>By default, <code>loadJavaScript</code> loads the files from ShortyCut's <code>data</code> folder.
+Sometimes it's beneficial to create subfolders and use relative paths:</p>
+<pre><code class="javascript">shortycut.loadJavaScript(
+    'personal/entertainment.js',
+    'personal/shopping.js',
+    'work/hr-and-policies.js',
+    'work/project-matilda.js'
+);
+</code></pre>
+
+<p>Files can also be loaded from the internet or a (shared network) drive
+by using their full address (including the protocol like <code>https://</code> or <code>file://</code>):</p>
+<pre><code class="javascript">shortycut.loadJavaScript(
+    'https://www.my-domain.com/shortycut/my-personal-shortcuts.js',
+    'file:///S:/Shared/Finance-Team/ShortyCut/finance-systems.js'
+);
+</code></pre>
+
+<p>Loading files via the network can slow down ShortyCut,
+because it waits until all files have been fully loaded before redirecting or showing the homepage.</p>
+<h2 id="loading-files-in-a-specific-order"><img alt="" src="img/arrow.svg" /> Loading files in a specific order</h2>
+<p>ShortyCut starts to load all files in parallel, even when using separate <code>loadJavaScript</code> commands:</p>
+<pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js');
+shortycut.loadJavaScript('shortcuts-02.js', 'shortcuts-03.js');
+</code></pre>
+
+<p>In this example, all three files are loaded simultaneously.
+However, some might load quicker and overtake others along the way.
+This could lead to <code>shortcuts-03.js</code> to effectively come before <code>shortcuts-01.js</code>.</p>
+<p>Loading files in parallel is quicker than doing it sequentially.
+But their actual order is unpredictable and can be different each time.
+In many cases that's not a problem, but it can become one when a file overrides keywords
+or uses JavaScript variables and functions that are defined in another file.
+In those cases, <code>andThen</code> can be used to describe dependencies between the files:</p>
+<pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js')
+                .andThen('shortcuts-03.js', 'shortcuts-04.js')
+                .andThen('shortcuts-05.js'                   );
+</code></pre>
+
+<p>This example starts by loading <code>shortcuts-01.js</code> and <code>shortcuts-02.js</code> in parallel.
+When both files have been fully loaded, <code>shortcuts-03.js</code> and <code>shortcuts-04.js</code> are loaded in parallel.
+When those files have both been loaded as well, ShortyCut starts to load<code>shortcuts-05.js</code>.</p>
+<p>For performance reasons it's best to load as many files in parallel as possible.
+To describe complex dependencies, the same file can be passed to <code>loadJavaScript</code> multiple times:</p>
+<pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js');
+shortycut.loadJavaScript('shortcuts-01.js').thenLoad( 'shortcuts-03.js');
+</code></pre>
+
+<p>In this example, <code>shortcuts-01.js</code> and <code>shortcuts-02.js</code> are loaded in parallel.
+<code>shortcuts-03.js</code> is loaded after <code>shortcuts-01.js</code> (but independent of <code>shortcuts-02.js</code>).
+Passing the same file to <code>loadJavaScript</code> again does not cause a reload.
+That is, the second line does not actually load <code>shortcuts-01.js</code>, because it has already been loaded in the first line.</p>
               
             </div>
           </div>
@@ -205,10 +231,10 @@ The links are already URL-encoded and can be modified as required (e.g. by repla
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="dynamic-links.html" class="btn btn-neutral float-right" title="Dynamic links">Next  &#x25BA;</a>
+        <a href="browser-integration.html" class="btn btn-neutral float-right" title="Overview">Next  &#x25BA;</a>
       
       
-        <a href="multi-link-shortcuts.html" class="btn btn-neutral" title="Multi-link shortcuts">&#x25C4;  Previous</a>
+        <a href="default-search-engine.html" class="btn btn-neutral" title="Default search engine">&#x25C4;  Previous</a>
       
     </div>
   
@@ -234,10 +260,10 @@ The links are already URL-encoded and can be modified as required (e.g. by repla
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="multi-link-shortcuts.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="default-search-engine.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="dynamic-links.html" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="browser-integration.html" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
