@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) Keyword query
 
-This integration method only works with browsers which natively support keywords (e.g. Chrome and Firefox).
+This integration method only works with browsers which natively support keywords (e.g. Firefox, Chrome and other Chromium-based browsers).
 It's an easy way to make ShortyCut accessible through the browser's address bar.
 A dedicated keyword (e.g. `sc`) is assigned to ShortyCut itself and needs to be entered before the actual keyword.
 For example, if the shortcut `e` performs a product search on eBay, then a search for sunglasses would be started via:
@@ -31,9 +31,10 @@ create a new bookmark and assign the keyword there:
 
 The keyword can also be changed later in the properties' dialog when editing the bookmark.
 
-## ![](img/arrow.svg) Chrome
+## ![](img/arrow.svg) Chrome and other Chromium-based browsers
 
-To create a keyword query in Chrome, open the browser integration page via the homepage's menu:
+To create a keyword query in Chrome or other Chromium-based browsers,
+open the browser integration page via the homepage's menu:
 
 ![](img/menu-browser-integration.png)
 

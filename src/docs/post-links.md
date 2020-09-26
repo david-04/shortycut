@@ -57,7 +57,7 @@ Text that is already encoded can also be decoded by entering it into the URL-enc
 Preparing a `POST` link can be a bit of a  scavenger hunt.
 The field names can't be seen in the browser's address bar and usually need to be extracted from the page's source code.
 An easier way is to automatically extract the links from the network traffic recorded by the browser.
-The instructions below are based on Chrome, but it can be done in most other browsers as well.
+The instructions below are based on Chrome, but it works similarly in most other browsers as well.
 
 The first step is to open the page and populate the form fields.
 Before clicking the submit button, right-click anywhere on the page and select "Inspect":

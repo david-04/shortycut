@@ -85,12 +85,12 @@ Keywords are incredibly handy.
 They bypass long-winded navigation steps, restore filter settings and open the right page straight away.
 As a native browser feature, they do have some limitations, though.
 
-In Chrome, for example, the usability is not great.
+In Chromium-based browsers, for example, the usability is not great.
 In order to assign keywords, bookmarks need to be added as search engines.
 This is done in the settings and less convenient than working with regular bookmarks.
 Search engines can't be organized in folders either.
 All keywords end up in one long list, making it hard to maintain them.
 
-Some browsers, like for example Edge, don't support keywords at all.
+Some browsers, don't support keywords at all.
 And those that do, usually lack the ability to synchronize them with other browsers.
 Keywords need to be maintained separately when using different browsers simultaneously.

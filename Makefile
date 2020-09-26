@@ -11,7 +11,7 @@ SHORTYCUT_ZIP=shortycut-$(VERSION).zip
 # Targets
 #-----------------------------------------------------------------------------------------------------------------------
 
-autorun :
+help :
 	echo
 	echo "    tsc ....... compile TypeScript"
 	echo "    watch ..... watch and re-compile TypeScript"

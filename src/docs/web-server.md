@@ -8,11 +8,11 @@ Once set up, keywords can be entered directly in the browser's address bar:
 This method requires a web server to run on the local machine
 or ShortyCut to be uploaded to a web hosting service.
 
-## ![](img/arrow.svg) No web server required for Chrome
+## ![](img/arrow.svg) Chromium-based browsers
 
-It's not necessary to run a web server when using Chrome.
-Instead create a keyword query and mark it as the default search engine.
-See "[Keyword query](keyword-query.md#chrome)" for details.
+It's not necessary to run a web server when using a Chromium-based browser.
+Instead, create a keyword query as the default search engine.
+See "[Keyword query](keyword-query.md#chrome-and-other-chromium-based-browsers)" for details.
 For all other browsers follow the instructions below.
 
 ## ![](img/arrow.svg) Starting the built-in web server
@@ -87,7 +87,7 @@ It will especially block suggestions that are usually displayed as you type.
 
 ## ![](img/arrow.svg) Using encrypted connections
 
-Some browsers like Edge only detect and accept search engines which are accessed via encrypted `https`.
+Some browsers only detect and accept search engines which are accessed via encrypted `https`.
 When using such a browser in combination with the built-in web server, open ShortyCut via this link:
 
 [https://localhost:4172/](https://localhost:4172/)
