@@ -36,11 +36,11 @@ namespace shortycut {
             );
         }
 
-        const key = `${dynamicLinkProtocol}://${Object.keys(startupCache.dynamicLinks).length}-${Math.random()}`;
-        startupCache.dynamicLinks[key] = {
+        const key = `${dynamicLinkProtocol}://${startupCache.dynamicLinks.size}-${Math.random()}`;
+        startupCache.dynamicLinks.put(key, {
             generator: dynamicLinkFunction,
             urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
-        };
+        });
         return key;
     }
 
@@ -55,9 +55,9 @@ namespace shortycut {
                     if (isUrl(url)) {
                         return url;
                     } else if (!invalidUrl) {
-                        invalidUrl = `${(dynamicLinkFunction as any)?.name || 'function'}(${
-                            undefined === searchTerm || null === searchTerm ? `${searchTerm}` : `'${searchTerm}'`
-                            }) => ${url}`;
+                        const name = (dynamicLinkFunction as any)?.name || 'function';
+                        const parameter = undefined === searchTerm || null === searchTerm ? `${searchTerm}` : `'${searchTerm}'`;
+                        invalidUrl = `${name}(${parameter}) => ${url}`;
                     }
                 }
             } catch (ignored) { }

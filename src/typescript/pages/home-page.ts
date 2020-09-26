@@ -72,7 +72,7 @@ namespace shortycut {
         public populateNotification() {
             if (startupCache.initializationErrors.length) {
                 this.dom.notification.applicationErrors.innerHTML = create('div.header',
-                    1 == startupCache.initializationErrors.length
+                    1 === startupCache.initializationErrors.length
                         ? 'An error occurred during initialization'
                         : 'Errors occurred during initialization'
                 ).outerHTML;
@@ -80,7 +80,7 @@ namespace shortycut {
                     .map(error => error.toHtml())
                     .forEach(element => this.dom.notification.applicationErrors.appendChild(element));
                 this.dom.notification.applicationErrors.style.display = 'block';
-            } else if (0 == Object.keys(shortcuts).length) {
+            } else if (0 === shortcuts.size) {
                 if (startupCache.exceptions.length) {
                     if (supportsBacktickSyntax()) {
                         this.dom.notification.errorWithBacktickSupport.style.display = 'block';
@@ -256,7 +256,7 @@ namespace shortycut {
 
             if (keyword) {
 
-                const shortcut = shortcuts[keyword];
+                const shortcut = shortcuts.get(keyword);
 
                 if (!postKeywordInput) {
                     this.suggestions.push(...this.filter.keywordSearch(keyword, postKeywordInput));
@@ -447,7 +447,7 @@ namespace shortycut {
 
             const input = this.dom.filter.value.trim();
             const keyword = adjustCase(input.replace(/\s.*/, ''));
-            const shortcut = shortcuts[keyword];
+            const shortcut = shortcuts.get(keyword);
             let searchTerm: string | undefined = input.replace(/^[^\s]*\s*/, '');
 
             if (!shortcut?.bookmarks && shortcut?.queries && !searchTerm) {

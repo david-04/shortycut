@@ -19,7 +19,7 @@ namespace shortycut {
 
     export type CreateElementConsumer = ((element: HTMLElement) => void | Element | string | Element[] | string[]);
 
-    export type CreateElementProperties = CreateElementConsumer | Element | string | Element[] | string[] | (Element|string)[];
+    export type CreateElementProperties = CreateElementConsumer | Element | string | Element[] | string[] | (Element | string)[];
 
     export function create(type: string, ...args: CreateElementProperties[]): HTMLElement {
 
@@ -38,7 +38,7 @@ namespace shortycut {
 
     class ElementProperties {
 
-        private static readonly cache: { [index: string]: ElementProperties } = {};
+        private static _cache: Hashtable<ElementProperties>;
 
         private constructor(
             public readonly tag: string,
@@ -46,8 +46,12 @@ namespace shortycut {
             public readonly isSanitized: boolean,
             public readonly id?: string) { }
 
+        private static get cache() {
+            return ElementProperties._cache = ElementProperties._cache ?? new Hashtable<ElementProperties>();
+        }
+
         public static of(type: string) {
-            return ElementProperties.cache[type] = ElementProperties.cache[type] ?? ElementProperties.parse(type);
+            return ElementProperties.cache.computeIfAbsent(type, ElementProperties.parse);
         }
 
         private static parse(type: string) {

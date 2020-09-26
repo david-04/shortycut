@@ -23,8 +23,9 @@ namespace shortycut {
         private onCompleteHandler?: () => void;
 
         private get files() {
-            window['shortycut.JavaScriptLoader.files' as any] = window['shortycut.JavaScriptLoader.files' as any] ?? {};
-            return window['shortycut.JavaScriptLoader.files' as any] as any as { [index: string]: JavaScriptFile };
+            const key: any = 'shortycut.JavaScriptLoader.files';
+            window[key] = window[key] ?? new Hashtable<JavaScriptFile>();
+            return window[key] as any as Hashtable<JavaScriptFile>;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -32,7 +33,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public add(url: string, dependencies?: JavaScriptFile[]) {
-            const file = this.files[url] = this.files[url] ?? new JavaScriptFile(url, []);
+            const file = this.files.computeIfAbsent(url, url => new JavaScriptFile(url, []));
             dependencies?.forEach(dependency => file.dependencies.push(dependency));
             this.checkDependenciesAndLoadFiles();
             return file;
@@ -43,7 +44,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private checkDependenciesAndLoadFiles() {
-            const files = Object.keys(this.files).map(url => this.files[url]);
+            const files = this.files.values;
             for (const file of files) {
                 if (file.status === 'waiting' && !file.dependencies.filter(dep => dep.status !== 'completed').length) {
                     this.startLoad(file);

@@ -53,7 +53,7 @@ namespace shortycut {
             }
 
             if ('defaultsearchengine' === config.defaultSearchEngine.keyword) {
-                delete shortcuts[config.defaultSearchEngine.keyword];
+                shortcuts.delete(config.defaultSearchEngine.keyword);
             }
 
             if (!defaultSearchEngine) {
@@ -81,32 +81,32 @@ namespace shortycut {
             let keywords = this.formKeywords(context, this.parseKeywordsAndDescription(context));
             let hasKeywords = false;
 
-            for (const keyword of Object.keys(keywords)) {
-                if (keyword) {
-                    const sections = keywords[keyword];
-                    if (shortcuts[keyword]) {
-                        shortcuts[keyword].addLink(
-                            keyword,
-                            sections,
-                            context.onMultiLink,
-                            context.urlOrDynamicLink,
-                            context.postFields
-                        );
-                    } else {
-                        shortcuts[keyword] = new Shortcut(
-                            keyword,
-                            sections,
-                            context.onMultiLink,
-                            context.urlOrDynamicLink,
-                            context.postFields
-                        );
-                    }
-                    if (keyword === config.defaultSearchEngine.keyword) {
-                        defaultSearchEngine = shortcuts[keyword];
-                    }
-                    hasKeywords = true;
+            keywords.entries.filter(entry => entry.key).forEach(entry => {
+                const keyword = entry.key;
+                const sections = entry.value;
+                if (shortcuts.get(keyword)) {
+                    shortcuts.get(keyword).addLink(
+                        keyword,
+                        sections,
+                        context.onMultiLink,
+                        context.urlOrDynamicLink,
+                        context.postFields
+                    );
+                } else {
+                    shortcuts.put(keyword, new Shortcut(
+                        keyword,
+                        sections,
+                        context.onMultiLink,
+                        context.urlOrDynamicLink,
+                        context.postFields
+                    ));
                 }
+                if (keyword === config.defaultSearchEngine.keyword) {
+                    defaultSearchEngine = shortcuts.get(keyword);
+                }
+                hasKeywords = true;
             }
+            );
 
             if (!hasKeywords) {
                 throw new ParserError('Failed to retrieve the keyword', context.line)
@@ -135,7 +135,7 @@ namespace shortycut {
             context.description = context.line.substr(0, context.line.length - url[0].length);
 
             if (0 === context.urlOrDynamicLink.indexOf(dynamicLinkProtocol)) {
-                context.urlOrDynamicLink = startupCache.dynamicLinks[context.urlOrDynamicLink]
+                context.urlOrDynamicLink = startupCache.dynamicLinks.get(context.urlOrDynamicLink);
                 if (!context.urlOrDynamicLink) {
                     throw new ParserError(
                         'The dynamic link created via shortycut.toUrl() must be at the end of the line',
@@ -271,7 +271,7 @@ namespace shortycut {
 
         private formKeywords(context: ParserContext, segments: Array<{ keywords: string[], description: string }>) {
 
-            let result: { [index: string]: Array<Segment> } = {};
+            let result = new Hashtable<Array<Segment>>();
             let hasMoreCombinations = true;
             let keyword = new Array<string>();
 
@@ -286,7 +286,7 @@ namespace shortycut {
                     keyword[index] = segments[index].keywords[context.combination[index]] ?? '';
                     array.push(this.createSegment(keyword[index], segments[index].description));
                 }
-                result[keyword.join('')] = array;
+                result.put(keyword.join(''), array);
 
                 hasMoreCombinations = false;
                 for (let index = segments.length - 1; 0 <= index; index--) {

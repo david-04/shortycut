@@ -10,11 +10,9 @@ namespace shortycut {
     // Shortcuts
     //------------------------------------------------------------------------------------------------------------------
 
-    export interface Shortcuts {
-        [index: string]: Shortcut
-    }
+    export type Shortcuts = Hashtable<Shortcut>;
 
-    export let shortcuts: Shortcuts = {};
+    export let shortcuts = null as any as Shortcuts;
 
     export let defaultSearchEngine: Shortcut | null = null;
 
@@ -102,13 +100,20 @@ namespace shortycut {
 
     export const dynamicLinkProtocol = 'function';
 
-    export const startupCache = {
-        exceptions: new Array<ErrorEvent>(),
-        config: new Array<object>(),
-        shortcuts: new Array<string>(),
-        initializationErrors: new Array<InitializationError>(),
-        dynamicLinks: {} as { [index: string]: DynamicLink }
-    };
+    class StartupCache {
+
+        public readonly exceptions = new Array<ErrorEvent>();
+        public readonly config = new Array<object>();
+        public readonly shortcuts = new Array<string>();
+        public readonly initializationErrors = new Array<InitializationError>();
+
+        private _dynamicLinks?: Hashtable<DynamicLink>;
+        public get dynamicLinks() {
+            return this._dynamicLinks = this._dynamicLinks ?? new Hashtable<DynamicLink>();
+        }
+    }
+
+    export const startupCache = new StartupCache();
 
     //------------------------------------------------------------------------------------------------------------------
     // Initialization of global variables once all modules have been loaded
@@ -116,6 +121,7 @@ namespace shortycut {
 
     export function initializeVariables() {
         config = DEFAULT_CONFIG;
+        shortcuts = new Hashtable<Shortcut>();
         queryParameters = new QueryParameters();
         redirector = new Redirector();
         router = new Router();

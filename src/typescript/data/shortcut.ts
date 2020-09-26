@@ -404,12 +404,12 @@ namespace shortycut {
         }
 
         public getSegmentMatches(length: number) {
-            const result: { [index: string]: MatchingSegment } = {};
+            const result = new Hashtable<MatchingSegment>();
             for (const link of [...(this._bookmarks?.current || []), ...this.queries?.current || []]) {
                 const match = link.segments.getMatch(length);
-                result[match.fingerprint] = result[match.fingerprint] ?? match;
+                result.computeIfAbsent(match.fingerprint, () => match);
             }
-            return Object.keys(result).map(fingerprint => result[fingerprint]);
+            return result.values;
         }
     }
 }

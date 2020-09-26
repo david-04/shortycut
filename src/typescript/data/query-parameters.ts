@@ -7,7 +7,7 @@ namespace shortycut {
         public static readonly SETUP = 'setup';
         public static readonly FACETS = 'facets';
 
-        public readonly queryParameters: ({ [index: string]: string })
+        public readonly queryParameters: Hashtable<string>;
         public readonly fullQuery: string;
         public readonly keyword: string;
         public readonly searchTerm: string;
@@ -26,14 +26,15 @@ namespace shortycut {
 
             this.queryParameters = this.getQueryParameters();
 
-            this.fullQuery = (this.queryParameters[QueryParameters.QUERY] || '').replace(/\+/g, ' ');
+            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, '').replace(/\+/g, ' ');
             this.keyword = adjustCase(this.fullQuery).replace(/\s.*$/, '');
             this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, '');
-            this.index = (this.queryParameters[QueryParameters.INDEX] || '').match(/^[0-9]+$/)
-                ? parseInt(this.queryParameters[QueryParameters.INDEX])
+            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, '').match(/^[0-9]+$/)
+                ? parseInt(this.queryParameters.getOrDefault(QueryParameters.INDEX, ''))
                 : undefined;
-            this.setup = this.queryParameters[QueryParameters.SETUP];
-            (this.queryParameters[QueryParameters.FACETS] || '')
+            this.setup = this.queryParameters.get(QueryParameters.SETUP);
+            this.queryParameters
+                .getOrDefault(QueryParameters.FACETS, '')
                 .split(',')
                 .map(facet => facet.trim().toLowerCase())
                 .filter(facet => facet)
@@ -60,7 +61,7 @@ namespace shortycut {
 
         private getQueryParameters() {
 
-            const result: ({ [index: string]: string }) = {};
+            const result = new Hashtable<string>();
 
             if (window.location.search) {
                 for (const parameter of window.location.search.trim().replace(/^\?/, '').trim().split('&')) {
@@ -68,10 +69,10 @@ namespace shortycut {
                     if (0 < index) {
                         const key = this.urlDecode(parameter.substr(0, index));
                         if (key) {
-                            result[key] = this.urlDecode(parameter.substr(index + 1));
+                            result.put(key, this.urlDecode(parameter.substr(index + 1)));
                         }
                     } else {
-                        result[this.urlDecode(parameter)] = '';
+                        result.put(this.urlDecode(parameter), '');
                     }
                 }
             }

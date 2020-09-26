@@ -17,7 +17,7 @@ namespace shortycut {
 
         public processQuery() {
 
-            const shortcut = shortcuts[queryParameters.keyword] || undefined;
+            const shortcut = shortcuts.get(queryParameters.keyword) || undefined;
             const setup = queryParameters.setup;
             const isHomepageKeyword = config.homepage.keywords.some(keyword => keyword === queryParameters.keyword);
 

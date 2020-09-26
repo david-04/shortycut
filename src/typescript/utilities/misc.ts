@@ -45,7 +45,6 @@ namespace shortycut {
 
     export function isDemoMode() {
         const keywords = ['tm', 'tz', 'tp', 'tt', 'tr', 'e', 'news'];
-        return Object.keys(shortcuts).length == keywords.length
-            && keywords.filter(keyword => shortcuts[keyword]).length === keywords.length;
+        return shortcuts.size == keywords.length && keywords.filter(shortcuts.get).length === keywords.length;
     }
 }

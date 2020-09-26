@@ -39,14 +39,14 @@ namespace shortycut {
             this.showCurlCommands = this.showCurlCommands.bind(this);
             this.selectAllCurlCommands = this.selectAllCurlCommands.bind(this);
 
-            for (const keyword of Object.keys(shortcuts)) {
-                for (const link of shortcuts[keyword].all.map(item => item.link)) {
+            shortcuts.values.forEach(shortcut => {
+                for (const link of shortcut.all.map(item => item.link)) {
                     const { protocol, domain } = FaviconManager.extractProtocolAndDomain(link.urlForFavicon);
                     if ('file' !== protocol && 'https' !== this.domains.pending[domain]) {
                         this.domains.pending[domain] = protocol;
                     }
                 }
-            }
+            });
 
             for (const domain of Object.keys(this.domains.pending)) {
                 faviconManager.createFavicon(`${this.domains.pending[domain]}://${domain}`)
