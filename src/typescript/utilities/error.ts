@@ -35,14 +35,18 @@ namespace shortycut {
     // Display an error message
     //------------------------------------------------------------------------------------------------------------------
 
-    export function displayError(exception: any) {
+    export function displayError(exception: Exception | string) {
         if (exception instanceof Exception) {
             pages.error.populate(exception);
         } else {
             console.error(exception);
+            let message = exception;
+            try {
+                message = exception.toString();
+            } catch (ignored) { }
             pages.error.populate('Internal error', [
                 create('p', 'An internal error occurred:'),
-                create('p', exception)
+                create('p', message)
             ]);
         }
         pages.hideAllExcept(pages.error);
@@ -74,8 +78,17 @@ namespace shortycut {
 
     export class ParserError extends InitializationError {
         constructor(public readonly description: string, public readonly line: string) {
-            super(create('div', description, ':'),
-            create('div', create('tt', line)))
-         }
+            super(create('div', description, ':'), create('div', create('tt', line)))
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Run and ignore errors
+    //------------------------------------------------------------------------------------------------------------------
+
+    export function runAndIgnoreErrors(callback: () => any) {
+        try {
+            callback();
+        } catch (ignored) { }
     }
 }

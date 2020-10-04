@@ -72,6 +72,7 @@ namespace shortycut {
                         }
                     }
                 }
+                faviconManager = new FaviconManager();
                 redirector.processQuery();
             }
         }));

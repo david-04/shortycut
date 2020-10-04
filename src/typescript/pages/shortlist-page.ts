@@ -42,7 +42,8 @@ namespace shortycut {
                     link.getHref(this.searchTerm),
                     link.segments.descriptionHtml,
                     (event) => this.openSelected(event, index + 1),
-                    sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, ''))
+                    sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, '')),
+                    link.url
                 ))
             ];
 
@@ -62,17 +63,19 @@ namespace shortycut {
             href: string,
             title: string,
             onClick: (event: MouseEvent) => void,
-            subtitle?: string
+            subtitle?: string,
+            url?: string
         ) {
 
             const a = document.createElement('a');
             a.href = href;
             a.id = `shortlist${index}`;
+            const favicon = url && config.homepage.suggestions.showFavicons ? faviconManager.getFavicon(url) : '';
             a.innerHTML = create('div.row', [
                 create('div.icon', createImage('resources/arrow.svg')),
                 create('div.text', [
                     create('div.title', title),
-                    subtitle ? create('div.url', subtitle) : ''
+                    url && subtitle ? create('div.url', favicon, subtitle) : ''
                 ])
             ]).outerHTML;
 

@@ -104,11 +104,13 @@ namespace shortycut {
             this.addEventHandlers();
             this.dom.home.style.display = 'flex';
             this.dom.filter.focus();
+            this.updateFaviconManagerParameters(true);
         }
 
         public hide() {
             this.removeEventHandlers();
             this.dom.home.style.display = 'none';
+            this.updateFaviconManagerParameters(false);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -308,6 +310,7 @@ namespace shortycut {
 
         private displaySuggestions() {
 
+            this.updateFaviconManagerParameters(true);
             this.dom.rows = this.suggestions.map((suggestion, index) =>
                 create(`div.row.${suggestion.type}.${suggestion.shortcutType}`, [
                     create('div.cursor', create('img.icon', element => (element as HTMLImageElement).src = 'resources/arrow.svg')),
@@ -316,7 +319,7 @@ namespace shortycut {
                             ? create('div.keyword:html', suggestion.keywordHtml)
                             : '',
                         config.homepage.suggestions.showFavicons
-                            ? faviconManager.createFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
+                            ? faviconManager.getFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
                             : '',
                         create('div.description:html', this.getDescription(suggestion))
                     ], rowContent => rowContent.addEventListener('click', (event: MouseEvent) => {
@@ -484,6 +487,24 @@ namespace shortycut {
 
         public removeFocus() {
             setTimeout(() => this.dom.filter.blur(), 0);
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Update the favicon manager's list of currently displayed icons
+        //--------------------------------------------------------------------------------------------------------------
+
+        private updateFaviconManagerParameters(homepageIsVisible: boolean) {
+
+            if (homepageIsVisible) {
+                faviconManager.setCurrentlyDisplayedLinks(
+                    this.suggestions.map(suggestion => suggestion.shortcut.all[0].link.urlForFavicon)
+                );
+                if (config.favicons.preloadOnStart) {
+                    faviconManager.startPreload();
+                }
+            } else {
+                faviconManager.removeCurrentlyDisplayedLinks();
+            }
         }
     }
 }

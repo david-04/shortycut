@@ -85,6 +85,19 @@
     margin-top: 0.75em;
 }
 
+#shortlist .row .text .url .favicon {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 0.5em;
+}
+
+#shortlist .row .text .url .favicon img {
+    height: 100%;
+    width: 100%;
+    margin-bottom: -0.2em;
+}
+
 #shortlist a:focus .row .text .key {
     background-color: white;
 }

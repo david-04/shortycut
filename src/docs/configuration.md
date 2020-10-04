@@ -31,14 +31,19 @@ shortycut.configure({
         suggestions: {
             showKeywords: true,
             showHotkeys: true,
-            showFavicons: true,
-            faviconFolders: ['favicons'],
+            showFavicons: true
         }
     },
     defaultSearchEngine: {
         keyword: 'defaultsearchengine',
         useInAddressBar: true,
         useOnHomepage: true
+    },
+    favicons: {
+        preloadOnStart: true,
+        rememberUrls: true,
+        fetchService: 'https://www.google.com/s2/favicons?sz=32&domain=%s',
+        localFolders: ['data/favicons']
     }
 });
 ```
@@ -164,13 +169,6 @@ This property enables or disables the display of favicons on ShortyCut's homepag
 The default value is `true`, meaning that websites' favicons are displayed as part of the suggestions.
 See "[Favicons](favicons.md)" for details.
 
-## ![](img/arrow.svg) homepage.suggestions.faviconFolders
-
-This property defines the folder(s) where downloaded favicons are stored.
-The default value is `data/favicons`.
-Favicons need to be downloaded and stored in this folder manually.
-See "[Favicons](favicons.md)" for details.
-
 ## ![](img/arrow.svg) defaultSearchEngine.keyword
 
 This property defines the keyword of the shortcut which serves as the default search engine.
@@ -191,3 +189,36 @@ This property enables or disables the default search engine on ShortyCut's homep
 The default value is `true`, meaning that all input that does not mach any keyword
 is forwarded to the default search engine.
 See "[Default search engine](default-search-engine.md)" for details.
+
+## ![](img/arrow.svg) homepage.favicons.preloadOnStart
+
+This property enables or disables the preloading of favicons.
+The default value is `true`, meaning that favicons are loaded in the background before they are actually needed.
+This creates additional network traffic, but allows them to be displayed quickly later on.
+See "[Favicons](favicons.md)" for details.
+
+
+## ![](img/arrow.svg) homepage.favicons.rememberUrls
+
+This property enables or disables the caching of favicon locations in the browser's local storage.
+The default value is `true`, meaning that ShortyCut permanently remembers where it has looked for favicons before.
+This occupies a small amount of disk space, but significantly speeds up subsequent page loads.
+See "[Favicons](favicons.md)" for details.
+
+
+## ![](img/arrow.svg) homepage.favicons.fetchService
+
+This property points to a web service that provides favicon images for any domain.
+It defaults to Google S2 (`https://www.google.com/s2/favicons?sz=32&domain=%s`).
+The URL must contain the `%s` placeholder for the actual domain name.
+It's used for websites where no favicon can be found otherwise.
+The fetch service can be disabled by setting the property to an empty string (`''`).
+See "[Favicons](favicons.md)" for details.
+
+## ![](img/arrow.svg) homepage.favicons.localFolders
+
+This property defines the folder(s) where downloaded favicons are stored.
+The default value is `data/favicons`.
+Favicons need to be downloaded and stored in this folder manually.
+See "[Favicons](favicons.md)" for details.
+

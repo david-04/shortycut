@@ -32,13 +32,18 @@ namespace shortycut {
                 showKeywords: true,
                 showHotkeys: true,
                 showFavicons: true,
-                faviconFolders: ['favicons'],
             }
         },
         defaultSearchEngine: {
             keyword: 'defaultsearchengine',
             useInAddressBar: true,
             useOnHomepage: true
+        },
+        favicons: {
+            preloadOnStart: true,
+            rememberUrls: true,
+            fetchService: 'https://www.google.com/s2/favicons?sz=32&domain=%s',
+            localFolders: ['data/favicons']
         }
     };
 
@@ -50,6 +55,7 @@ namespace shortycut {
         shortcutFormat: ShortcutConfig;
         homepage: HomepageConfig;
         defaultSearchEngine: DefaultSearchEngineConfig;
+        favicons: FaviconConfig;
     }
 
     interface ShortcutConfig {
@@ -89,7 +95,6 @@ namespace shortycut {
         showKeywords: boolean;
         showHotkeys: boolean;
         showFavicons: boolean;
-        faviconFolders: string[];
     }
 
     interface DefaultSearchEngineConfig {
@@ -98,12 +103,21 @@ namespace shortycut {
         useOnHomepage: boolean;
     }
 
+    interface FaviconConfig {
+        preloadOnStart: boolean;
+        rememberUrls: boolean;
+        fetchService: string;
+        localFolders: Array<string>
+
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Apply and validate the config
     //------------------------------------------------------------------------------------------------------------------
 
     export function applyAndValidateConfig() {
         for (let index = 0; index < startupCache.config.length; index++) {
+            migrateConfig(startupCache.config[index]);
             mergeConfig(config, startupCache.config[index], startupCache.config[index]);
         }
         validateConfig();
@@ -114,6 +128,22 @@ namespace shortycut {
             config.homepage.keywords = config.homepage.keywords
                 .filter(keyword => !!keyword)
                 .map(keyword => adjustCase(keyword));
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Migrate configuration from older versions
+    //------------------------------------------------------------------------------------------------------------------
+
+    function migrateConfig(config: any) {
+
+        // homepage.suggestions.faviconFolders => favicons.localFolders
+        let faviconFolders = config?.homepage?.suggestions?.faviconFolders as string | Array<String> | null | undefined;
+        if (faviconFolders) {
+            delete config.homepage.suggestions.faviconFolders;
+            config.favicons = config.favicons ?? {};
+            config.favicons.localFolders = toArray(config.favicons.localFolders);
+            toArray(faviconFolders).forEach(folder => config.favicons.localFolders.push(folder));
         }
     }
 
@@ -226,6 +256,16 @@ namespace shortycut {
 
     function isStringy(value: any): boolean {
         return null === value || undefined === value || 'string' === typeof value
+    }
+
+    function toArray(value: any) {
+        if (Array.isArray(value)) {
+            return value;
+        } else if (!value) {
+            return [];
+        } else {
+            return [value];
+        }
     }
 
     //------------------------------------------------------------------------------------------------------------------

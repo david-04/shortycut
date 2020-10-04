@@ -125,7 +125,6 @@ namespace shortycut {
         queryParameters = new QueryParameters();
         redirector = new Redirector();
         router = new Router();
-        faviconManager = new FaviconManager();
         hotkeySelector = new HotkeySelector();
     }
 }

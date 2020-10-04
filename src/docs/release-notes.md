@@ -1,5 +1,12 @@
 # ![](img/arrow.svg) Release notes
 
+## Version 1.2-dev
+
+- Improved the [favicon](favicons.md) loading speed by preloading all images on startup
+  and caching their known locations in the browser's local storage
+- Added favicons to the interactive selection list
+  displayed when accessing [keywords with multiple links](multi-link-shortcuts.md)
+
 ## Version 1.1 / 2020-09-26
 
 - Added the ability to [load additional JavaScript files](loading-separate-files.md),
