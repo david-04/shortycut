@@ -245,8 +245,8 @@ release : build/$(SHORTYCUT_ZIP)
 	echo docs/demo/data/settings.s
 	cat docs/demo/data/settings.js \
 		| tr '\n' '\a' \
-		| sed "s|faviconFolders\s*:\s*\[[^]]*\]|faviconFolders: []|g" \
-		| sed "s|rememberUrls\s*:.*,?|rememberUrls: false,|g" \
+		| sed "s|localFolders\s*:\s*\[[^]]*\]|localFolders: []|g" \
+		| sed "s|rememberUrls\s*:[^,]*|rememberUrls: false|g" \
 		| tr '\a' '\n' \
 		> docs/demo/data/settings.js.tmp
 	mv -f docs/demo/data/settings.js.tmp docs/demo/data/settings.js
