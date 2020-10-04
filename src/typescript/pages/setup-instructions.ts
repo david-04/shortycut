@@ -4,7 +4,7 @@ namespace shortycut {
     // A menu of links attached to the current keyword
     //------------------------------------------------------------------------------------------------------------------
 
-    export class SetupPage implements Page {
+    export class SetupInstructions implements Page {
 
         public static readonly VALIDATE = 'validate';
         private setupComplete = false;
@@ -28,7 +28,7 @@ namespace shortycut {
 
         public populate(mode: string) {
 
-            if (SetupPage.VALIDATE === mode) {
+            if (SetupInstructions.VALIDATE === mode) {
                 if (!startupCache.config.length || !startupCache.shortcuts.length) {
                     this.dom.error.style.display = 'block';
                     this.dom.header.style.display = 'none';

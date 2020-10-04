@@ -4,7 +4,7 @@ namespace shortycut {
     // Index page with a listing of all shortcuts
     //------------------------------------------------------------------------------------------------------------------
 
-    export class HomePage implements Page {
+    export class Homepage implements Page {
 
         private readonly dom = {
             filter: document.querySelector('#home .input') as HTMLInputElement,
@@ -26,7 +26,7 @@ namespace shortycut {
         };
 
         private static readonly MAX_SUGGESTIONS = 12;
-        private readonly filter = new Filter(HomePage.MAX_SUGGESTIONS);
+        private readonly filter = new Filter(Homepage.MAX_SUGGESTIONS);
         private suggestions = new Array<Suggestion>();
         private selectedIndex = -1;
         private originalInput = '';
@@ -276,7 +276,7 @@ namespace shortycut {
                 }
             }
 
-            this.suggestions.length = Math.min(HomePage.MAX_SUGGESTIONS, this.suggestions.length);
+            this.suggestions.length = Math.min(Homepage.MAX_SUGGESTIONS, this.suggestions.length);
             this.displaySuggestions();
             this.previousInput = input;
             if (autoSelectFirstRow && 0 < this.suggestions.length) {
@@ -331,7 +331,7 @@ namespace shortycut {
             this.dom.suggestions.innerHTML = '';
             this.dom.rows.forEach(row => this.dom.suggestions.appendChild(row));
 
-            if (HomePage.MAX_SUGGESTIONS <= this.suggestions.length) {
+            if (Homepage.MAX_SUGGESTIONS <= this.suggestions.length) {
                 this.dom.suggestions.classList.add('truncated');
             } else {
                 this.dom.suggestions.classList.remove('truncated');

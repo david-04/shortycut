@@ -42,12 +42,12 @@ namespace shortycut {
         private readonly pages = {
             browserIntegration: null as BrowserIntegration | null,
             error: null as ErrorPage | null,
-            home: null as HomePage | null,
+            home: null as Homepage | null,
             linkTools: null as LinkTools | null,
-            faviconTools: null as FaviconToolsPage | null,
+            faviconTools: null as FaviconTools | null,
             redirect: null as RedirectPage | null,
-            setup: null as SetupPage | null,
-            shortlist: null as ShortlistPage | null
+            setup: null as SetupInstructions | null,
+            shortlist: null as Shortlist | null
         }
 
         public hideAllExcept(page: Page | null) {
@@ -68,7 +68,7 @@ namespace shortycut {
         }
 
         public get home() {
-            return this.pages.home = this.pages.home ?? new HomePage();
+            return this.pages.home = this.pages.home ?? new Homepage();
         }
 
         public get linkTools() {
@@ -76,7 +76,7 @@ namespace shortycut {
         }
 
         public get faviconTools() {
-            return this.pages.faviconTools = this.pages.faviconTools ?? new FaviconToolsPage();
+            return this.pages.faviconTools = this.pages.faviconTools ?? new FaviconTools();
         }
 
         public get redirect() {
@@ -84,11 +84,11 @@ namespace shortycut {
         }
 
         public get setup() {
-            return this.pages.setup = this.pages.setup ?? new SetupPage();
+            return this.pages.setup = this.pages.setup ?? new SetupInstructions();
         }
 
         public get shortlist() {
-            return this.pages.shortlist = this.pages.shortlist ?? new ShortlistPage();
+            return this.pages.shortlist = this.pages.shortlist ?? new Shortlist();
         }
     }
 

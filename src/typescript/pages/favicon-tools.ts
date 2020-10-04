@@ -4,7 +4,7 @@ namespace shortycut {
     // A menu of links attached to the current keyword
     //------------------------------------------------------------------------------------------------------------------
 
-    export class FaviconToolsPage implements Page {
+    export class FaviconTools implements Page {
 
         private readonly dom = {
             faviconTools: document.querySelector('#favicon-tools') as HTMLElement,

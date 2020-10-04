@@ -4,7 +4,7 @@ namespace shortycut {
     // A menu of links attached to the current keyword
     //------------------------------------------------------------------------------------------------------------------
 
-    export class ShortlistPage implements Page {
+    export class Shortlist implements Page {
 
         private readonly dom = {
             shortlist: document.getElementById('shortlist')!!,
