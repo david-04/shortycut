@@ -480,7 +480,9 @@ namespace shortycut {
 
         public startNextLoad() {
 
-            this.currentlyDisplayedDomains?.forEach(domain => domain.startNextLoad(FaviconLoadScope.PRIORITY));
+            this.currentlyDisplayedDomains
+                ?.filter(domain => !domain.isResolved)
+                .forEach(domain => domain.startNextLoad(FaviconLoadScope.PRIORITY));
 
             if (this.currentlyDisplayedDomains?.filter(domain => domain.isLoading).length || !this.preload) {
                 return;
