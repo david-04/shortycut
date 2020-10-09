@@ -168,14 +168,19 @@ They are stored in <code>settings.js</code>, which is located in the <code>data<
         suggestions: {
             showKeywords: true,
             showHotkeys: true,
-            showFavicons: true,
-            faviconFolders: ['favicons'],
+            showFavicons: true
         }
     },
     defaultSearchEngine: {
         keyword: 'defaultsearchengine',
         useInAddressBar: true,
         useOnHomepage: true
+    },
+    favicons: {
+        preloadOnStart: true,
+        rememberUrls: true,
+        fetchService: 'https://www.google.com/s2/favicons?sz=32&amp;domain=%s',
+        localFolders: ['data/favicons']
     }
 });
 </code></pre>
@@ -267,11 +272,6 @@ See "<a href="hotkeys.html">Hotkeys</a>" for details.</p>
 <p>This property enables or disables the display of favicons on ShortyCut's homepage.
 The default value is <code>true</code>, meaning that websites' favicons are displayed as part of the suggestions.
 See "<a href="favicons.html">Favicons</a>" for details.</p>
-<h2 id="homepagesuggestionsfaviconfolders"><img alt="" src="img/arrow.svg" /> homepage.suggestions.faviconFolders</h2>
-<p>This property defines the folder(s) where downloaded favicons are stored.
-The default value is <code>data/favicons</code>.
-Favicons need to be downloaded and stored in this folder manually.
-See "<a href="favicons.html">Favicons</a>" for details.</p>
 <h2 id="defaultsearchenginekeyword"><img alt="" src="img/arrow.svg" /> defaultSearchEngine.keyword</h2>
 <p>This property defines the keyword of the shortcut which serves as the default search engine.
 The default value is <code>defaultsearchengine</code>.
@@ -287,6 +287,28 @@ See "<a href="default-search-engine.html">Default search engine</a>" for details
 The default value is <code>true</code>, meaning that all input that does not mach any keyword
 is forwarded to the default search engine.
 See "<a href="default-search-engine.html">Default search engine</a>" for details.</p>
+<h2 id="homepagefaviconspreloadonstart"><img alt="" src="img/arrow.svg" /> homepage.favicons.preloadOnStart</h2>
+<p>This property enables or disables the preloading of favicons.
+The default value is <code>true</code>, meaning that favicons are loaded in the background before they are actually needed.
+This creates additional network traffic, but allows them to be displayed quickly later on.
+See "<a href="favicons.html">Favicons</a>" for details.</p>
+<h2 id="homepagefaviconsrememberurls"><img alt="" src="img/arrow.svg" /> homepage.favicons.rememberUrls</h2>
+<p>This property enables or disables the caching of favicon locations in the browser's local storage.
+The default value is <code>true</code>, meaning that ShortyCut permanently remembers where it has looked for favicons before.
+This occupies a small amount of disk space, but significantly speeds up subsequent page loads.
+See "<a href="favicons.html">Favicons</a>" for details.</p>
+<h2 id="homepagefaviconsfetchservice"><img alt="" src="img/arrow.svg" /> homepage.favicons.fetchService</h2>
+<p>This property points to a web service that provides favicon images for any domain.
+It defaults to Google S2 (<code>https://www.google.com/s2/favicons?sz=32&amp;domain=%s</code>).
+The URL must contain the <code>%s</code> placeholder for the actual domain name.
+It's used for websites where no favicon can be found otherwise.
+The fetch service can be disabled by setting the property to an empty string (<code>''</code>).
+See "<a href="favicons.html">Favicons</a>" for details.</p>
+<h2 id="homepagefaviconslocalfolders"><img alt="" src="img/arrow.svg" /> homepage.favicons.localFolders</h2>
+<p>This property defines the folder(s) where downloaded favicons are stored.
+The default value is <code>data/favicons</code>.
+Favicons need to be downloaded and stored in this folder manually.
+See "<a href="favicons.html">Favicons</a>" for details.</p>
               
             </div>
           </div>

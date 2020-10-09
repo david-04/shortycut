@@ -1,13 +1,13 @@
 # ![](img/arrow.svg) Release notes
 
-## Version 1.2-dev
+## Version 1.2 | 2020-10-09
 
 - Improved the [favicon](favicons.md) loading speed by preloading all images on startup
   and caching their known locations in the browser's local storage
 - Added favicons to the interactive selection list
   displayed when accessing [keywords with multiple links](multi-link-shortcuts.md)
 
-## Version 1.1 / 2020-09-26
+## Version 1.1 | 2020-09-26
 
 - Added the ability to [load additional JavaScript files](loading-separate-files.md),
   so that large shortcut collections can be spread across multiple files
@@ -24,6 +24,6 @@
 - Fixed an issue with the homepage's [no-focus mode](homepage.md)
   where control keys like `Alt` and `Ctrl` would still put the focus on the input field
 
-## Version 1.0 / 2020-08-16
+## Version 1.0 | 2020-08-16
 
 - Initial release

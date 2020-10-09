@@ -26,11 +26,11 @@ var shortycut;
         if ('function' !== typeof dynamicLinkFunction) {
             shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create('div', 'The parameter passed to shortycut.toUrl() is not a function:'), shortycut.create('div', shortycut.create('tt', "" + dynamicLinkFunction))));
         }
-        var key = shortycut.dynamicLinkProtocol + "://" + Object.keys(shortycut.startupCache.dynamicLinks).length + "-" + Math.random();
-        shortycut.startupCache.dynamicLinks[key] = {
+        var key = shortycut.dynamicLinkProtocol + "://" + shortycut.startupCache.dynamicLinks.size + "-" + Math.random();
+        shortycut.startupCache.dynamicLinks.put(key, {
             generator: dynamicLinkFunction,
             urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
-        };
+        });
         return key;
     }
     shortycut.toUrl = toUrl;
@@ -46,7 +46,9 @@ var shortycut;
                         return url;
                     }
                     else if (!invalidUrl) {
-                        invalidUrl = (((_b = dynamicLinkFunction) === null || _b === void 0 ? void 0 : _b.name) || 'function') + "(" + (undefined === searchTerm || null === searchTerm ? "" + searchTerm : "'" + searchTerm + "'") + ") => " + url;
+                        var name_1 = ((_b = dynamicLinkFunction) === null || _b === void 0 ? void 0 : _b.name) || 'function';
+                        var parameter = undefined === searchTerm || null === searchTerm ? "" + searchTerm : "'" + searchTerm + "'";
+                        invalidUrl = name_1 + "(" + parameter + ") => " + url;
                     }
                 }
             }
@@ -80,6 +82,719 @@ var shortycut;
         return (_a = new JavaScriptDependencyBuilder([])).andThen.apply(_a, files);
     }
     shortycut.loadJavaScript = loadJavaScript;
+})(shortycut || (shortycut = {}));
+var shortycut;
+(function (shortycut) {
+    var FaviconCacheEntry = (function () {
+        function FaviconCacheEntry(fileName, lastAccessed) {
+            this.fileName = fileName;
+            this.lastAccessed = lastAccessed;
+        }
+        ;
+        return FaviconCacheEntry;
+    }());
+    shortycut.FaviconCacheEntry = FaviconCacheEntry;
+    var FaviconCache = (function () {
+        function FaviconCache() {
+            var _this = this;
+            this.today = 0;
+            this.cache = new shortycut.Hashtable();
+            this.deleteStorage = this.deleteStorage.bind(this);
+            this.recalculateToday = this.recalculateToday.bind(this);
+            this.saveCache = this.saveCache.bind(this);
+            try {
+                this.storage = shortycut.config.favicons.rememberUrls ? localStorage : sessionStorage;
+                if (!this.canWriteToStorage()) {
+                    delete this.storage;
+                }
+            }
+            catch (ignored) {
+                delete this.storage;
+            }
+            this.recalculateToday();
+            shortycut.runAndIgnoreErrors(function () { return _this.loadCache(); });
+        }
+        FaviconCache.prototype.get = function (domain, origin) {
+            var _a;
+            var cacheEntry = (_a = this.cache.get(domain)) === null || _a === void 0 ? void 0 : _a.get(origin);
+            if (cacheEntry) {
+                if (cacheEntry.lastAccessed !== this.today) {
+                    cacheEntry.lastAccessed = this.today;
+                    this.scheduleSaveCache();
+                }
+            }
+            return cacheEntry === null || cacheEntry === void 0 ? void 0 : cacheEntry.fileName;
+        };
+        FaviconCache.prototype.set = function (domain, origin, fileName) {
+            this.cache.computeIfAbsent(domain, function () { return new shortycut.Hashtable(); })
+                .put(origin, new FaviconCacheEntry(fileName, this.today));
+            this.scheduleSaveCache();
+        };
+        FaviconCache.prototype.recalculateToday = function () {
+            var epochMs = new Date().getTime();
+            var msPerDay = 24 * 60 * 60 * 1000;
+            this.today = Math.ceil(epochMs / msPerDay);
+            setTimeout(this.recalculateToday, this.today * msPerDay - epochMs + 5 * 60 * 1000);
+        };
+        FaviconCache.prototype.deleteExpiredEntries = function (cache) {
+            var _this = this;
+            cache.forEach(function (domain, origins) {
+                origins.forEach(function (origin, entry) {
+                    if (14 < _this.today - entry.lastAccessed) {
+                        origins.delete(origin);
+                    }
+                });
+                if (!origins.size) {
+                    cache.delete(domain);
+                }
+            });
+        };
+        FaviconCache.prototype.scheduleSaveCache = function () {
+            var _a;
+            this.saveJobTimeout = (_a = this.saveJobTimeout) !== null && _a !== void 0 ? _a : setTimeout(this.saveCache, 5 * 1000);
+        };
+        FaviconCache.prototype.cancelScheduledSaveJob = function () {
+            if ('number' === typeof this.saveJobTimeout) {
+                clearTimeout(this.saveJobTimeout);
+                delete this.saveJobTimeout;
+            }
+        };
+        FaviconCache.prototype.saveCache = function () {
+            this.cancelScheduledSaveJob();
+            try {
+                this.deleteExpiredEntries(this.cache);
+                this.writeStorage(this.serializeCache());
+            }
+            catch (exception) {
+                shortycut.runAndIgnoreErrors(this.deleteStorage);
+                throw exception;
+            }
+        };
+        FaviconCache.prototype.serializeCache = function () {
+            return this.cache.map(function (domain, origins) {
+                var columns = [domain];
+                origins.forEach(function (origin, entry) {
+                    columns.push(origin);
+                    columns.push(entry.fileName);
+                    columns.push("" + entry.lastAccessed);
+                });
+                return columns.join(FaviconCache.COLUMN_SEPARATOR);
+            }).join(FaviconCache.LINE_SEPARATOR);
+        };
+        FaviconCache.prototype.loadCache = function () {
+            this.cache = this.deserializeCache(this.readStorage());
+        };
+        FaviconCache.prototype.deserializeCache = function (data) {
+            var cache = new shortycut.Hashtable();
+            var table = data.split(FaviconCache.LINE_SEPARATOR).map(function (line) { return line.split(FaviconCache.COLUMN_SEPARATOR); });
+            for (var index = 0; index < table.length; index++) {
+                var row = table[index];
+                if (1 === row.length % 3) {
+                    var origins = cache.computeIfAbsent(row[0], function () { return new shortycut.Hashtable(); });
+                    for (var offset = 1; offset + 2 < row.length; offset += 3) {
+                        origins.put(row[offset], new FaviconCacheEntry(row[offset + 1], parseInt(row[offset + 2])));
+                    }
+                }
+                else {
+                    return new shortycut.Hashtable();
+                }
+            }
+            return cache;
+        };
+        FaviconCache.prototype.deleteStorage = function () {
+            if (this.storage) {
+                for (var index = 0; true; index++) {
+                    var key = this.getStorageKey(index);
+                    if (!this.storage.getItem(key)) {
+                        break;
+                    }
+                    this.storage.removeItem(key);
+                }
+            }
+        };
+        FaviconCache.prototype.writeStorage = function (data) {
+            if (this.storage) {
+                this.deleteStorage();
+                for (var index = 0, size = data.length; data; size = Math.min(Math.ceil(size / 2), data.length)) {
+                    try {
+                        for (; data; index++, size = Math.min(size, data.length)) {
+                            this.storage.setItem(this.getStorageKey(index), data.substr(0, size));
+                            data = data.substr(size);
+                        }
+                    }
+                    catch (exception) {
+                        if (size < 100) {
+                            throw exception;
+                        }
+                    }
+                }
+            }
+        };
+        FaviconCache.prototype.readStorage = function () {
+            var result = '';
+            var segment;
+            if (this.storage) {
+                for (var index = 0; segment = this.storage.getItem(this.getStorageKey(index)); index++) {
+                    result += segment;
+                }
+            }
+            return result;
+        };
+        FaviconCache.prototype.canWriteToStorage = function () {
+            var _this = this;
+            var key = this.getStorageKey(-1);
+            var value = "" + Math.random();
+            var canWrite = false;
+            shortycut.runAndIgnoreErrors(function () {
+                if (_this.storage) {
+                    _this.storage.setItem(key, value);
+                    canWrite = value === _this.storage.getItem(key);
+                }
+            });
+            shortycut.runAndIgnoreErrors(function () { return _this.storage ? _this.storage.removeItem(key) : void (0); });
+            return canWrite;
+        };
+        FaviconCache.prototype.getStorageKey = function (index) {
+            return 'shortycut.favicon-cache' + (index ? "." + index : '');
+        };
+        FaviconCache.LINE_SEPARATOR = '\n';
+        FaviconCache.COLUMN_SEPARATOR = '\t';
+        return FaviconCache;
+    }());
+    shortycut.FaviconCache = FaviconCache;
+})(shortycut || (shortycut = {}));
+var shortycut;
+(function (shortycut) {
+    var FaviconOriginType = (function () {
+        function FaviconOriginType(isFetchService, isWebsite, isOffline) {
+            this.isFetchService = isFetchService;
+            this.isWebsite = isWebsite;
+            this.isOffline = isOffline;
+        }
+        FaviconOriginType.values = new Array();
+        FaviconOriginType.CACHE_OFFLINE = new FaviconOriginType(false, false, true);
+        FaviconOriginType.CACHE_ONLINE = new FaviconOriginType(false, false, false);
+        FaviconOriginType.WEBSITE = new FaviconOriginType(false, true, false);
+        FaviconOriginType.FETCH_SERVICE = new FaviconOriginType(true, false, false);
+        return FaviconOriginType;
+    }());
+    var FaviconLoadScope = (function () {
+        function FaviconLoadScope() {
+            var originTypes = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                originTypes[_i] = arguments[_i];
+            }
+            this.originTypes = originTypes;
+        }
+        FaviconLoadScope.OFFLINE = new FaviconLoadScope(FaviconOriginType.CACHE_OFFLINE);
+        FaviconLoadScope.ONLINE = new FaviconLoadScope(FaviconOriginType.CACHE_OFFLINE, FaviconOriginType.WEBSITE);
+        FaviconLoadScope.FETCH_SERVICE = new FaviconLoadScope(FaviconOriginType.FETCH_SERVICE);
+        FaviconLoadScope.PRIORITY = new FaviconLoadScope(FaviconOriginType.CACHE_OFFLINE, FaviconOriginType.FETCH_SERVICE, FaviconOriginType.WEBSITE);
+        return FaviconLoadScope;
+    }());
+    var FaviconLoadJob = (function () {
+        function FaviconLoadJob(url) {
+            this.url = url;
+            this.status = 'new';
+            this.observers = new Array();
+        }
+        FaviconLoadJob.prototype.addObserver = function (file) {
+            if ('loaded' === this.status) {
+                file.onResolved();
+            }
+            else if ('failed' === this.status) {
+                file.onRejected();
+            }
+            else {
+                this.observers.push(file);
+            }
+        };
+        Object.defineProperty(FaviconLoadJob.prototype, "isNew", {
+            get: function () {
+                return 'new' === this.status;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconLoadJob.prototype, "isLoading", {
+            get: function () {
+                return 'loading' === this.status;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconLoadJob.prototype, "isFinished", {
+            get: function () {
+                return this.isLoaded || this.hasFailed;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconLoadJob.prototype, "isLoaded", {
+            get: function () {
+                return 'loaded' === this.status;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconLoadJob.prototype, "hasFailed", {
+            get: function () {
+                return 'failed' === this.status;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        FaviconLoadJob.prototype.startLoad = function () {
+            var _this = this;
+            if ('new' !== this.status) {
+                return false;
+            }
+            this.status = 'loading';
+            shortycut.create('img', function (element) {
+                element.addEventListener('load', function () { return _this.onLoadEnd(true); });
+                element.addEventListener('error', function () { return _this.onLoadEnd(false); });
+                element.src = _this.url;
+            });
+            return true;
+        };
+        FaviconLoadJob.prototype.onLoadEnd = function (success) {
+            var _a;
+            this.status = success ? 'loaded' : 'failed';
+            this.observers.forEach(function (observer) { return success ? observer.onResolved() : observer.onRejected(); });
+            (_a = this.observers[0]) === null || _a === void 0 ? void 0 : _a.origin.domain.registry.startNextLoad();
+        };
+        return FaviconLoadJob;
+    }());
+    var FaviconFile = (function () {
+        function FaviconFile(origin, name, url) {
+            this.origin = origin;
+            this.name = name;
+            this.url = url;
+            this.job = origin.domain.registry.jobs.computeIfAbsent(url, function () { return new FaviconLoadJob(url); });
+            this.job.addObserver(this);
+        }
+        FaviconFile.prototype.onResolved = function () {
+            this.origin.onResolved(this);
+        };
+        FaviconFile.prototype.onRejected = function () {
+            this.origin.onRejected(this);
+        };
+        return FaviconFile;
+    }());
+    var FaviconOrigin = (function () {
+        function FaviconOrigin(domain, name, type, url) {
+            var _this = this;
+            this.domain = domain;
+            this.name = name;
+            this.type = type;
+            this.url = url;
+            this.files = new Array();
+            if (type.isFetchService) {
+                var url_1 = this.url.replace(/%s/g, this.domain.name.replace(/:[0-9]+$/, ''));
+                this.files = [new FaviconFile(this, url_1, url_1)];
+            }
+            else {
+                var basename_1 = type.isWebsite ? 'favicon' : this.domain.name.replace(/:/g, '!');
+                this.files = FaviconOrigin.EXTENSIONS
+                    .map(function (extension) { return basename_1 + "." + extension; })
+                    .map(function (filename) { return new FaviconFile(_this, filename, _this.url.replace(/%s/g, filename)); });
+            }
+        }
+        Object.defineProperty(FaviconOrigin.prototype, "isLoading", {
+            get: function () {
+                return !!this.files.filter(function (location) { return location.job.isLoading; }).length;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconOrigin.prototype, "isResolved", {
+            get: function () {
+                return !!this.resolvedFile;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconOrigin.prototype, "isRejected", {
+            get: function () {
+                return !this.isResolved && !this.files.length;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconOrigin.prototype, "resolvedUrl", {
+            get: function () {
+                var _a;
+                return (_a = this.resolvedFile) === null || _a === void 0 ? void 0 : _a.url;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        FaviconOrigin.prototype.startNextLoad = function (includeNonCached, includeAllExtensions) {
+            var _a, _b;
+            if (this.isResolved || this.isRejected) {
+                return false;
+            }
+            if (this.domain.registry.readCache) {
+                var filename_1 = this.domain.registry.cache.get(this.domain.name, this.name);
+                if (filename_1 && ((_a = this.files.filter(function (file) { return file.name === filename_1; })[0]) === null || _a === void 0 ? void 0 : _a.job.startLoad())) {
+                    return true;
+                }
+            }
+            if (includeNonCached) {
+                for (var _i = 0, _c = this.files.filter(function (file) { return file.name.match(/ico$/i); }); _i < _c.length; _i++) {
+                    var file = _c[_i];
+                    if (file.job.startLoad()) {
+                        return true;
+                    }
+                }
+            }
+            return includeAllExtensions && ((_b = this.files.filter(function (file) { return file.job.isNew; })[0]) === null || _b === void 0 ? void 0 : _b.job.startLoad());
+        };
+        FaviconOrigin.prototype.onResolved = function (file) {
+            if (!this.resolvedFile) {
+                this.resolvedFile = file;
+                if (!this.type.isFetchService) {
+                    this.domain.registry.cache.set(this.domain.name, this.name, this.resolvedFile.name);
+                }
+                this.domain.onOriginResolved(this);
+            }
+        };
+        FaviconOrigin.prototype.onRejected = function (file) {
+            this.files = this.files.filter(function (currentFile) { return currentFile.name !== file.name; });
+            if (!this.files.length) {
+                this.domain.registry.cache.set(this.domain.name, this.name, '');
+                this.domain.onOriginRejected(this);
+            }
+        };
+        FaviconOrigin.EXTENSIONS = ['ico', 'png', 'jpg', 'gif', 'svg', 'jpeg'];
+        return FaviconOrigin;
+    }());
+    var FaviconDomain = (function () {
+        function FaviconDomain(registry, name, protocols, isPrimary) {
+            this.registry = registry;
+            this.name = name;
+            this.protocols = protocols;
+            this.isPrimary = isPrimary;
+            this.origins = new shortycut.Hashtable();
+            this.subDomains = new shortycut.Hashtable();
+            this.observers = new Array();
+            this.createOrigins();
+            this.createParentDomain();
+            this.displayName = this.name.replace(/^www\./i, '');
+        }
+        FaviconDomain.prototype.createOrigins = function () {
+            var _this = this;
+            for (var _i = 0, _a = this.protocols; _i < _a.length; _i++) {
+                var protocol = _a[_i];
+                var url = protocol + "://" + this.name + "/%s";
+                this.origins.put(protocol, new FaviconOrigin(this, protocol, FaviconOriginType.WEBSITE, url));
+            }
+            for (var _b = 0, _c = shortycut.config.favicons.localFolders; _b < _c.length; _b++) {
+                var origin_1 = _c[_b];
+                if (!origin_1.match(/^[a-z]+:\/\//i)) {
+                    origin_1 = window.location.href.replace(/\/[^/]+$/, '') + '/' + origin_1;
+                }
+                origin_1 = origin_1.replace(/\/$/, '');
+                var type = origin_1.match(/^file:/) ? FaviconOriginType.CACHE_OFFLINE : FaviconOriginType.CACHE_ONLINE;
+                this.origins.put(origin_1, new FaviconOrigin(this, origin_1, type, origin_1 + "/%s"));
+            }
+            if (shortycut.config.favicons.fetchService) {
+                var url = shortycut.config.favicons.fetchService;
+                this.origins.put(url, new FaviconOrigin(this, url, FaviconOriginType.FETCH_SERVICE, url));
+            }
+            if (this.registry.readCache) {
+                this.origins.keys
+                    .filter(function (origin) { return '' === _this.registry.cache.get(_this.name, origin); })
+                    .forEach(function (origin) { return _this.origins.delete(origin); });
+            }
+        };
+        FaviconDomain.prototype.createParentDomain = function () {
+            var parentDomain = this.name.replace(/^[^.]+\./, '');
+            if (parentDomain !== this.name) {
+                this.parentDomain = this.registry.addDomain(parentDomain, this.protocols, false);
+                this.parentDomain.subDomains.put(this.name, this);
+            }
+        };
+        FaviconDomain.prototype.startNextLoad = function (scope) {
+            var _a;
+            if (this.isLoading) {
+                return false;
+            }
+            var _loop_1 = function (type) {
+                if (this_1.isPrimary || !type.isWebsite) {
+                    for (var _i = 0, _a = this_1.origins.values.filter(function (origin) { return origin.type === type; }); _i < _a.length; _i++) {
+                        var origin_2 = _a[_i];
+                        for (var _b = 0, _c = [[false, false], [true, false], [true, true]]; _b < _c.length; _b++) {
+                            var parameters = _c[_b];
+                            if (origin_2.startNextLoad(parameters[0], parameters[1])) {
+                                return { value: true };
+                            }
+                        }
+                    }
+                }
+            };
+            var this_1 = this;
+            for (var _i = 0, _b = scope.originTypes; _i < _b.length; _i++) {
+                var type = _b[_i];
+                var state_1 = _loop_1(type);
+                if (typeof state_1 === "object")
+                    return state_1.value;
+            }
+            return !!((_a = this.parentDomain) === null || _a === void 0 ? void 0 : _a.startNextLoad(scope));
+        };
+        FaviconDomain.prototype.onOriginResolved = function (origin) {
+            var _this = this;
+            var _a;
+            if (!this.resolvedOrigin) {
+                this.resolvedOrigin = origin;
+                this.notifyObservers((_a = origin.resolvedFile) === null || _a === void 0 ? void 0 : _a.url);
+                this.subDomains.values.forEach(function (domain) { return domain.onParentDomainResolved(_this); });
+            }
+            this.registry.updateFaviconToolsPage();
+        };
+        FaviconDomain.prototype.onOriginRejected = function (origin) {
+            this.origins.delete(origin.name);
+            this.registry.updateFaviconToolsPage();
+        };
+        FaviconDomain.prototype.onParentDomainResolved = function (domain) {
+            var _a, _b;
+            this.notifyObservers((_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.url);
+            this.registry.updateFaviconToolsPage();
+        };
+        FaviconDomain.prototype.notifyObservers = function (url) {
+            if (url) {
+                this.observers.forEach(function (img) { return img.src = url; });
+                this.observers = [];
+            }
+        };
+        Object.defineProperty(FaviconDomain.prototype, "isLoading", {
+            get: function () {
+                var _a;
+                return !!this.origins.values.filter(function (origin) { return origin.isLoading; }).length || !!((_a = this.parentDomain) === null || _a === void 0 ? void 0 : _a.isLoading);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconDomain.prototype, "isResolved", {
+            get: function () {
+                var _a;
+                return !!(this.resolvedOrigin || ((_a = this.parentDomain) === null || _a === void 0 ? void 0 : _a.isResolved));
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FaviconDomain.prototype, "isRejected", {
+            get: function () {
+                return !this.origins.size && !this.resolvedOrigin && (!this.parentDomain || this.parentDomain.isResolved);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        FaviconDomain.prototype.getFavicon = function () {
+            var _this = this;
+            var _a, _b;
+            var img = shortycut.create('img');
+            var domain = this;
+            while (!domain.resolvedOrigin && domain.parentDomain) {
+                domain = domain.parentDomain;
+            }
+            var url = (_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.url;
+            if (url) {
+                img.src = url;
+            }
+            else {
+                this.observers.push(img);
+            }
+            return shortycut.create('div.favicon', img, function (element) {
+                element.dataset['domain'] = _this.name;
+            });
+        };
+        return FaviconDomain;
+    }());
+    var FaviconRegistry = (function () {
+        function FaviconRegistry(cache, readCache, preload, protocolsPerDomain) {
+            var _this = this;
+            this.cache = cache;
+            this.readCache = readCache;
+            this.preload = preload;
+            this.jobs = new shortycut.Hashtable();
+            this.domains = new shortycut.Hashtable();
+            protocolsPerDomain.entries.forEach(function (entry) { return _this.addDomain(entry.key, entry.value, true); });
+            this.startNextLoad();
+        }
+        FaviconRegistry.prototype.addDomain = function (domain, protocols, isPrimary) {
+            var _this = this;
+            var faviconDomain = this.domains.computeIfAbsent(domain, function () { return new FaviconDomain(_this, domain, protocols, isPrimary); });
+            faviconDomain.isPrimary = faviconDomain.isPrimary || isPrimary;
+            return faviconDomain;
+        };
+        FaviconRegistry.prototype.setCurrentlyDisplayedDomains = function (domains) {
+            var _this = this;
+            this.currentlyDisplayedDomains = domains.map(function (domain) { return _this.domains.get(domain); }).filter(function (domain) { return !!domain; });
+            this.startNextLoad();
+        };
+        FaviconRegistry.prototype.removeCurrentlyDisplayedDomains = function () {
+            delete this.currentlyDisplayedDomains;
+            this.startNextLoad();
+        };
+        FaviconRegistry.prototype.startNextLoad = function () {
+            var _a, _b;
+            (_a = this.currentlyDisplayedDomains) === null || _a === void 0 ? void 0 : _a.filter(function (domain) { return !domain.isResolved; }).forEach(function (domain) { return domain.startNextLoad(FaviconLoadScope.PRIORITY); });
+            if (((_b = this.currentlyDisplayedDomains) === null || _b === void 0 ? void 0 : _b.filter(function (domain) { return domain.isLoading; }).length) || !this.preload) {
+                return;
+            }
+            var remainingJobs = Math.max(0, 10 - this.currentJobCount);
+            for (var _i = 0, _c = [FaviconLoadScope.OFFLINE, FaviconLoadScope.ONLINE, FaviconLoadScope.FETCH_SERVICE]; _i < _c.length; _i++) {
+                var scope = _c[_i];
+                for (var _d = 0, _e = this.domains.values.filter(function (domain) { return domain.isPrimary && !domain.isResolved; }); _d < _e.length; _d++) {
+                    var domain = _e[_d];
+                    if (!remainingJobs) {
+                        return;
+                    }
+                    if (domain.startNextLoad(scope)) {
+                        remainingJobs--;
+                    }
+                }
+                if (this.currentJobCount) {
+                    return;
+                }
+            }
+        };
+        Object.defineProperty(FaviconRegistry.prototype, "currentJobCount", {
+            get: function () {
+                return this.jobs.values.filter(function (job) { return job.isLoading; }).length;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        FaviconRegistry.prototype.getFavicon = function (domain) {
+            return this.domains.get(domain).getFavicon();
+        };
+        FaviconRegistry.prototype.updateFaviconToolsPage = function () {
+            shortycut.pages.faviconTools.refreshPageContent();
+        };
+        return FaviconRegistry;
+    }());
+    var FaviconManager = (function () {
+        function FaviconManager() {
+            this.domains = new shortycut.Hashtable();
+            this.cache = new shortycut.FaviconCache();
+            for (var _i = 0, _a = shortycut.shortcuts.values; _i < _a.length; _i++) {
+                var shortcut = _a[_i];
+                var _loop_2 = function (url) {
+                    var _a = FaviconManager.extractProtocolAndDomain(url), protocol = _a.protocol, domain = _a.domain;
+                    if ('file' !== protocol) {
+                        var protocols = this_2.domains.computeIfAbsent(domain, function () { return new Array(); });
+                        if (!protocols.filter(function (currentProtocol) { return currentProtocol === protocol; }).length) {
+                            if ('https' === protocol) {
+                                protocols.unshift(protocol);
+                            }
+                            else {
+                                protocols.push(protocol);
+                            }
+                        }
+                    }
+                };
+                var this_2 = this;
+                for (var _b = 0, _c = shortcut.all.map(function (item) { return item.link; }).map(function (link) { return link.urlForFavicon; }); _b < _c.length; _b++) {
+                    var url = _c[_b];
+                    _loop_2(url);
+                }
+            }
+            this.registry = new FaviconRegistry(this.cache, true, false, this.domains);
+        }
+        FaviconManager.extractProtocolAndDomain = function (url) {
+            return {
+                protocol: url.match(/^([a-z]+:\/\/)?/i)[0].replace(/:.*/, '').toLocaleLowerCase() || 'http',
+                domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, '').replace(/\/.*/, '').toLowerCase()
+            };
+        };
+        FaviconManager.prototype.startPreload = function () {
+            this.registry.preload = true;
+            this.registry.readCache = true;
+            this.registry.startNextLoad();
+        };
+        FaviconManager.prototype.startFullRescan = function () {
+            this.registry.preload = false;
+            this.registry = new FaviconRegistry(this.cache, false, true, this.domains);
+            this.registry.updateFaviconToolsPage();
+        };
+        FaviconManager.prototype.setCurrentlyDisplayedLinks = function (urls) {
+            var domains = urls.map(function (url) { return FaviconManager.extractProtocolAndDomain(url).domain; });
+            this.registry.setCurrentlyDisplayedDomains(domains);
+        };
+        FaviconManager.prototype.removeCurrentlyDisplayedLinks = function () {
+            this.registry.removeCurrentlyDisplayedDomains();
+        };
+        FaviconManager.prototype.getFavicon = function (url) {
+            var _a = FaviconManager.extractProtocolAndDomain(url), protocol = _a.protocol, domain = _a.domain;
+            if ('file' === protocol || !this.registry.domains.get(domain)) {
+                var div = shortycut.create('div.favicon', shortycut.createImage('resources/local.svg'));
+                div.dataset['domain'] = domain;
+                return div;
+            }
+            else {
+                return this.registry.getFavicon(domain);
+            }
+        };
+        FaviconManager.prototype.getPendingDomains = function () {
+            var _this = this;
+            return this.registry.domains.values
+                .filter(function (domain) { return domain.isPrimary && !domain.isResolved && !domain.isRejected; })
+                .map(function (domain) { return domain.displayName; })
+                .sort(function (domain1, domain2) { return _this.compare(domain1, domain2); });
+        };
+        FaviconManager.prototype.getMissingDomains = function () {
+            var _this = this;
+            return this.registry.domains.values
+                .filter(function (domain) { return domain.isPrimary && domain.isRejected; })
+                .map(function (domain) { return domain.displayName; })
+                .sort(function (domain1, domain2) { return _this.compare(domain1, domain2); });
+        };
+        FaviconManager.prototype.getOnlineDomains = function () {
+            var _this = this;
+            var _a, _b, _c, _d;
+            var files = new shortycut.Hashtable();
+            for (var _i = 0, _e = this.registry.domains.values.filter(function (domain) { return domain.isPrimary && domain.isResolved; }); _i < _e.length; _i++) {
+                var domain = _e[_i];
+                while (!domain.resolvedOrigin && domain.parentDomain) {
+                    domain = domain.parentDomain;
+                }
+                if (((_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.job.url) && domain.resolvedOrigin.type.isWebsite) {
+                    var name_2 = domain.displayName.replace(/:/g, '!');
+                    var extension = (_d = (_c = domain.resolvedOrigin) === null || _c === void 0 ? void 0 : _c.resolvedFile.name.replace(/^.*\./, '')) !== null && _d !== void 0 ? _d : 'ico';
+                    files.put(name_2 + "." + extension, domain.resolvedOrigin.resolvedFile.job.url);
+                }
+            }
+            return files.entries
+                .map(function (entry) { return { filename: entry.key, url: entry.value }; })
+                .sort(function (a, b) { return _this.compare(a.filename, b.filename); });
+        };
+        FaviconManager.prototype.getOfflineDomains = function () {
+            var _this = this;
+            var _a, _b, _c, _d;
+            var files = new shortycut.Hashtable();
+            var prefix = window.location.href.replace(/\/[^/]+$/, '') + '/';
+            for (var _i = 0, _e = this.registry.domains.values.filter(function (domain) { return domain.isPrimary && domain.isResolved; }); _i < _e.length; _i++) {
+                var domain = _e[_i];
+                while (!domain.resolvedOrigin && domain.parentDomain) {
+                    domain = domain.parentDomain;
+                }
+                if (((_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.job.url) && domain.resolvedOrigin.type.isOffline) {
+                    var url = (_d = (_c = domain.resolvedOrigin) === null || _c === void 0 ? void 0 : _c.resolvedFile) === null || _d === void 0 ? void 0 : _d.job.url;
+                    files.put(url.substr(0 === url.indexOf(prefix) ? prefix.length : 0), url);
+                }
+            }
+            return files.entries
+                .map(function (entry) { return { path: entry.key, url: entry.value }; })
+                .sort(function (item1, item2) { return _this.compare(item1.path, item2.path); });
+        };
+        FaviconManager.prototype.compare = function (s1, s2) {
+            return s1 < s2 ? -1 : (s1 == s2 ? 0 : 1);
+        };
+        return FaviconManager;
+    }());
+    shortycut.FaviconManager = FaviconManager;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
@@ -128,6 +843,7 @@ var shortycut;
                         }
                     }
                 }
+                shortycut.faviconManager = new shortycut.FaviconManager();
                 shortycut.redirector.processQuery();
             }
         }); });
@@ -148,7 +864,7 @@ var shortycut;
         }
         Redirector.prototype.processQuery = function () {
             var _a, _b;
-            var shortcut = shortycut.shortcuts[shortycut.queryParameters.keyword] || undefined;
+            var shortcut = shortycut.shortcuts.get(shortycut.queryParameters.keyword) || undefined;
             var setup = shortycut.queryParameters.setup;
             var isHomepageKeyword = shortycut.config.homepage.keywords.some(function (keyword) { return keyword === shortycut.queryParameters.keyword; });
             if (setup) {
@@ -362,22 +1078,22 @@ var shortycut;
         Object.defineProperty(JavaScriptLoader.prototype, "files", {
             get: function () {
                 var _a;
-                window['shortycut.JavaScriptLoader.files'] = (_a = window['shortycut.JavaScriptLoader.files']) !== null && _a !== void 0 ? _a : {};
-                return window['shortycut.JavaScriptLoader.files'];
+                var key = 'shortycut.JavaScriptLoader.files';
+                window[key] = (_a = window[key]) !== null && _a !== void 0 ? _a : new shortycut.Hashtable();
+                return window[key];
             },
             enumerable: false,
             configurable: true
         });
         JavaScriptLoader.prototype.add = function (url, dependencies) {
-            var _a;
-            var file = this.files[url] = (_a = this.files[url]) !== null && _a !== void 0 ? _a : new JavaScriptFile(url, []);
+            var file = this.files.computeIfAbsent(url, function (url) { return new JavaScriptFile(url, []); });
             dependencies === null || dependencies === void 0 ? void 0 : dependencies.forEach(function (dependency) { return file.dependencies.push(dependency); });
             this.checkDependenciesAndLoadFiles();
             return file;
         };
         JavaScriptLoader.prototype.checkDependenciesAndLoadFiles = function () {
             var _this = this;
-            var files = Object.keys(this.files).map(function (url) { return _this.files[url]; });
+            var files = this.files.values;
             for (var _i = 0, files_1 = files; _i < files_1.length; _i++) {
                 var file = files_1[_i];
                 if (file.status === 'waiting' && !file.dependencies.filter(function (dep) { return dep.status !== 'completed'; }).length) {
@@ -477,17 +1193,23 @@ var shortycut;
                 showKeywords: true,
                 showHotkeys: true,
                 showFavicons: true,
-                faviconFolders: ['favicons'],
             }
         },
         defaultSearchEngine: {
             keyword: 'defaultsearchengine',
             useInAddressBar: true,
             useOnHomepage: true
+        },
+        favicons: {
+            preloadOnStart: true,
+            rememberUrls: true,
+            fetchService: 'https://www.google.com/s2/favicons?sz=32&domain=%s',
+            localFolders: ['data/favicons']
         }
     };
     function applyAndValidateConfig() {
         for (var index = 0; index < shortycut.startupCache.config.length; index++) {
+            migrateConfig(shortycut.startupCache.config[index]);
             mergeConfig(shortycut.config, shortycut.startupCache.config[index], shortycut.startupCache.config[index]);
         }
         validateConfig();
@@ -501,8 +1223,18 @@ var shortycut;
         }
     }
     shortycut.applyAndValidateConfig = applyAndValidateConfig;
+    function migrateConfig(config) {
+        var _a, _b, _c;
+        var faviconFolders = (_b = (_a = config === null || config === void 0 ? void 0 : config.homepage) === null || _a === void 0 ? void 0 : _a.suggestions) === null || _b === void 0 ? void 0 : _b.faviconFolders;
+        if (faviconFolders) {
+            delete config.homepage.suggestions.faviconFolders;
+            config.favicons = (_c = config.favicons) !== null && _c !== void 0 ? _c : {};
+            config.favicons.localFolders = toArray(config.favicons.localFolders);
+            toArray(faviconFolders).forEach(function (folder) { return config.favicons.localFolders.push(folder); });
+        }
+    }
     function mergeConfig(target, patch, patchRoot) {
-        var _loop_1 = function (key) {
+        var _loop_3 = function (key) {
             var targetValue = target[key];
             var patchValue = patch[key];
             [
@@ -541,7 +1273,7 @@ var shortycut;
             }
         };
         for (var key in patch) {
-            _loop_1(key);
+            _loop_3(key);
         }
     }
     function validateConfig() {
@@ -593,6 +1325,17 @@ var shortycut;
     }
     function isStringy(value) {
         return null === value || undefined === value || 'string' === typeof value;
+    }
+    function toArray(value) {
+        if (Array.isArray(value)) {
+            return value;
+        }
+        else if (!value) {
+            return [];
+        }
+        else {
+            return [value];
+        }
     }
     function throwConfigExceptionIf(condition, description, properties, overrideConfig) {
         if (condition) {
@@ -646,7 +1389,7 @@ var shortycut;
             }
             else {
                 var letter = keyword.charAt(this.level);
-                return (_b = (_a = this.children[letter]) === null || _a === void 0 ? void 0 : _a.getSuggestions(keyword, maxResults, postKeywordInput)) !== null && _b !== void 0 ? _b : [];
+                return (_b = (_a = this.children.get(letter)) === null || _a === void 0 ? void 0 : _a.getSuggestions(keyword, maxResults, postKeywordInput)) !== null && _b !== void 0 ? _b : [];
             }
         };
         Object.defineProperty(DictionaryItem.prototype, "children", {
@@ -659,16 +1402,12 @@ var shortycut;
         });
         DictionaryItem.prototype.initializeChildren = function () {
             var _this = this;
-            var dictionary = {};
+            var dictionary = new shortycut.Hashtable();
             this.shortcuts.forEach(function (shortcut) {
                 if (_this.level < shortcut.keyword.length) {
                     var letter = shortcut.keyword ? shortcut.keyword.charAt(_this.level) : '';
-                    if (dictionary[letter]) {
-                        dictionary[letter].shortcuts.push(shortcut);
-                    }
-                    else {
-                        dictionary[letter] = new DictionaryItem(_this.level + 1, [shortcut]);
-                    }
+                    dictionary.computeIfAbsent(letter, function () { return new DictionaryItem(_this.level + 1, []); })
+                        .shortcuts.push(shortcut);
                 }
             });
             return dictionary;
@@ -676,8 +1415,8 @@ var shortycut;
         DictionaryItem.prototype.childSuggestions = function (maxResults, postKeywordInput) {
             var _this = this;
             if (!this._suggestions) {
-                var matches_1 = {};
-                var count = 0;
+                var matches = new shortycut.Hashtable();
+                var count_1 = 0;
                 var maxLength_1 = postKeywordInput ? this.level : 999;
                 var shortcuts_3 = this.shortcuts.filter(function (shortcut) {
                     return _this.level === shortcut.keyword.length && shortcut.keyword.length <= maxLength_1;
@@ -687,38 +1426,29 @@ var shortycut;
                     .forEach(function (shortcut) { return shortcuts_3.push(shortcut); });
                 for (var _i = 0, shortcuts_2 = shortcuts_3; _i < shortcuts_2.length; _i++) {
                     var shortcut = shortcuts_2[_i];
-                    var _loop_2 = function (match) {
-                        var nonPartialMatch = Object.keys(matches_1)
-                            .map(function (fingerprint) { return matches_1[fingerprint]; })
-                            .filter(function (item) { return item.match.keyword === match.keyword; })[0];
+                    var _loop_4 = function (match) {
+                        var nonPartialMatch = matches.values.filter(function (item) { return item.match.keyword === match.keyword; })[0];
                         if (nonPartialMatch) {
                             nonPartialMatch.match.hidesMoreChildren = true;
                             return "continue";
                         }
-                        if (matches_1[match.fingerprint]) {
-                            matches_1[match.fingerprint].shortcuts.push(shortcut);
-                        }
-                        else {
-                            matches_1[match.fingerprint] = { match: match, shortcuts: [shortcut] };
-                            count++;
-                        }
-                        if (maxResults <= count) {
+                        matches.computeIfAbsent(match.fingerprint, function () { count_1++; return { match: match, shortcuts: [] }; })
+                            .shortcuts.push(shortcut);
+                        if (maxResults <= count_1) {
                             return "break";
                         }
                     };
                     for (var _a = 0, _b = shortcut.getSegmentMatches(this.level); _a < _b.length; _a++) {
                         var match = _b[_a];
-                        var state_1 = _loop_2(match);
-                        if (state_1 === "break")
+                        var state_2 = _loop_4(match);
+                        if (state_2 === "break")
                             break;
                     }
-                    if (maxResults <= count) {
+                    if (maxResults <= count_1) {
                         break;
                     }
                 }
-                this._suggestions = Object.keys(matches_1)
-                    .map(function (fingerprint) { return matches_1[fingerprint]; })
-                    .map(function (match) { return _this.createChildSuggestion(match.match, match.shortcuts); });
+                this._suggestions = matches.values.map(function (match) { return _this.createChildSuggestion(match.match, match.shortcuts); });
             }
             return this._suggestions;
         };
@@ -830,7 +1560,7 @@ var shortycut;
             configurable: true
         });
         Filter.initializeDictionary = function () {
-            return new DictionaryItem(0, Object.keys(shortycut.shortcuts).map(function (keyword) { return shortycut.shortcuts[keyword]; }).sort(shortycut.comparing(function (s) { var _a, _b; return ((_b = (_a = s.bookmarks) === null || _a === void 0 ? void 0 : _a.current) !== null && _b !== void 0 ? _b : s.queries.current)[0].segments.description; })));
+            return new DictionaryItem(0, shortycut.shortcuts.values.sort(shortycut.comparing(function (s) { var _a, _b; return ((_b = (_a = s.bookmarks) === null || _a === void 0 ? void 0 : _a.current) !== null && _b !== void 0 ? _b : s.queries.current)[0].segments.description; })));
         };
         Object.defineProperty(Filter.prototype, "allLinks", {
             get: function () {
@@ -843,11 +1573,9 @@ var shortycut;
         Filter.initializeLinks = function () {
             var _this = this;
             var result = new Array();
-            for (var _i = 0, _a = Object.keys(shortycut.shortcuts); _i < _a.length; _i++) {
-                var keyword = _a[_i];
-                var shortcut = shortycut.shortcuts[keyword];
-                result.push.apply(result, shortcut.all.filter(function (item) { return _this.includeOverriddenShortcuts || !item.link.overridden; }));
-            }
+            shortycut.shortcuts.values.forEach(function (shortcut) {
+                return result.push.apply(result, shortcut.all.filter(function (item) { return _this.includeOverriddenShortcuts || !item.link.overridden; }));
+            });
             return result.sort(shortycut.comparing((function (item) { return item.link.segments.description; }))).map(function (item) { return ({
                 link: item.link,
                 links: item.links,
@@ -855,7 +1583,7 @@ var shortycut;
                 keywordLowerCase: item.link.keyword.toLocaleLowerCase(),
                 description: item.link.segments.descriptionPlaceholder,
                 descriptionLowerCase: item.link.segments.descriptionPlaceholder.toLowerCase(),
-                shortcut: shortycut.shortcuts[item.link.keyword]
+                shortcut: shortycut.shortcuts.get(item.link.keyword)
             }); });
         };
         Filter.includeOverriddenShortcuts = false;
@@ -901,7 +1629,7 @@ var shortycut;
                 }
             }
             if ('defaultsearchengine' === shortycut.config.defaultSearchEngine.keyword) {
-                delete shortcuts[shortycut.config.defaultSearchEngine.keyword];
+                shortcuts.delete(shortycut.config.defaultSearchEngine.keyword);
             }
             if (!shortycut.defaultSearchEngine) {
                 shortycut.defaultSearchEngine = new shortycut.Shortcut('config.defaultSearchEngine.keyword', [], shortycut.OnMultiLink.SHOW_MENU, 'https://duckduckgo.com/?q='
@@ -915,22 +1643,20 @@ var shortycut;
             this.parsePostFields(context);
             var keywords = this.formKeywords(context, this.parseKeywordsAndDescription(context));
             var hasKeywords = false;
-            for (var _i = 0, _a = Object.keys(keywords); _i < _a.length; _i++) {
-                var keyword = _a[_i];
-                if (keyword) {
-                    var sections = keywords[keyword];
-                    if (shortcuts[keyword]) {
-                        shortcuts[keyword].addLink(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields);
-                    }
-                    else {
-                        shortcuts[keyword] = new shortycut.Shortcut(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields);
-                    }
-                    if (keyword === shortycut.config.defaultSearchEngine.keyword) {
-                        shortycut.defaultSearchEngine = shortcuts[keyword];
-                    }
-                    hasKeywords = true;
+            keywords.entries.filter(function (entry) { return entry.key; }).forEach(function (entry) {
+                var keyword = entry.key;
+                var sections = entry.value;
+                if (shortcuts.get(keyword)) {
+                    shortcuts.get(keyword).addLink(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields);
                 }
-            }
+                else {
+                    shortcuts.put(keyword, new shortycut.Shortcut(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields));
+                }
+                if (keyword === shortycut.config.defaultSearchEngine.keyword) {
+                    shortycut.defaultSearchEngine = shortcuts.get(keyword);
+                }
+                hasKeywords = true;
+            });
             if (!hasKeywords) {
                 throw new shortycut.ParserError('Failed to retrieve the keyword', context.line);
             }
@@ -946,7 +1672,7 @@ var shortycut;
             context.urlOrDynamicLink = url[0].trim();
             context.description = context.line.substr(0, context.line.length - url[0].length);
             if (0 === context.urlOrDynamicLink.indexOf(shortycut.dynamicLinkProtocol)) {
-                context.urlOrDynamicLink = shortycut.startupCache.dynamicLinks[context.urlOrDynamicLink];
+                context.urlOrDynamicLink = shortycut.startupCache.dynamicLinks.get(context.urlOrDynamicLink);
                 if (!context.urlOrDynamicLink) {
                     throw new shortycut.ParserError('The dynamic link created via shortycut.toUrl() must be at the end of the line', context.line);
                 }
@@ -1048,7 +1774,7 @@ var shortycut;
         };
         ShortcutParser.prototype.formKeywords = function (context, segments) {
             var _a;
-            var result = {};
+            var result = new shortycut.Hashtable();
             var hasMoreCombinations = true;
             var keyword = new Array();
             for (var index = 0; index < segments.length; index++) {
@@ -1060,7 +1786,7 @@ var shortycut;
                     keyword[index] = (_a = segments[index].keywords[context.combination[index]]) !== null && _a !== void 0 ? _a : '';
                     array.push(this.createSegment(keyword[index], segments[index].description));
                 }
-                result[keyword.join('')] = array;
+                result.put(keyword.join(''), array);
                 hasMoreCombinations = false;
                 for (var index = segments.length - 1; 0 <= index; index--) {
                     if (context.combination[index] + 1 < segments[index].keywords.length) {
@@ -1109,14 +1835,15 @@ var shortycut;
                 noFocus: false
             };
             this.queryParameters = this.getQueryParameters();
-            this.fullQuery = (this.queryParameters[QueryParameters.QUERY] || '').replace(/\+/g, ' ');
+            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, '').replace(/\+/g, ' ');
             this.keyword = shortycut.adjustCase(this.fullQuery).replace(/\s.*$/, '');
             this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, '');
-            this.index = (this.queryParameters[QueryParameters.INDEX] || '').match(/^[0-9]+$/)
-                ? parseInt(this.queryParameters[QueryParameters.INDEX])
+            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, '').match(/^[0-9]+$/)
+                ? parseInt(this.queryParameters.getOrDefault(QueryParameters.INDEX, ''))
                 : undefined;
-            this.setup = this.queryParameters[QueryParameters.SETUP];
-            (this.queryParameters[QueryParameters.FACETS] || '')
+            this.setup = this.queryParameters.get(QueryParameters.SETUP);
+            this.queryParameters
+                .getOrDefault(QueryParameters.FACETS, '')
                 .split(',')
                 .map(function (facet) { return facet.trim().toLowerCase(); })
                 .filter(function (facet) { return facet; })
@@ -1134,7 +1861,7 @@ var shortycut;
             }
         };
         QueryParameters.prototype.getQueryParameters = function () {
-            var result = {};
+            var result = new shortycut.Hashtable();
             if (window.location.search) {
                 for (var _i = 0, _a = window.location.search.trim().replace(/^\?/, '').trim().split('&'); _i < _a.length; _i++) {
                     var parameter = _a[_i];
@@ -1142,11 +1869,11 @@ var shortycut;
                     if (0 < index) {
                         var key = this.urlDecode(parameter.substr(0, index));
                         if (key) {
-                            result[key] = this.urlDecode(parameter.substr(index + 1));
+                            result.put(key, this.urlDecode(parameter.substr(index + 1)));
                         }
                     }
                     else {
-                        result[this.urlDecode(parameter)] = '';
+                        result.put(this.urlDecode(parameter), '');
                     }
                 }
             }
@@ -1550,14 +2277,17 @@ var shortycut;
             (_a = this._queries) === null || _a === void 0 ? void 0 : _a.replacePlaceholders(searchTerm);
         };
         Shortcut.prototype.getSegmentMatches = function (length) {
-            var _a, _b, _c;
-            var result = {};
-            for (var _i = 0, _d = __spreadArrays((((_a = this._bookmarks) === null || _a === void 0 ? void 0 : _a.current) || []), ((_b = this.queries) === null || _b === void 0 ? void 0 : _b.current) || []); _i < _d.length; _i++) {
-                var link = _d[_i];
+            var _a, _b;
+            var result = new shortycut.Hashtable();
+            var _loop_5 = function (link) {
                 var match = link.segments.getMatch(length);
-                result[match.fingerprint] = (_c = result[match.fingerprint]) !== null && _c !== void 0 ? _c : match;
+                result.computeIfAbsent(match.fingerprint, function () { return match; });
+            };
+            for (var _i = 0, _c = __spreadArrays((((_a = this._bookmarks) === null || _a === void 0 ? void 0 : _a.current) || []), ((_b = this.queries) === null || _b === void 0 ? void 0 : _b.current) || []); _i < _c.length; _i++) {
+                var link = _c[_i];
+                _loop_5(link);
             }
-            return Object.keys(result).map(function (fingerprint) { return result[fingerprint]; });
+            return result.values;
         };
         return Shortcut;
     }());
@@ -1566,7 +2296,7 @@ var shortycut;
 var shortycut;
 (function (shortycut) {
     shortycut.config = null;
-    shortycut.shortcuts = {};
+    shortycut.shortcuts = null;
     shortycut.defaultSearchEngine = null;
     shortycut.queryParameters = null;
     shortycut.redirector = null;
@@ -1615,7 +2345,7 @@ var shortycut;
         Object.defineProperty(Pages.prototype, "home", {
             get: function () {
                 var _a;
-                return this.pages.home = (_a = this.pages.home) !== null && _a !== void 0 ? _a : new shortycut.HomePage();
+                return this.pages.home = (_a = this.pages.home) !== null && _a !== void 0 ? _a : new shortycut.Homepage();
             },
             enumerable: false,
             configurable: true
@@ -1631,7 +2361,7 @@ var shortycut;
         Object.defineProperty(Pages.prototype, "faviconTools", {
             get: function () {
                 var _a;
-                return this.pages.faviconTools = (_a = this.pages.faviconTools) !== null && _a !== void 0 ? _a : new shortycut.FaviconToolsPage();
+                return this.pages.faviconTools = (_a = this.pages.faviconTools) !== null && _a !== void 0 ? _a : new shortycut.FaviconTools();
             },
             enumerable: false,
             configurable: true
@@ -1647,7 +2377,7 @@ var shortycut;
         Object.defineProperty(Pages.prototype, "setup", {
             get: function () {
                 var _a;
-                return this.pages.setup = (_a = this.pages.setup) !== null && _a !== void 0 ? _a : new shortycut.SetupPage();
+                return this.pages.setup = (_a = this.pages.setup) !== null && _a !== void 0 ? _a : new shortycut.SetupInstructions();
             },
             enumerable: false,
             configurable: true
@@ -1655,7 +2385,7 @@ var shortycut;
         Object.defineProperty(Pages.prototype, "shortlist", {
             get: function () {
                 var _a;
-                return this.pages.shortlist = (_a = this.pages.shortlist) !== null && _a !== void 0 ? _a : new shortycut.ShortlistPage();
+                return this.pages.shortlist = (_a = this.pages.shortlist) !== null && _a !== void 0 ? _a : new shortycut.Shortlist();
             },
             enumerable: false,
             configurable: true
@@ -1664,19 +2394,30 @@ var shortycut;
     }());
     shortycut.pages = new Pages();
     shortycut.dynamicLinkProtocol = 'function';
-    shortycut.startupCache = {
-        exceptions: new Array(),
-        config: new Array(),
-        shortcuts: new Array(),
-        initializationErrors: new Array(),
-        dynamicLinks: {}
-    };
+    var StartupCache = (function () {
+        function StartupCache() {
+            this.exceptions = new Array();
+            this.config = new Array();
+            this.shortcuts = new Array();
+            this.initializationErrors = new Array();
+        }
+        Object.defineProperty(StartupCache.prototype, "dynamicLinks", {
+            get: function () {
+                var _a;
+                return this._dynamicLinks = (_a = this._dynamicLinks) !== null && _a !== void 0 ? _a : new shortycut.Hashtable();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        return StartupCache;
+    }());
+    shortycut.startupCache = new StartupCache();
     function initializeVariables() {
         shortycut.config = shortycut.DEFAULT_CONFIG;
+        shortycut.shortcuts = new shortycut.Hashtable();
         shortycut.queryParameters = new shortycut.QueryParameters();
         shortycut.redirector = new shortycut.Redirector();
         shortycut.router = new shortycut.Router();
-        shortycut.faviconManager = new shortycut.FaviconManager();
         shortycut.hotkeySelector = new shortycut.HotkeySelector();
     }
     shortycut.initializeVariables = initializeVariables;
@@ -1820,230 +2561,8 @@ var shortycut;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
-    var ObservableImage = (function () {
-        function ObservableImage(url) {
-            var _this = this;
-            this.status = 'loading';
-            this.element = shortycut.createImage(url, function (element) {
-                element.addEventListener('load', function () { return _this.status = 'completed'; });
-                element.addEventListener('error', function () { return _this.status = 'failed'; });
-            });
-        }
-        ObservableImage.prototype.onLoadCompleted = function (action) {
-            if ('completed' === this.status) {
-                action();
-            }
-            else if ('loading' === this.status) {
-                this.element.addEventListener('load', action);
-            }
-        };
-        ObservableImage.prototype.onLoadFailed = function (action) {
-            if ('failed' === this.status) {
-                action();
-            }
-            else if ('loading' === this.status) {
-                this.element.addEventListener('error', action);
-            }
-        };
-        return ObservableImage;
-    }());
-    var FaviconDiscoveryJob = (function () {
-        function FaviconDiscoveryJob(protocol, domain) {
-            var _a;
-            this.protocol = protocol;
-            this.FOLDERS = (_a = shortycut.config.homepage.suggestions.faviconFolders) !== null && _a !== void 0 ? _a : [];
-            this.domains = new Array();
-            this.folder = 0;
-            this.extension = 0;
-            this.domains.push(domain);
-            if (this.isLocal && domain.match(/^www\..*\..*/)) {
-                this.domains.push(domain.replace(/^www\./, ''));
-            }
-        }
-        Object.defineProperty(FaviconDiscoveryJob.prototype, "isLocal", {
-            get: function () {
-                return this.folder < this.FOLDERS.length;
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(FaviconDiscoveryJob.prototype, "currentDomain", {
-            get: function () {
-                return this.domains[this.isLocal ? 0 : this.domains.length - 1];
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(FaviconDiscoveryJob.prototype, "currentUrl", {
-            get: function () {
-                var domain = this.domains[this.domains.length - 1];
-                var ext = FaviconDiscoveryJob.EXTENSIONS[this.extension];
-                if (this.isLocal) {
-                    return this.FOLDERS[this.folder] + "/" + domain.replace(/:/g, '!') + "." + ext;
-                }
-                else {
-                    return this.protocol + "://" + domain + "/favicon." + ext;
-                }
-            },
-            enumerable: false,
-            configurable: true
-        });
-        FaviconDiscoveryJob.prototype.switchToNextUrl = function () {
-            if (this.isLocal) {
-                if (FaviconDiscoveryJob.EXTENSIONS.length <= ++this.extension) {
-                    this.extension = 0;
-                    if (this.FOLDERS.length <= ++this.folder) {
-                        if (this.domains[this.domains.length - 1].match(/^[^.]+\.[^.]/)) {
-                            this.folder = 0;
-                            this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
-                        }
-                        else {
-                            this.domains.length = 1;
-                        }
-                    }
-                }
-                return true;
-            }
-            else {
-                if (this.domains[0].match(/.*\.[0-9]+$/)) {
-                    return false;
-                }
-                this.domains.push(this.domains[this.domains.length - 1].replace(/^[^.]+\./, ''));
-                return this.domains[this.domains.length - 2] !== this.domains[this.domains.length - 1];
-            }
-        };
-        FaviconDiscoveryJob.EXTENSIONS = ['ico', 'png', 'jpg', 'svg', 'jpeg'];
-        return FaviconDiscoveryJob;
-    }());
-    var FaviconManager = (function () {
-        function FaviconManager() {
-            this.images = {};
-            this.onLoadComplete = this.onLoadComplete.bind(this);
-            this.onLoadFailed = this.onLoadFailed.bind(this);
-            this.cache = this.loadCache();
-        }
-        FaviconManager.prototype.createFavicon = function (url) {
-            var _this = this;
-            var _a;
-            var _b = FaviconManager.extractProtocolAndDomain(url), protocol = _b.protocol, domain = _b.domain;
-            var image = (_a = this.cache['file' === protocol ? '' : domain]) === null || _a === void 0 ? void 0 : _a.url;
-            if (image) {
-                var div = shortycut.create('div.favicon', shortycut.createImage(image, function (element) {
-                    if ('file' !== protocol) {
-                        element.addEventListener('error', function () { return _this.removeFaviconFromCache(image); });
-                    }
-                }));
-                div.dataset['domain'] = domain;
-                return div;
-            }
-            else {
-                this.runJob(new FaviconDiscoveryJob(protocol, domain));
-                var div = shortycut.create('div.favicon');
-                div.dataset['domain'] = domain;
-                return div;
-            }
-        };
-        FaviconManager.extractProtocolAndDomain = function (url) {
-            return {
-                protocol: url.match(/^([a-z]+:\/\/)?/i)[0].replace(/:.*/, '').toLocaleLowerCase() || 'http',
-                domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, '').replace(/\/.*/, '').toLowerCase()
-            };
-        };
-        FaviconManager.prototype.getFavicon = function (domain) {
-            return this.cache[domain];
-        };
-        FaviconManager.prototype.runJob = function (job) {
-            var _this = this;
-            var _a;
-            var url = job.currentUrl;
-            var image = this.images[url] = (_a = this.images[url]) !== null && _a !== void 0 ? _a : new ObservableImage(url);
-            image.onLoadCompleted(function () { return _this.onLoadComplete(job, image.element); });
-            image.onLoadFailed(function () { return _this.onLoadFailed(job); });
-        };
-        FaviconManager.prototype.onLoadComplete = function (job, image) {
-            var _a;
-            for (var _i = 0, _b = job.domains; _i < _b.length; _i++) {
-                var domain = _b[_i];
-                this.cache[domain] = {
-                    domain: domain,
-                    url: job.currentUrl,
-                    isStoredLocally: job.isLocal,
-                    effectiveDomain: job.domains[job.domains.length - 1]
-                };
-                var elements = document.querySelectorAll('div.favicon');
-                for (var index = 0; index < elements.length; index++) {
-                    var div = elements[index];
-                    if (((_a = div.attributes.getNamedItem('data-domain')) === null || _a === void 0 ? void 0 : _a.value) === domain && !div.childElementCount) {
-                        div.appendChild(image.cloneNode());
-                    }
-                }
-            }
-            this.saveCache();
-        };
-        FaviconManager.prototype.onLoadFailed = function (job) {
-            if (job.switchToNextUrl()) {
-                this.runJob(job);
-            }
-            else {
-                for (var _i = 0, _a = job.domains; _i < _a.length; _i++) {
-                    var domain = _a[_i];
-                    this.cache[domain] = { domain: domain, isStoredLocally: false, effectiveDomain: domain };
-                }
-                this.saveCache();
-            }
-        };
-        FaviconManager.prototype.saveCache = function () {
-            window.localStorage.setItem('shortycut.favicon-urls', JSON.stringify(this.cache));
-            window.localStorage.setItem('shortycut.favicon-folders', this.getFaviconFolders());
-        };
-        FaviconManager.prototype.loadCache = function () {
-            var _a;
-            var cache = {};
-            try {
-                if (window.localStorage.getItem('shortycut.favicon-folders') === this.getFaviconFolders()) {
-                    cache = JSON.parse((_a = window.localStorage.getItem('shortycut.favicon-urls')) !== null && _a !== void 0 ? _a : '{}');
-                }
-            }
-            catch (ignored) { }
-            cache[''] = { domain: '', isStoredLocally: true, url: 'resources/local.svg', effectiveDomain: '' };
-            return cache;
-        };
-        FaviconManager.prototype.getFaviconFolders = function () {
-            return shortycut.config.homepage.suggestions.faviconFolders.join('\t');
-        };
-        FaviconManager.prototype.removeFaviconFromCache = function (domain, protocol) {
-            if (!protocol) {
-                this.removeFaviconFromCache(domain, 'http');
-                this.removeFaviconFromCache(domain, 'https');
-            }
-            else {
-                var job = new FaviconDiscoveryJob(protocol, domain);
-                do {
-                    delete this.cache[job.currentDomain];
-                    delete this.images[job.currentUrl];
-                } while (job.switchToNextUrl());
-                this.removeFaviconFromPage(domain);
-                this.saveCache();
-            }
-        };
-        FaviconManager.prototype.removeFaviconFromPage = function (domain) {
-            var _a;
-            var elements = document.querySelectorAll('div.favicon');
-            for (var index = 0; index < elements.length; index++) {
-                var div = elements[index];
-                if (((_a = div.attributes.getNamedItem('data-domain')) === null || _a === void 0 ? void 0 : _a.value) === domain) {
-                    div.innerHTML = '';
-                }
-            }
-        };
-        return FaviconManager;
-    }());
-    shortycut.FaviconManager = FaviconManager;
-})(shortycut || (shortycut = {}));
-var shortycut;
-(function (shortycut) {
-    var FaviconToolsPage = (function () {
-        function FaviconToolsPage() {
+    var FaviconTools = (function () {
+        function FaviconTools() {
             this.dom = {
                 faviconTools: document.querySelector('#favicon-tools'),
                 configWarning: document.querySelector('#favicon-tools .config-warning'),
@@ -2058,148 +2577,101 @@ var shortycut;
                 offline: document.querySelector('#favicon-tools .offline'),
                 offlineListing: document.querySelector('#favicon-tools .offline .listing'),
             };
-            this.domains = {
-                pending: {},
-                online: new Array(),
-                offline: new Array(),
-                missing: new Array(),
-                effective: {}
-            };
-            this.refreshPageContent = this.refreshPageContent.bind(this);
             this.showCurlCommands = this.showCurlCommands.bind(this);
             this.selectAllCurlCommands = this.selectAllCurlCommands.bind(this);
-            for (var _i = 0, _a = Object.keys(shortycut.shortcuts); _i < _a.length; _i++) {
-                var keyword = _a[_i];
-                for (var _b = 0, _c = shortycut.shortcuts[keyword].all.map(function (item) { return item.link; }); _b < _c.length; _b++) {
-                    var link = _c[_b];
-                    var _d = shortycut.FaviconManager.extractProtocolAndDomain(link.urlForFavicon), protocol = _d.protocol, domain = _d.domain;
-                    if ('file' !== protocol && 'https' !== this.domains.pending[domain]) {
-                        this.domains.pending[domain] = protocol;
-                    }
-                }
-            }
-            for (var _e = 0, _f = Object.keys(this.domains.pending); _e < _f.length; _e++) {
-                var domain = _f[_e];
-                shortycut.faviconManager.createFavicon(this.domains.pending[domain] + "://" + domain);
-            }
             this.dom.configWarning.style.display = shortycut.config.homepage.suggestions.showFavicons ? 'none' : 'block';
-            this.refreshPageContent();
         }
-        FaviconToolsPage.prototype.hasMenu = function () {
+        FaviconTools.prototype.hasMenu = function () {
             return true;
         };
-        FaviconToolsPage.prototype.show = function () {
+        FaviconTools.prototype.show = function () {
             this.addEventHandlers();
             this.dom.faviconTools.style.display = 'flex';
+            shortycut.faviconManager.startFullRescan();
+            this.refreshPageContent();
         };
-        FaviconToolsPage.prototype.hide = function () {
+        FaviconTools.prototype.hide = function () {
             this.removeEventHandlers();
             this.dom.faviconTools.style.display = 'none';
         };
-        FaviconToolsPage.prototype.addEventHandlers = function () {
+        FaviconTools.prototype.addEventHandlers = function () {
             this.dom.curlLink.addEventListener('click', this.showCurlCommands);
             this.dom.curlTextarea.addEventListener('focus', this.selectAllCurlCommands);
         };
-        FaviconToolsPage.prototype.removeEventHandlers = function () {
+        FaviconTools.prototype.removeEventHandlers = function () {
             this.dom.curlLink.removeEventListener('click', this.showCurlCommands);
             this.dom.curlTextarea.addEventListener('focus', this.selectAllCurlCommands);
         };
-        FaviconToolsPage.prototype.showCurlCommands = function (event) {
+        FaviconTools.prototype.showCurlCommands = function (event) {
             this.dom.curlLink.style.display = 'none';
             this.dom.curlTextarea.style.display = 'block';
             event.preventDefault();
             return false;
         };
-        FaviconToolsPage.prototype.selectAllCurlCommands = function () {
+        FaviconTools.prototype.selectAllCurlCommands = function () {
             this.dom.curlTextarea.select();
         };
-        FaviconToolsPage.prototype.refreshPageContent = function () {
-            for (var _i = 0, _a = Object.keys(this.domains.pending); _i < _a.length; _i++) {
-                var domain = _a[_i];
-                var favicon = shortycut.faviconManager.getFavicon(domain);
-                if (favicon) {
-                    if (!this.domains.effective[favicon.effectiveDomain]) {
-                        if (favicon.url) {
-                            if (favicon.isStoredLocally) {
-                                this.addOfflineFavicon(favicon.url);
-                            }
-                            else {
-                                this.addOnlineFavicon(favicon.effectiveDomain, favicon.url);
-                            }
-                        }
-                        else {
-                            this.addMissingFavicon(favicon.domain);
-                        }
-                        this.domains.effective[favicon.effectiveDomain] = true;
-                    }
-                    delete this.domains.pending[domain];
-                }
-            }
-            this.updateProgress();
-            if (Object.keys(this.domains.pending).length) {
-                setTimeout(this.refreshPageContent, 250);
+        FaviconTools.prototype.refreshPageContent = function () {
+            if ('none' !== this.dom.faviconTools.style.display) {
+                this.refreshPageContentPending();
+                this.refreshPageContentMissing();
+                this.refreshPageContentOnline();
+                this.refreshPageContentOffline();
             }
         };
-        FaviconToolsPage.prototype.addOnlineFavicon = function (domain, url) {
-            var filename = this.getBaseFilename(domain) + "." + (url.replace(/^(.*\.|[^.]*$)/, '') || 'ico');
-            this.dom.onlineListing.appendChild(shortycut.create('div.row', [
-                shortycut.create('div.icon', this.createLink(url, filename)),
-                shortycut.create('div.domain', filename)
-            ]));
-            this.dom.curlTextarea.value += "curl -s -L -o \"" + filename + "\" \"" + url + "\"\n";
-            this.dom.online.style.display = 'block';
-        };
-        FaviconToolsPage.prototype.createLink = function (url, filename) {
-            var _this = this;
-            return shortycut.create('a', shortycut.createImage(url), function (element) {
-                element.download = filename;
-                element.href = url;
-                element.addEventListener('click', function () { return _this.onClickIcon(url, filename); });
-            });
-        };
-        FaviconToolsPage.prototype.onClickIcon = function (url, filename) {
-            console.log(filename);
-            fetch(url).then(function (response) {
-                console.log(response);
-            }).catch(function (err) {
-                console.log('Fetch problem: ' + err.message);
-            });
-        };
-        FaviconToolsPage.prototype.addMissingFavicon = function (domain) {
-            this.dom.missingListing.appendChild(shortycut.create('div.row', this.getBaseFilename(domain)));
-            this.dom.missing.style.display = 'block';
-        };
-        FaviconToolsPage.prototype.addOfflineFavicon = function (url) {
-            var filename = url.replace(/^\//, '');
-            this.dom.offlineListing.appendChild(shortycut.create('div.row', [
-                shortycut.create('div.icon', shortycut.createImage(url)),
-                shortycut.create('div.domain', filename)
-            ]));
-            this.dom.offline.style.display = 'block';
-        };
-        FaviconToolsPage.prototype.updateProgress = function () {
-            if (0 === Object.keys(this.domains.pending).length) {
-                this.dom.pending.style.display = 'none';
+        FaviconTools.prototype.refreshPageContentPending = function () {
+            var domains = shortycut.faviconManager.getPendingDomains();
+            if (domains.length) {
+                this.dom.pendingListing.innerHTML =
+                    shortycut.create('div', domains.map(function (domain) { return shortycut.create('div.row', shortycut.sanitize(domain)); })).innerHTML;
             }
-            else {
-                this.dom.pending.style.display = 'block';
-                this.dom.pendingListing.innerHTML = Object.keys(this.domains.pending)
-                    .map(function (domain) { return domain.match(/^www\..*\..*/) ? domain.replace(/^www\./, '') : domain; })
-                    .map(function (domain) { return shortycut.sanitize(domain); })
-                    .join('<br>');
+            this.dom.pending.style.display = domains.length ? 'block' : 'none';
+        };
+        FaviconTools.prototype.refreshPageContentMissing = function () {
+            var domains = shortycut.faviconManager.getMissingDomains();
+            if (domains.length) {
+                this.dom.missingListing.innerHTML =
+                    shortycut.create('div', domains.map(function (domain) { return shortycut.create('div.row', shortycut.sanitize(domain)); })).innerHTML;
             }
+            this.dom.missing.style.display = domains.length ? 'block' : 'none';
         };
-        FaviconToolsPage.prototype.getBaseFilename = function (domain) {
-            return (domain.match(/^www\..*\..*/) ? domain.replace(/^www\./, '') : domain).replace(/:/g, '!');
+        FaviconTools.prototype.refreshPageContentOnline = function () {
+            var icons = shortycut.faviconManager.getOnlineDomains();
+            if (icons.length) {
+                this.dom.curlTextarea.value =
+                    icons.map(function (item) { return "curl -s -L -o \"" + item.filename + "\" \"" + item.url + "\""; }).join('\n') + '\n';
+                this.dom.onlineListing.innerHTML = icons.map(function (item) {
+                    return shortycut.create('div.row', [
+                        shortycut.create('div.icon', shortycut.create('a', shortycut.createImage(item.url), function (element) {
+                            element.download = item.filename;
+                            element.href = item.url;
+                        })),
+                        shortycut.create('div.domain', shortycut.sanitize(item.filename))
+                    ]);
+                }).map(function (element) { return element.outerHTML; }).join('');
+            }
+            this.dom.online.style.display = icons.length ? 'block' : 'none';
         };
-        return FaviconToolsPage;
+        FaviconTools.prototype.refreshPageContentOffline = function () {
+            var icons = shortycut.faviconManager.getOfflineDomains();
+            if (icons.length) {
+                this.dom.offlineListing.innerHTML = icons.map(function (item) {
+                    return shortycut.create('div.row', [
+                        shortycut.create('div.icon', shortycut.createImage(item.url)),
+                        shortycut.create('div.domain', shortycut.sanitize(item.path))
+                    ]);
+                }).map(function (element) { return element.outerHTML; }).join('');
+            }
+            this.dom.offline.style.display = icons.length ? 'block' : 'none';
+        };
+        return FaviconTools;
     }());
-    shortycut.FaviconToolsPage = FaviconToolsPage;
+    shortycut.FaviconTools = FaviconTools;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
-    var HomePage = (function () {
-        function HomePage() {
+    var Homepage = (function () {
+        function Homepage() {
             this.dom = {
                 filter: document.querySelector('#home .input'),
                 home: document.querySelector('#home'),
@@ -2218,7 +2690,7 @@ var shortycut;
                     errorWithoutBacktickSupport: document.querySelector('#home .notification .error-without-backtick-support'),
                 }
             };
-            this.filter = new shortycut.Filter(HomePage.MAX_SUGGESTIONS);
+            this.filter = new shortycut.Filter(Homepage.MAX_SUGGESTIONS);
             this.suggestions = new Array();
             this.selectedIndex = -1;
             this.originalInput = '';
@@ -2231,10 +2703,10 @@ var shortycut;
             this.cancelClearFilter = this.cancelClearFilter.bind(this);
             this.populateNotification();
         }
-        HomePage.prototype.hasMenu = function () {
+        Homepage.prototype.hasMenu = function () {
             return true;
         };
-        HomePage.prototype.populate = function (query) {
+        Homepage.prototype.populate = function (query) {
             this.dom.filter.value = query !== null && query !== void 0 ? query : '';
             this.previousInput = undefined;
             this.originalInput = '';
@@ -2246,10 +2718,10 @@ var shortycut;
             }
             return this;
         };
-        HomePage.prototype.populateNotification = function () {
+        Homepage.prototype.populateNotification = function () {
             var _this = this;
             if (shortycut.startupCache.initializationErrors.length) {
-                this.dom.notification.applicationErrors.innerHTML = shortycut.create('div.header', 1 == shortycut.startupCache.initializationErrors.length
+                this.dom.notification.applicationErrors.innerHTML = shortycut.create('div.header', 1 === shortycut.startupCache.initializationErrors.length
                     ? 'An error occurred during initialization'
                     : 'Errors occurred during initialization').outerHTML;
                 shortycut.startupCache.initializationErrors
@@ -2257,7 +2729,7 @@ var shortycut;
                     .forEach(function (element) { return _this.dom.notification.applicationErrors.appendChild(element); });
                 this.dom.notification.applicationErrors.style.display = 'block';
             }
-            else if (0 == Object.keys(shortycut.shortcuts).length) {
+            else if (0 === shortycut.shortcuts.size) {
                 if (shortycut.startupCache.exceptions.length) {
                     if (shortycut.supportsBacktickSyntax()) {
                         this.dom.notification.errorWithBacktickSupport.style.display = 'block';
@@ -2275,16 +2747,18 @@ var shortycut;
                 this.dom.notification.welcome.self.style.display = 'block';
             }
         };
-        HomePage.prototype.show = function () {
+        Homepage.prototype.show = function () {
             this.addEventHandlers();
             this.dom.home.style.display = 'flex';
             this.dom.filter.focus();
+            this.updateFaviconManagerParameters(true);
         };
-        HomePage.prototype.hide = function () {
+        Homepage.prototype.hide = function () {
             this.removeEventHandlers();
             this.dom.home.style.display = 'none';
+            this.updateFaviconManagerParameters(false);
         };
-        HomePage.prototype.addEventHandlers = function () {
+        Homepage.prototype.addEventHandlers = function () {
             var _this = this;
             ['change', 'keydown', 'input'].forEach(function (event) {
                 return _this.dom.filter.addEventListener(event, _this.onFilterChanged);
@@ -2302,7 +2776,7 @@ var shortycut;
             }
             document.addEventListener('keydown', this.onKeyBody);
         };
-        HomePage.prototype.removeEventHandlers = function () {
+        Homepage.prototype.removeEventHandlers = function () {
             var _this = this;
             ['change', 'keydown', 'input'].forEach(function (event) {
                 return _this.dom.filter.removeEventListener(event, _this.onFilterChanged);
@@ -2320,7 +2794,7 @@ var shortycut;
             }
             document.removeEventListener('keydown', this.onKeyBody);
         };
-        HomePage.prototype.onKeyBody = function (event) {
+        Homepage.prototype.onKeyBody = function (event) {
             var isRightArrow = ('ArrowRight' === event.key || 'Right' === event.key)
                 && 0 <= this.selectedIndex
                 && (this.suggestions[this.selectedIndex].hidesMoreChildren
@@ -2369,39 +2843,39 @@ var shortycut;
             }
             return true;
         };
-        HomePage.prototype.onFilterChanged = function () {
+        Homepage.prototype.onFilterChanged = function () {
             if (this.dom.filter.value !== this.previousInput) {
                 this.applyFilter();
                 this.selectedIndex = -1;
             }
             return true;
         };
-        HomePage.prototype.onFocusEvent = function () {
+        Homepage.prototype.onFocusEvent = function () {
             var _this = this;
             if (!shortycut.queryParameters.facets.noFocus) {
                 setTimeout(function () { return _this.dom.filter.focus(); }, 0);
             }
         };
-        HomePage.prototype.cancelClearFilter = function () {
+        Homepage.prototype.cancelClearFilter = function () {
             if (this.clearFilterJob) {
                 clearTimeout(this.clearFilterJob);
                 this.clearFilterJob = undefined;
             }
             this.lastCancelClearFilterEvent = new Date().getTime();
         };
-        HomePage.prototype.scheduleClearFilter = function () {
+        Homepage.prototype.scheduleClearFilter = function () {
             if (100 <= new Date().getTime() - this.lastCancelClearFilterEvent) {
                 this.clearFilterJob = setTimeout(this.clearFilter, 10);
             }
         };
-        HomePage.prototype.clearFilter = function () {
+        Homepage.prototype.clearFilter = function () {
             if (!shortycut.queryParameters.facets.noFocus || this.dom.filter.value) {
                 this.dom.filter.focus();
             }
             this.dom.filter.value = '';
             this.applyFilter();
         };
-        HomePage.prototype.applyFilter = function (autoSelectFirstRow) {
+        Homepage.prototype.applyFilter = function (autoSelectFirstRow) {
             var _a, _b;
             var _c;
             if (autoSelectFirstRow === void 0) { autoSelectFirstRow = false; }
@@ -2411,7 +2885,7 @@ var shortycut;
             var keyword = shortycut.adjustCase((_c = splitInput[0]) !== null && _c !== void 0 ? _c : '');
             var postKeywordInput = input.replace(/^\s*/, '').substr(keyword.length);
             if (keyword) {
-                var shortcut = shortycut.shortcuts[keyword];
+                var shortcut = shortycut.shortcuts.get(keyword);
                 if (!postKeywordInput) {
                     (_a = this.suggestions).push.apply(_a, this.filter.keywordSearch(keyword, postKeywordInput));
                 }
@@ -2430,7 +2904,7 @@ var shortycut;
                     (_b = this.suggestions).push.apply(_b, this.filter.fullTextSearch(splitInput));
                 }
             }
-            this.suggestions.length = Math.min(HomePage.MAX_SUGGESTIONS, this.suggestions.length);
+            this.suggestions.length = Math.min(Homepage.MAX_SUGGESTIONS, this.suggestions.length);
             this.displaySuggestions();
             this.previousInput = input;
             if (autoSelectFirstRow && 0 < this.suggestions.length) {
@@ -2446,7 +2920,7 @@ var shortycut;
                 : 'block';
             this.updateInputFieldHighlight();
         };
-        HomePage.prototype.createSuggestion = function (shortcut, type, shortcutType) {
+        Homepage.prototype.createSuggestion = function (shortcut, type, shortcutType) {
             var links = 'bookmark' === shortcutType ? shortcut.bookmarks : shortcut.queries;
             return {
                 type: type,
@@ -2458,8 +2932,9 @@ var shortycut;
                 hidesMoreChildren: false
             };
         };
-        HomePage.prototype.displaySuggestions = function () {
+        Homepage.prototype.displaySuggestions = function () {
             var _this = this;
+            this.updateFaviconManagerParameters(true);
             this.dom.rows = this.suggestions.map(function (suggestion, index) {
                 return shortycut.create("div.row." + suggestion.type + "." + suggestion.shortcutType, [
                     shortycut.create('div.cursor', shortycut.create('img.icon', function (element) { return element.src = 'resources/arrow.svg'; })),
@@ -2468,7 +2943,7 @@ var shortycut;
                             ? shortycut.create('div.keyword:html', suggestion.keywordHtml)
                             : '',
                         shortycut.config.homepage.suggestions.showFavicons
-                            ? shortycut.faviconManager.createFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
+                            ? shortycut.faviconManager.getFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
                             : '',
                         shortycut.create('div.description:html', _this.getDescription(suggestion))
                     ], function (rowContent) { return rowContent.addEventListener('click', function (event) {
@@ -2479,14 +2954,14 @@ var shortycut;
             });
             this.dom.suggestions.innerHTML = '';
             this.dom.rows.forEach(function (row) { return _this.dom.suggestions.appendChild(row); });
-            if (HomePage.MAX_SUGGESTIONS <= this.suggestions.length) {
+            if (Homepage.MAX_SUGGESTIONS <= this.suggestions.length) {
                 this.dom.suggestions.classList.add('truncated');
             }
             else {
                 this.dom.suggestions.classList.remove('truncated');
             }
         };
-        HomePage.prototype.getDescription = function (suggestion) {
+        Homepage.prototype.getDescription = function (suggestion) {
             if (suggestion.hidesMoreChildren || suggestion.type === 'segment') {
                 return shortycut.create('div:html', [
                     suggestion.descriptionHtml,
@@ -2499,7 +2974,7 @@ var shortycut;
                 return suggestion.descriptionHtml;
             }
         };
-        HomePage.prototype.updateInputFieldHighlight = function () {
+        Homepage.prototype.updateInputFieldHighlight = function () {
             var hasInput = !!this.dom.filter.value.trim();
             var canUseSearchEngine = shortycut.defaultSearchEngine && shortycut.config.defaultSearchEngine.useOnHomepage;
             var focusOnSuggestion = this.selectedIndex != -1;
@@ -2518,7 +2993,7 @@ var shortycut;
                 this.dom.filter.classList.remove('warning');
             }
         };
-        HomePage.prototype.selectSuggestion = function (index) {
+        Homepage.prototype.selectSuggestion = function (index) {
             var _a, _b;
             index = Math.min(Math.max(-1, index), this.suggestions.length - 1);
             if (index !== this.selectedIndex) {
@@ -2546,7 +3021,7 @@ var shortycut;
                 this.updateInputFieldHighlight();
             }
         };
-        HomePage.prototype.applySuggestion = function (mode, viaRightArrow) {
+        Homepage.prototype.applySuggestion = function (mode, viaRightArrow) {
             var _a, _b, _c, _d;
             var suggestion = this.suggestions[this.selectedIndex];
             var shortcut = suggestion.shortcut;
@@ -2574,11 +3049,11 @@ var shortycut;
                 }
             }
         };
-        HomePage.prototype.redirect = function (mode) {
+        Homepage.prototype.redirect = function (mode) {
             var _a;
             var input = this.dom.filter.value.trim();
             var keyword = shortycut.adjustCase(input.replace(/\s.*/, ''));
-            var shortcut = shortycut.shortcuts[keyword];
+            var shortcut = shortycut.shortcuts.get(keyword);
             var searchTerm = input.replace(/^[^\s]*\s*/, '');
             if (!(shortcut === null || shortcut === void 0 ? void 0 : shortcut.bookmarks) && (shortcut === null || shortcut === void 0 ? void 0 : shortcut.queries) && !searchTerm) {
                 searchTerm = searchTerm || ((_a = prompt('Search term')) === null || _a === void 0 ? void 0 : _a.trim());
@@ -2609,14 +3084,25 @@ var shortycut;
                 this.applySuggestion(mode, false);
             }
         };
-        HomePage.prototype.removeFocus = function () {
+        Homepage.prototype.removeFocus = function () {
             var _this = this;
             setTimeout(function () { return _this.dom.filter.blur(); }, 0);
         };
-        HomePage.MAX_SUGGESTIONS = 12;
-        return HomePage;
+        Homepage.prototype.updateFaviconManagerParameters = function (homepageIsVisible) {
+            if (homepageIsVisible) {
+                shortycut.faviconManager.setCurrentlyDisplayedLinks(this.suggestions.map(function (suggestion) { return suggestion.shortcut.all[0].link.urlForFavicon; }));
+                if (shortycut.config.favicons.preloadOnStart) {
+                    shortycut.faviconManager.startPreload();
+                }
+            }
+            else {
+                shortycut.faviconManager.removeCurrentlyDisplayedLinks();
+            }
+        };
+        Homepage.MAX_SUGGESTIONS = 12;
+        return Homepage;
     }());
-    shortycut.HomePage = HomePage;
+    shortycut.Homepage = Homepage;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
@@ -2715,9 +3201,9 @@ var shortycut;
                     var postParameters = (_c = (_b = entry === null || entry === void 0 ? void 0 : entry.request) === null || _b === void 0 ? void 0 : _b.postData) === null || _c === void 0 ? void 0 : _c.params;
                     for (var index = 0; postParameters && index < postParameters.length; index++) {
                         url += 0 == index ? shortycut.config.shortcutFormat.url.postIndicator : '&';
-                        var name_1 = encodeURIComponent(postParameters[index].name);
+                        var name_3 = encodeURIComponent(postParameters[index].name);
                         var value = encodeURIComponent(postParameters[index].value);
-                        url += name_1 + "=" + value;
+                        url += name_3 + "=" + value;
                     }
                     result.push(shortycut.create('p.url', shortycut.sanitize(url)));
                 }
@@ -2899,8 +3385,8 @@ var shortycut;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
-    var SetupPage = (function () {
-        function SetupPage() {
+    var SetupInstructions = (function () {
+        function SetupInstructions() {
             this.setupComplete = false;
             this.dom = {
                 setup: document.querySelector('#setup'),
@@ -2911,11 +3397,11 @@ var shortycut;
                 syntaxWarning: document.querySelector('#setup .syntax-warning')
             };
         }
-        SetupPage.prototype.hasMenu = function () {
+        SetupInstructions.prototype.hasMenu = function () {
             return false;
         };
-        SetupPage.prototype.populate = function (mode) {
-            if (SetupPage.VALIDATE === mode) {
+        SetupInstructions.prototype.populate = function (mode) {
+            if (SetupInstructions.VALIDATE === mode) {
                 if (!shortycut.startupCache.config.length || !shortycut.startupCache.shortcuts.length) {
                     this.dom.error.style.display = 'block';
                     this.dom.header.style.display = 'none';
@@ -2937,23 +3423,23 @@ var shortycut;
             this.dom.syntaxWarning.style.display = shortycut.supportsBacktickSyntax() ? 'none' : 'block';
             return this;
         };
-        SetupPage.prototype.show = function () {
+        SetupInstructions.prototype.show = function () {
             if (!this.setupComplete) {
                 this.dom.setup.style.display = 'flex';
             }
         };
-        SetupPage.prototype.hide = function () {
+        SetupInstructions.prototype.hide = function () {
             this.dom.setup.style.display = 'none';
         };
-        SetupPage.VALIDATE = 'validate';
-        return SetupPage;
+        SetupInstructions.VALIDATE = 'validate';
+        return SetupInstructions;
     }());
-    shortycut.SetupPage = SetupPage;
+    shortycut.SetupInstructions = SetupInstructions;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
-    var ShortlistPage = (function () {
-        function ShortlistPage() {
+    var Shortlist = (function () {
+        function Shortlist() {
             this.dom = {
                 shortlist: document.getElementById('shortlist'),
                 listItems: new Array()
@@ -2964,56 +3450,57 @@ var shortycut;
             this.onKey = this.onKey.bind(this);
             this.openAll = this.openAll.bind(this);
         }
-        ShortlistPage.prototype.hasMenu = function () {
+        Shortlist.prototype.hasMenu = function () {
             return true;
         };
-        ShortlistPage.prototype.populate = function (links, searchTerm) {
+        Shortlist.prototype.populate = function (links, searchTerm) {
             var _this = this;
             this.links = __spreadArrays([null], links);
             this.searchTerm = searchTerm;
             this.dom.listItems = __spreadArrays([
                 this.createHeader()
-            ], this.links.slice(1).map(function (link, index) { return _this.createLink(index + 1, link.getHref(_this.searchTerm), link.segments.descriptionHtml, function (event) { return _this.openSelected(event, index + 1); }, shortycut.sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, ''))); }));
+            ], this.links.slice(1).map(function (link, index) { return _this.createLink(index + 1, link.getHref(_this.searchTerm), link.segments.descriptionHtml, function (event) { return _this.openSelected(event, index + 1); }, shortycut.sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, '')), link.url); }));
             this.dom.shortlist.innerHTML = '';
             this.dom.listItems.forEach(function (href) { return _this.dom.shortlist.appendChild(href); });
             this.focusIndex = 0;
             return this;
         };
-        ShortlistPage.prototype.createHeader = function () {
+        Shortlist.prototype.createHeader = function () {
             return this.createLink(0, 'javascript:void(0)', 'Open all', this.openAll);
         };
-        ShortlistPage.prototype.createLink = function (index, href, title, onClick, subtitle) {
+        Shortlist.prototype.createLink = function (index, href, title, onClick, subtitle, url) {
             var a = document.createElement('a');
             a.href = href;
             a.id = "shortlist" + index;
+            var favicon = url && shortycut.config.homepage.suggestions.showFavicons ? shortycut.faviconManager.getFavicon(url) : '';
             a.innerHTML = shortycut.create('div.row', [
                 shortycut.create('div.icon', shortycut.createImage('resources/arrow.svg')),
                 shortycut.create('div.text', [
                     shortycut.create('div.title', title),
-                    subtitle ? shortycut.create('div.url', subtitle) : ''
+                    url && subtitle ? shortycut.create('div.url', favicon, subtitle) : ''
                 ])
             ]).outerHTML;
             a.addEventListener('click', onClick);
             return a;
         };
-        ShortlistPage.prototype.show = function () {
+        Shortlist.prototype.show = function () {
             this.addEventHandlers();
             this.dom.shortlist.style.display = 'flex';
             this.dom.listItems[this.focusIndex].focus();
         };
-        ShortlistPage.prototype.hide = function () {
+        Shortlist.prototype.hide = function () {
             this.removeEventHandlers();
             this.dom.shortlist.style.display = 'none';
         };
-        ShortlistPage.prototype.addEventHandlers = function () {
+        Shortlist.prototype.addEventHandlers = function () {
             var _this = this;
             ['keyup', 'keydown'].forEach(function (event) { return document.addEventListener(event, _this.onKey); });
         };
-        ShortlistPage.prototype.removeEventHandlers = function () {
+        Shortlist.prototype.removeEventHandlers = function () {
             var _this = this;
             ['keyup', 'keydown'].forEach(function (event) { return document.removeEventListener(event, _this.onKey); });
         };
-        ShortlistPage.prototype.onKey = function (event) {
+        Shortlist.prototype.onKey = function (event) {
             var _a;
             if ('keyup' === event.type) {
                 return false;
@@ -3038,17 +3525,17 @@ var shortycut;
                 return true;
             }
         };
-        ShortlistPage.prototype.openSelected = function (event, current) {
+        Shortlist.prototype.openSelected = function (event, current) {
             shortycut.redirector.redirect([this.links[current]], shortycut.OnMultiLink.OPEN_IN_NEW_TAB, this.searchTerm, shortycut.queryParameters.facets.newTabs ? shortycut.RedirectMode.NEW_TAB : shortycut.RedirectMode.PRESERVE_HISTORY);
             event.preventDefault();
             return false;
         };
-        ShortlistPage.prototype.openAll = function (event) {
+        Shortlist.prototype.openAll = function (event) {
             shortycut.redirector.redirect(this.links.slice(1), shortycut.OnMultiLink.OPEN_IN_NEW_TAB, this.searchTerm, shortycut.RedirectMode.PRESERVE_HISTORY);
             event.preventDefault();
             return false;
         };
-        ShortlistPage.prototype.getTargetIndex = function (key, current) {
+        Shortlist.prototype.getTargetIndex = function (key, current) {
             if ('ArrowDown' === key || 'Down' === key || 'Enter' === key || 'Tab' === key) {
                 return Math.min(Math.max(current + 1, 0), this.links.length - 1);
             }
@@ -3068,9 +3555,9 @@ var shortycut;
             }
             return current;
         };
-        return ShortlistPage;
+        return Shortlist;
     }());
-    shortycut.ShortlistPage = ShortlistPage;
+    shortycut.Shortlist = Shortlist;
 })(shortycut || (shortycut = {}));
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3114,9 +3601,14 @@ var shortycut;
         }
         else {
             console.error(exception);
+            var message = exception;
+            try {
+                message = exception.toString();
+            }
+            catch (ignored) { }
             shortycut.pages.error.populate('Internal error', [
                 shortycut.create('p', 'An internal error occurred:'),
-                shortycut.create('p', exception)
+                shortycut.create('p', message)
             ]);
         }
         shortycut.pages.hideAllExcept(shortycut.pages.error);
@@ -3157,6 +3649,85 @@ var shortycut;
         return ParserError;
     }(InitializationError));
     shortycut.ParserError = ParserError;
+    function runAndIgnoreErrors(callback) {
+        try {
+            callback();
+        }
+        catch (ignored) { }
+    }
+    shortycut.runAndIgnoreErrors = runAndIgnoreErrors;
+})(shortycut || (shortycut = {}));
+var shortycut;
+(function (shortycut) {
+    var Hashtable = (function () {
+        function Hashtable() {
+            this.data = {};
+        }
+        Hashtable.prototype.get = function (key) {
+            return this.data[key];
+        };
+        Hashtable.prototype.getOrDefault = function (key, defaultValue) {
+            var _a;
+            return (_a = this.data[key]) !== null && _a !== void 0 ? _a : defaultValue;
+        };
+        Hashtable.prototype.put = function (key, value) {
+            this.data[key] = value;
+        };
+        Hashtable.prototype.computeIfAbsent = function (key, supplier) {
+            var _a;
+            return this.data[key] = (_a = this.data[key]) !== null && _a !== void 0 ? _a : supplier(key);
+        };
+        Hashtable.prototype.delete = function (key) {
+            delete this.data[key];
+        };
+        Object.defineProperty(Hashtable.prototype, "keys", {
+            get: function () {
+                return Object.keys(this.data);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Hashtable.prototype, "values", {
+            get: function () {
+                var _this = this;
+                return Object.keys(this.data).map(function (key) { return _this.data[key]; });
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Hashtable.prototype, "entries", {
+            get: function () {
+                var _this = this;
+                return Object.keys(this.data).map(function (key) { return ({ key: key, value: _this.data[key] }); });
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Hashtable.prototype, "size", {
+            get: function () {
+                return this.keys.length;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Hashtable.prototype.map = function (callback) {
+            var _this = this;
+            return this.entries.map(function (entry) { return callback(entry.key, entry.value, _this); });
+        };
+        Hashtable.prototype.mapKeys = function (callback) {
+            var _this = this;
+            return this.keys.map(function (key) { return callback(key, _this); });
+        };
+        Hashtable.prototype.mapValues = function (callback) {
+            return this.values.map(function (value) { return callback(value); });
+        };
+        Hashtable.prototype.forEach = function (callback) {
+            var _this = this;
+            this.entries.forEach(function (entry) { return callback(entry.key, entry.value, _this); });
+        };
+        return Hashtable;
+    }());
+    shortycut.Hashtable = Hashtable;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
@@ -3321,15 +3892,21 @@ var shortycut;
             this.isSanitized = isSanitized;
             this.id = id;
         }
+        Object.defineProperty(ElementProperties, "cache", {
+            get: function () {
+                var _a;
+                return ElementProperties._cache = (_a = ElementProperties._cache) !== null && _a !== void 0 ? _a : new shortycut.Hashtable();
+            },
+            enumerable: false,
+            configurable: true
+        });
         ElementProperties.of = function (type) {
-            var _a;
-            return ElementProperties.cache[type] = (_a = ElementProperties.cache[type]) !== null && _a !== void 0 ? _a : ElementProperties.parse(type);
+            return ElementProperties.cache.computeIfAbsent(type, ElementProperties.parse);
         };
         ElementProperties.parse = function (type) {
             var array = type.split(/(?=[.#:])/).map(function (token) { return token.trim(); }).filter(function (token) { return token; });
             return new ElementProperties(array[0], array.filter(function (item) { return '.' === item.charAt(0); }).map(function (item) { return item.substr(1); }).join(' '), array.some(function (item) { return item === ':html'; }), array.filter(function (item) { return '#' === item.charAt(0); }).map(function (item) { return item.substr(1); })[0]);
         };
-        ElementProperties.cache = {};
         return ElementProperties;
     }());
     function applyCreateProperties(mustSanitize, element) {
@@ -3377,7 +3954,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return '1.1'.replace(/^##.*/, '');
+        return '1.2'.replace(/^##.*/, '');
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {
@@ -3393,9 +3970,9 @@ var shortycut;
     }
     shortycut.supportsBacktickSyntax = supportsBacktickSyntax;
     function isDemoMode() {
-        var keywords = ['tm', 'tz', 'tp', 'tt', 'tr', 'e', 'news'];
-        return Object.keys(shortycut.shortcuts).length == keywords.length
-            && keywords.filter(function (keyword) { return shortycut.shortcuts[keyword]; }).length === keywords.length;
+        var demoKeywords = ['tm', 'tz', 'tp', 'tt', 'tr', 'e', 'news'];
+        var matchedKeywords = demoKeywords.filter(function (keyword) { return shortycut.shortcuts.get(keyword); });
+        return shortycut.shortcuts.size == demoKeywords.length && matchedKeywords.length === demoKeywords.length;
     }
     shortycut.isDemoMode = isDemoMode;
 })(shortycut || (shortycut = {}));

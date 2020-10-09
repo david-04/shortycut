@@ -29,13 +29,18 @@ shortycut.configure({
         suggestions: {
             showKeywords: true,
             showHotkeys: true,
-            showFavicons: true,
-            faviconFolders: []
+            showFavicons: true
         }
     },
     defaultSearchEngine: {
         keyword: 'defaultsearchengine',
         useInAddressBar: true,
         useOnHomepage: true
+    },
+    favicons: {
+        preloadOnStart: true,
+        rememberUrls: false,
+        fetchService: 'https://www.google.com/s2/favicons?sz=32&domain=%s',
+        localFolders: []
     }
 });
