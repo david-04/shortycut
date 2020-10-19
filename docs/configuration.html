@@ -186,7 +186,7 @@ They are stored in <code>settings.js</code>, which is located in the <code>data<
 </code></pre>
 
 <p>Settings can be boolean values (<code>true</code> or <code>false</code>) or text, which must be surrounded by single quotes (<code>'</code>).
-Some settings allow to configure multiple values.
+Some settings allow multiple values to be configured.
 They must be separated by commas (<code>,</code>) and surrounded by square brackets (<code>[</code> and <code>]</code>).</p>
 <p>Text containing certain characters can interfere with the JavaScript syntax and cause problems.
 Try to avoid using the following characters, particularly in the <code>shortcutFormat</code> section:</p>
@@ -200,9 +200,9 @@ Try to avoid using the following characters, particularly in the <code>shortcutF
 This might happen when upgrading to a newer version of ShortyCut which introduces additional settings.
 When adding new properties to <code>settings.js</code>, make sure to place them at the same location as in the example above.</p>
 <h2 id="shortcutformatcomment"><img alt="" src="img/arrow.svg" /> shortcutFormat.comment</h2>
-<p>This property defines the character(s) which introduce comments within shortcut definitions.
+<p>This property defines the delimiter that introduces comments within shortcut definitions.
 The default value is the double-slash (<code>//</code>).
-Lines starting with the given sequence are treated as comment and ignored.
+Lines starting with the given sequence are treated as a comment and ignored.
 See "<a href="file-format.html">File format</a>" for details.</p>
 <h2 id="shortcutformatkeywordcasesensitive"><img alt="" src="img/arrow.svg" /> shortcutFormat.keyword.caseSensitive</h2>
 <p>This property enables or disables case-sensitivity for keywords.
@@ -213,7 +213,7 @@ keywords must be entered exactly as they are defined in <code>shortcuts.js</code
 <h2 id="shortcutformatkeywordopeningdelimiter-and-shortcutformatkeywordclosingdelimiter"><img alt="" src="img/arrow.svg" /> shortcutFormat.keyword.openingDelimiter and shortcutFormat.keyword.closingDelimiter</h2>
 <p>These properties define the characters that can be put in front and after keywords in shortcut definitions.
 The default values are the square brackets (<code>[</code> and <code>]</code>).
-It is optional to actually use the delimiters when defining shortcuts.
+It is optional to use the delimiters when defining shortcuts.
 See "<a href="shortcut-syntax.html#keyword">Shortcut syntax</a>" for details.</p>
 <h2 id="shortcutformatkeywordseparator"><img alt="" src="img/arrow.svg" /> shortcutFormat.keyword.separator</h2>
 <p>This property defines the character that separates multiple keywords for the same shortcut.
@@ -280,22 +280,22 @@ See "<a href="default-search-engine.html">Default search engine</a>" for details
 <h2 id="defaultsearchengineuseinaddressbar"><img alt="" src="img/arrow.svg" /> defaultSearchEngine.useInAddressBar</h2>
 <p>This property enables or disables the default search engine when ShortyCut is invoked from the browser's address bar.
 The default value is <code>true</code>,
-meaning that all input that does not mach any keyword is forwarded to the default search engine.
+meaning that all input that does not match any keyword is forwarded to the default search engine.
 See "<a href="default-search-engine.html">Default search engine</a>" for details.</p>
 <h2 id="defaultsearchengineuseonhomepage"><img alt="" src="img/arrow.svg" /> defaultSearchEngine.useOnHomepage</h2>
 <p>This property enables or disables the default search engine on ShortyCut's homepage.
-The default value is <code>true</code>, meaning that all input that does not mach any keyword
+The default value is <code>true</code>, meaning that all input that does not match any keyword
 is forwarded to the default search engine.
 See "<a href="default-search-engine.html">Default search engine</a>" for details.</p>
 <h2 id="homepagefaviconspreloadonstart"><img alt="" src="img/arrow.svg" /> homepage.favicons.preloadOnStart</h2>
 <p>This property enables or disables the preloading of favicons.
 The default value is <code>true</code>, meaning that favicons are loaded in the background before they are actually needed.
-This creates additional network traffic, but allows them to be displayed quickly later on.
+This creates additional network traffic but allows them to be displayed quickly later on.
 See "<a href="favicons.html">Favicons</a>" for details.</p>
 <h2 id="homepagefaviconsrememberurls"><img alt="" src="img/arrow.svg" /> homepage.favicons.rememberUrls</h2>
 <p>This property enables or disables the caching of favicon locations in the browser's local storage.
 The default value is <code>true</code>, meaning that ShortyCut permanently remembers where it has looked for favicons before.
-This occupies a small amount of disk space, but significantly speeds up subsequent page loads.
+This occupies a small amount of disk space but significantly speeds up subsequent page loads.
 See "<a href="favicons.html">Favicons</a>" for details.</p>
 <h2 id="homepagefaviconsfetchservice"><img alt="" src="img/arrow.svg" /> homepage.favicons.fetchService</h2>
 <p>This property points to a web service that provides favicon images for any domain.

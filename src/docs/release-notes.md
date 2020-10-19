@@ -18,7 +18,7 @@
 - Improved the homepage's ability to lock itself to a [pinned browser tab](homepage.md)
   by opening links to the manual in new tabs
 - Improved the accessibility of the menu through the keyboard
-  when using a browser extensions like Vimium
+  when using a browser extension like Vimium
 - Fixed an issue that could cause [POST links](post-links.md) to fail or send wrong data
   if the search term contained special characters like `&` or `%`
 - Fixed an issue with the homepage's [no-focus mode](homepage.md)

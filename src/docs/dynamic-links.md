@@ -6,9 +6,8 @@ It helps to reduce the overall number of keywords by reusing preexisting ones fo
 
 ## ![](img/arrow.svg) Use case
 
-Sometimes there are different ways how information can be accessed and searched.
-One example are the MkDocs issues reported on GitHub.
-They can be accessed by...
+Sometimes there are different ways of how information can be accessed and searched.
+The MkDocs' issues on GitHub, for example, can be accessed in various ways...
 
 
 - Listing all issues<br>
@@ -29,7 +28,7 @@ shortycut.addShortcuts(`
 `);
 ```
 
-This provides great flexibility, but also increases the number of keywords.
+This provides great flexibility but also increases the number of keywords.
 From a usability point of view, it would be better to have only one keyword for all links:
 
 ```javascript
@@ -54,7 +53,7 @@ Depending on the configuration,
 ShortyCut would either open both links in separate tabs or display a list to manually choose from.
 
 Dynamic links avoid opening multiple tabs or having to choose from a list.
-They analyse the search term and automatically select the most suitable target page.
+They analyze the search term and automatically select the most suitable target page.
 
 ## ![](img/arrow.svg) Creating dynamic links
 
@@ -73,7 +72,7 @@ function mkDocsIssues(searchTerm) {
 ```
 
 The search term is passed in as regular text (i.e. not URL-encoded).
-Prior to embedding it into a link, it needs to be be passed through `encodeURIComponent()`.
+Before embedding it into a link, it needs to be passed through `encodeURIComponent()`.
 However, it's easier to just return a link with the `%s` placeholder and let ShortyCut insert the search term.
 
 The next step is to register the function:
@@ -141,7 +140,7 @@ function mkDocsIssues(searchTerm) {
 ```
 
 This dynamic link redirects all queries to one of two GitHub pages,
-but uses the favicon of MkDoc's homepage (rather than the one from GibHub).
+but uses the favicon of MkDoc's homepage (rather than the one from GitHub).
 
 There is no need to map the search term `null` or `undefined` to a dedicated URL,
-unless the favicon of the links returned by the function anyway (GitHub in the example above) are unsuitable.
+unless the favicons of links returned by the function anyway (GitHub in the example above) are unsuitable.

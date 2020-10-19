@@ -49,7 +49,7 @@ shortycut.configure({
 ```
 
 Settings can be boolean values (`true` or `false`) or text, which must be surrounded by single quotes (`'`).
-Some settings allow to configure multiple values.
+Some settings allow multiple values to be configured.
 They must be separated by commas (`,`) and surrounded by square brackets (`[` and `]`).
 
 Text containing certain characters can interfere with the JavaScript syntax and cause problems.
@@ -66,9 +66,9 @@ When adding new properties to `settings.js`, make sure to place them at the same
 
 ## ![](img/arrow.svg) shortcutFormat.comment
 
-This property defines the character(s) which introduce comments within shortcut definitions.
+This property defines the delimiter that introduces comments within shortcut definitions.
 The default value is the double-slash (`//`).
-Lines starting with the given sequence are treated as comment and ignored.
+Lines starting with the given sequence are treated as a comment and ignored.
 See "[File format](file-format.md)" for details.
 
 ## ![](img/arrow.svg) shortcutFormat.keyword.caseSensitive
@@ -83,7 +83,7 @@ keywords must be entered exactly as they are defined in `shortcuts.js`.
 
 These properties define the characters that can be put in front and after keywords in shortcut definitions.
 The default values are the square brackets (`[` and `]`).
-It is optional to actually use the delimiters when defining shortcuts.
+It is optional to use the delimiters when defining shortcuts.
 See "[Shortcut syntax](shortcut-syntax.md#keyword)" for details.
 
 ## ![](img/arrow.svg) shortcutFormat.keyword.separator
@@ -180,13 +180,13 @@ See "[Default search engine](default-search-engine.md)" for details.
 
 This property enables or disables the default search engine when ShortyCut is invoked from the browser's address bar.
 The default value is `true`,
-meaning that all input that does not mach any keyword is forwarded to the default search engine.
+meaning that all input that does not match any keyword is forwarded to the default search engine.
 See "[Default search engine](default-search-engine.md)" for details.
 
 ## ![](img/arrow.svg) defaultSearchEngine.useOnHomepage
 
 This property enables or disables the default search engine on ShortyCut's homepage.
-The default value is `true`, meaning that all input that does not mach any keyword
+The default value is `true`, meaning that all input that does not match any keyword
 is forwarded to the default search engine.
 See "[Default search engine](default-search-engine.md)" for details.
 
@@ -194,7 +194,7 @@ See "[Default search engine](default-search-engine.md)" for details.
 
 This property enables or disables the preloading of favicons.
 The default value is `true`, meaning that favicons are loaded in the background before they are actually needed.
-This creates additional network traffic, but allows them to be displayed quickly later on.
+This creates additional network traffic but allows them to be displayed quickly later on.
 See "[Favicons](favicons.md)" for details.
 
 
@@ -202,7 +202,7 @@ See "[Favicons](favicons.md)" for details.
 
 This property enables or disables the caching of favicon locations in the browser's local storage.
 The default value is `true`, meaning that ShortyCut permanently remembers where it has looked for favicons before.
-This occupies a small amount of disk space, but significantly speeds up subsequent page loads.
+This occupies a small amount of disk space but significantly speeds up subsequent page loads.
 See "[Favicons](favicons.md)" for details.
 
 

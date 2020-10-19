@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) Keywords
 
-Some browsers allow to assign keywords to bookmarks.
+Some browsers allow assigning keywords to bookmarks.
 Instead of having to find and click on the bookmark itself,
 the page can be opened by entering the keyword in the browser's address bar.
 This is quicker than navigating through the bookmark collection.
@@ -9,16 +9,16 @@ This is quicker than navigating through the bookmark collection.
 
 Websites are continuously growing as more content and new features are added.
 This makes them more useful, but also adds complexity.
-Finding the relevant information often involves visiting  multiple intermediate pages.
+Finding relevant information often involves visiting multiple intermediate pages.
 Each of them takes effort (to find and click on the right link) and time (to wait for the next page to load).
-Navigating in small steps, one at a time, is neither efficient nor enjoyable.
+Navigating in small steps - one at a time - is neither efficient nor enjoyable.
 
 One example of click-intensive browsing is online shopping.
 Getting the most relevant results often requires multiple filters to be applied.
 Imagine you're in Australia and - with summer approaching fast - in urgent need of a nice (and cheap) pair of sunnies.
 To find suitable offers, you might go through a couple of steps:
 
-* Open ebay.com.au (or use a search engine for lesser known domains)
+* Open ebay.com.au (or use a search engine for lesser-known domains)
 * Enter the term "sunglasses" into the search field
 * Select the category "men" or "women" (to fit your style)
 * Change the sort order to "price" (so that the cheapest offers appear on top)
@@ -60,7 +60,7 @@ There's no need to step through intermediate pages, customize the listing or fin
 Keyword bookmarks are great for quickly restoring filters and directly accessing nested pages.
 But they're also kind of a one-trick pony and always produce the same page view.
 A more versatile form are keyword searches.
-They work with websites that allow searching for things like products, news or images.
+They work with websites that allow searching for things like products, news, or images.
 Like filters and settings, the search term is usually included in the page's address:
 
 ```text
@@ -72,21 +72,21 @@ Once such a page has been bookmarked, it can be turned into a keyword search by 
 
 ![](img/ebay-properties.png)
 
-This bookmark allows to search for any product on eBay and is no longer limited to sunglasses.
+This bookmark allows searching for any product on eBay and is no longer limited to sunglasses.
 It's used by entering the keyword (`ebay`) followed by the search term (e.g. `hat`) in the address bar:
 
 ![](img/ebay-address-bar.png)
 
-This will open eBay, restore all bookmarked filters and search for hats.
+This will open eBay, restore all bookmarked filters, and search for hats.
 
 ## ![](img/arrow.svg) Limitations
 
 Keywords are incredibly handy.
-They bypass long-winded navigation steps, restore filter settings and open the right page straight away.
+They bypass long-winded navigation steps, restore filter settings, and open the right page straight away.
 As a native browser feature, they do have some limitations, though.
 
 In Chromium-based browsers, for example, the usability is not great.
-In order to assign keywords, bookmarks need to be added as search engines.
+To assign keywords, bookmarks need to be added as search engines.
 This is done in the settings and less convenient than working with regular bookmarks.
 Search engines can't be organized in folders either.
 All keywords end up in one long list, making it hard to maintain them.

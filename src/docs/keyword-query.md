@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) Keyword query
 
-This integration method only works with browsers which natively support keywords (e.g. Firefox, Chrome and other Chromium-based browsers).
+This integration method only works with browsers that natively support keywords (e.g. Firefox, Chrome, and other Chromium-based browsers).
 It's an easy way to make ShortyCut accessible through the browser's address bar.
 A dedicated keyword (e.g. `sc`) is assigned to ShortyCut itself and needs to be entered before the actual keyword.
 For example, if the shortcut `e` performs a product search on eBay, then a search for sunglasses would be started via:
@@ -16,7 +16,7 @@ To create a keyword query in Firefox, open the browser integration page via the 
 
 ![](img/menu-browser-integration.png)
 
-Scroll down to the "Keyword query" section, right click on the input field and select "Add a Keyword for this Search...":
+Scroll down to the "Keyword query" section, right-click on the input field, and select "Add a Keyword for this Search...":
 
 ![](img/keyword-query-firefox-01.png)
 
@@ -42,7 +42,7 @@ Scroll down to the "Keyword query" section and copy the link at the bottom of th
 
 ![](img/keyword-query-chrome-01.png)
 
-Open the browser settings, scroll down to the "Search engine" section and select "Manage search engines":
+Open the browser settings, scroll down to the "Search engine" section, and select "Manage search engines":
 
 ![](img/keyword-query-chrome-02.png)
 
@@ -50,7 +50,7 @@ Under "Other search engines", click the "Add" button:
 
 ![](img/keyword-query-chrome-03.png)
 
-Give the search engine a name (e.g. `ShortyCut`), assign a keyword (e.g. `sc`) and paste the link from the browser
+Give the search engine a name (e.g. `ShortyCut`), assign a keyword (e.g. `sc`), and paste the link from the browser
 integration page:
 
 ![](img/keyword-query-chrome-04.png)

@@ -1,7 +1,7 @@
 # ![](img/arrow.svg) Multi-link shortcuts
 
 Sometimes web pages provide similar or complementing information.
-One example are news websites with index pages per category and region.
+For example, news websites usually have index pages per category and region.
 Separate keywords can be used to bookmark them individually:
 
 ```text
@@ -70,7 +70,7 @@ An equals sign (`=`) in front of a link causes all previous links to be discarde
 
 In this example, importing the last line will cause ShortyCut to discard all previous links.
 The `news` keyword is treated as if it had only one link (world news).
-It's the same effect as if the first three lines lines were not there at all.
+It's the same effect as if the first three lines were not there at all.
 
 Ignoring previous links is rarely needed.
 It can be used to override individual keywords when importing shared shortcut collections.
@@ -90,7 +90,7 @@ The behavior for the remaining shortcuts is determined only by the last link.
 ```
 
 In this example, the equals sign (`=`) in finance news causes the previous link (Australia news) to be discarded.
-The keyword will eventually have three links (finance, sports and world news).
+The keyword will eventually have three links (finance, sports, and world news).
 A list will be displayed, because the last link (world news) has a question mark (`?`).
 If it didn't have any indicator, the configured default behavior would apply.
 The caret (`^`) in front of the sports link is always ignored and can be omitted.

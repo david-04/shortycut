@@ -143,9 +143,8 @@
 This is an advanced technique that requires JavaScript code to be written.
 It helps to reduce the overall number of keywords by reusing preexisting ones for similar queries.</p>
 <h2 id="use-case"><img alt="" src="img/arrow.svg" /> Use case</h2>
-<p>Sometimes there are different ways how information can be accessed and searched.
-One example are the MkDocs issues reported on GitHub.
-They can be accessed by...</p>
+<p>Sometimes there are different ways of how information can be accessed and searched.
+The MkDocs' issues on GitHub, for example, can be accessed in various ways...</p>
 <ul>
 <li>Listing all issues<br>
   <a href="https://github.com/mkdocs/mkdocs/issues">https://github.com/mkdocs/mkdocs/issues</a></li>
@@ -163,7 +162,7 @@ They can be accessed by...</p>
 `);
 </code></pre>
 
-<p>This provides great flexibility, but also increases the number of keywords.
+<p>This provides great flexibility but also increases the number of keywords.
 From a usability point of view, it would be better to have only one keyword for all links:</p>
 <pre><code class="javascript">shortycut.addShortcuts(`
 
@@ -184,7 +183,7 @@ But if a search term was entered as well, two queries (search issues and goto is
 Depending on the configuration,
 ShortyCut would either open both links in separate tabs or display a list to manually choose from.</p>
 <p>Dynamic links avoid opening multiple tabs or having to choose from a list.
-They analyse the search term and automatically select the most suitable target page.</p>
+They analyze the search term and automatically select the most suitable target page.</p>
 <h2 id="creating-dynamic-links"><img alt="" src="img/arrow.svg" /> Creating dynamic links</h2>
 <p>Dynamic links are simple JavaScript functions.
 They receive the search term as a parameter and return the applicable link as the result:</p>
@@ -199,7 +198,7 @@ They receive the search term as a parameter and return the applicable link as th
 </code></pre>
 
 <p>The search term is passed in as regular text (i.e. not URL-encoded).
-Prior to embedding it into a link, it needs to be be passed through <code>encodeURIComponent()</code>.
+Before embedding it into a link, it needs to be passed through <code>encodeURIComponent()</code>.
 However, it's easier to just return a link with the <code>%s</code> placeholder and let ShortyCut insert the search term.</p>
 <p>The next step is to register the function:</p>
 <pre><code class="javascript">var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
@@ -254,9 +253,9 @@ when the search term is <code>null</code> or <code>undefined</code>:</p>
 </code></pre>
 
 <p>This dynamic link redirects all queries to one of two GitHub pages,
-but uses the favicon of MkDoc's homepage (rather than the one from GibHub).</p>
+but uses the favicon of MkDoc's homepage (rather than the one from GitHub).</p>
 <p>There is no need to map the search term <code>null</code> or <code>undefined</code> to a dedicated URL,
-unless the favicon of the links returned by the function anyway (GitHub in the example above) are unsuitable.</p>
+unless the favicons of links returned by the function anyway (GitHub in the example above) are unsuitable.</p>
               
             </div>
           </div>

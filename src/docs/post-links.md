@@ -4,7 +4,7 @@ Some pages transmit data via the `POST` method,
 which prevents filters and settings from showing up in the browser's address bar.
 It's often used for sensitive input like usernames and passwords.
 As a side effect, these pages can't (and often shouldn't) be bookmarked.
-But in some cases it's safe and handy to create a shortcut nevertheless.
+But in some cases, it's safe and handy to create a shortcut nevertheless.
 
 
 ## ![](img/arrow.svg) Link syntax
@@ -66,7 +66,7 @@ Before clicking the submit button, right-click anywhere on the page and select "
 
 This will open the browser's developer tools on the side or at the bottom of the window.
 Switch to the "Network" tab and tick the "preserve log" checkbox.
-In some browsers this might be hidden in the menu and have a different name (e.g. "persist log"):
+In some browsers, this might be hidden in the menu and have a different name (e.g. "persist log"):
 
 ![](img/har-02-dev-tools.png)
 

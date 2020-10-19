@@ -3,10 +3,10 @@
 Grouping can be used to reduce the number of suggestions on ShortyCut's homepage.
 This is useful when similar shortcuts have keywords that start with the same letters.
 One example is GitHub, where it can be handy to not only quickly access specific projects,
-but also their various pages (like releases, pull requests and issues):
+but also their various pages (like releases, pull requests, and issues):
 
 ```text
-[gh]       GibHub                          https://github.com/
+[gh]       GitHub                          https://github.com/
 
 [ghsc]     GitHub ShortyCut                https://github.com/david-04/shortycut
 [ghscc]    GitHub ShortyCut commits        https://github.com/.../commits
@@ -47,7 +47,7 @@ shortycut.configure({
 When grouping is enabled, the keywords can be segmented and intertwined with the description:
 
 ```text
-[gh] GibHub                                      https://github.com/
+[gh] GitHub                                      https://github.com/
 
 [gh] GitHub [sc]  ShortyCut                      https://github.com/david-04/shortycut
 [gh] GitHub [sc]  ShortyCut [c]  commits         https://github.com/.../commits

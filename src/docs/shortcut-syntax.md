@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) Shortcut syntax
 
-Each shortcut consists of a keyword, a description and a link:
+Each shortcut consists of a keyword, a description, and a link:
 
 ```text
 [sunnies] Sunglasses at eBay https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
@@ -24,7 +24,7 @@ Each shortcut can have multiple keywords.
 This allows the link to be opened by entering any one of them.
 Multiple keywords are concatenated with pipe symbols (`|`) between them.
 When using square brackets (`[` and `]`), blanks can be inserted for readability.
-Otherwise there must be no whitespace between the keywords and the pipe symbols (`|`):
+Otherwise, there must be no whitespace between the keywords and the pipe symbols (`|`):
 
 ```text
 s|sunnies     Sunglasses at eBay  https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
@@ -57,5 +57,5 @@ On the other hand, the link for `ebay` does have a placeholder.
 The keyword is entered alongside a search term, which replaces the `%s` in the link.
 For example, entering `ebay hat` in the browser's address bar will open the hats listing.
 
-Shortcuts can also point to POST pages, where the link does not contain settings, filters or search terms.
+Shortcuts can also point to POST pages, where the link does not contain settings, filters, or search terms.
 See "[POST links](post-links.md)" for details.

@@ -1,12 +1,12 @@
 # ![](img/arrow.svg) Browser integration
 
-In order to intercept keywords and redirect to the corresponding pages, ShortyCut needs to be integrated with the browser.
+To intercept keywords and redirect to the corresponding pages, ShortyCut needs to be integrated with the browser.
 There are different methods to accomplish this.
 
 ## ![](img/arrow.svg) Homepage
 
 Using ShortyCut's homepage is the easiest approach that works across all browsers.
-It's also the most convenient way to enter keywords, because it displays suggestions:
+It's also the most convenient way to enter keywords because it displays suggestions:
 
 ![](img/favicons-suggestions.png)
 
@@ -17,7 +17,7 @@ See "[Homepage](homepage.md)" for details.
 
 A keyword query is a lightweight method to make shortcuts accessible through the browser's address bar.
 ShortyCut itself is bookmarked and a keyword is assigned to it.
-This only works with browsers which natively support keywords.
+This only works with browsers that natively support keywords.
 
 The keyword assigned to the ShortyCut bookmark (e.g. `sc`) needs to be entered before the actual keyword itself.
 If the shortcut `e` performs a product search on eBay, then a search for sunglasses would be started via:

@@ -45,7 +45,7 @@ It's best to create a start-up task to automatically restart the web server afte
 ## ![](img/arrow.svg) Using a web hosting service
 
 Rather than running a local web server, ShortyCut can also be uploaded to a web hosting service.
-However, it needs to be re-uploaded over and over again, whenever shortcuts are added, removed or modified.
+However, it needs to be re-uploaded over and over again, whenever shortcuts are added, removed, or modified.
 Before uploading it for the first time, open `search.xml` from the `data` folder in a text editor
 and update the following two lines:
 
@@ -68,7 +68,7 @@ When running the built-in web server locally, go to:
 [http://localhost:4171/](http://localhost:4171/)
 
 If accessed through a web server (and not loaded directly from the disk drive),
-ShortyCut is detected automatically by the browser and can be added to the the search engines:
+ShortyCut is detected automatically by the browser and can be added to the search engines:
 
 ![](img/web-server-discover.png)
 

@@ -19,8 +19,8 @@ shortycut.addShortcuts(`
 `);
 ```
 
-Lines which are empty or start with a double-slash (`//`) are treated as comments and ignored.
-This allows to add notes or to temporarily disable shortcuts without deleting them.
+Lines that are empty or start with a double-slash (`//`) are treated as comments and ignored.
+This allows adding notes or temporarily disabling shortcuts without deleting them.
 
 Backslashes (`\`), backticks (`` ` ``) and dollar signs followed by an opening curly bracket (`${`)
 have a special meaning in JavaScript.

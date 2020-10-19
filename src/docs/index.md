@@ -15,7 +15,7 @@ shortycut.addShortcuts(`
 `);
 ```
 
-Links are opened by entering the corresponding keyword (e.g. `ta` or `tr`).
+Links are opened by entering the corresponding keyword (for example `ta` or `tr`).
 Using ShortyCut's homepage is the easiest way to do this,
 because it works in all browsers and provides suggestions while typing:
 

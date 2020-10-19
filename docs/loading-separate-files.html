@@ -203,7 +203,7 @@ However, some might load quicker and overtake others along the way.
 This could lead to <code>shortcuts-03.js</code> to effectively come before <code>shortcuts-01.js</code>.</p>
 <p>Loading files in parallel is quicker than doing it sequentially.
 But their actual order is unpredictable and can be different each time.
-In many cases that's not a problem, but it can become one when a file overrides keywords
+In many cases, that's not a problem, but it can become one when a file overrides keywords
 or uses JavaScript variables and functions that are defined in another file.
 In those cases, <code>andThen</code> can be used to describe dependencies between the files:</p>
 <pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js')
@@ -214,7 +214,7 @@ In those cases, <code>andThen</code> can be used to describe dependencies betwee
 <p>This example starts by loading <code>shortcuts-01.js</code> and <code>shortcuts-02.js</code> in parallel.
 When both files have been fully loaded, <code>shortcuts-03.js</code> and <code>shortcuts-04.js</code> are loaded in parallel.
 When those files have both been loaded as well, ShortyCut starts to load<code>shortcuts-05.js</code>.</p>
-<p>For performance reasons it's best to load as many files in parallel as possible.
+<p>For performance reasons, it's best to load as many files in parallel as possible.
 To describe complex dependencies, the same file can be passed to <code>loadJavaScript</code> multiple times:</p>
 <pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js');
 shortycut.loadJavaScript('shortcuts-01.js').thenLoad( 'shortcuts-03.js');

@@ -83,7 +83,7 @@ This could lead to `shortcuts-03.js` to effectively come before `shortcuts-01.js
 
 Loading files in parallel is quicker than doing it sequentially.
 But their actual order is unpredictable and can be different each time.
-In many cases that's not a problem, but it can become one when a file overrides keywords
+In many cases, that's not a problem, but it can become one when a file overrides keywords
 or uses JavaScript variables and functions that are defined in another file.
 In those cases, `andThen` can be used to describe dependencies between the files:
 
@@ -97,7 +97,7 @@ This example starts by loading `shortcuts-01.js` and `shortcuts-02.js` in parall
 When both files have been fully loaded, `shortcuts-03.js` and `shortcuts-04.js` are loaded in parallel.
 When those files have both been loaded as well, ShortyCut starts to load`shortcuts-05.js`.
 
-For performance reasons it's best to load as many files in parallel as possible.
+For performance reasons, it's best to load as many files in parallel as possible.
 To describe complex dependencies, the same file can be passed to `loadJavaScript` multiple times:
 
 ```javascript

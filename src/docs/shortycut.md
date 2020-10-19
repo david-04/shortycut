@@ -11,7 +11,7 @@ Along the way it provides suggestions, making it easier to find the right shortc
 ![](img/favicons-suggestions.png)
 
 When no keyword matches, suggestions are drawn from the shortcuts' descriptions.
-This allows to search through the bookmark collection without having to remember the keyword.
+This allows searching through the bookmark collection without having to remember the keyword.
 
 ## ![](img/arrow.svg) Address bar integration
 
@@ -22,8 +22,8 @@ For most browsers, this requires a small web server, which already comes bundled
 ## ![](img/arrow.svg) Shortcuts as text file
 
 Shortcuts are stored as plain text and can be edited in any text editor.
-This makes it easy to reorganize, back up and share them with others.
-Each shortcut contains a keyword, an optional description and a link:
+This makes it easy to reorganize, back up, and share them with others.
+Each shortcut contains a keyword, an optional description, and a link:
 
 ```text
 [sunnies] Sunglasses at eBay https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
@@ -51,7 +51,7 @@ ShortyCut allows to bookmark and reopen these pages as if they supported filters
 
 ## ![](img/arrow.svg) Generated bookmarks
 
-Shortcuts can not only be defined as plain text, but also generated through JavaScript code.
+Shortcuts can not only be defined as plain text but also generated through JavaScript code.
 This can be useful when links follow a similar pattern.
 For example, when working with GitHub repositories,
 it might be handy to have shortcuts for different aspects of a project:

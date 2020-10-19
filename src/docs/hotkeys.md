@@ -4,7 +4,7 @@ When ShortyCut displays suggestions, it shows the keyword and highlights the nex
 
 ![](img/hotkeys-automatic.png)
 
-The letters highlighted as hotkeys might not be the best choice, if keywords follow specific patterns.
+The letters highlighted as hotkeys might not be the best choice if keywords follow specific patterns.
 For example, they might be composed of the first letter of each word, like `tg` for "`T`yping `G`ames".
 The automatic highlighting does not consider those rules and highlights the wrong `g`.
 
