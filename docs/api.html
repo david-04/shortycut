@@ -142,24 +142,22 @@
 <p>ShortyCut provides functions that can be used to interact with it through JavaScript code.</p>
 <h2 id="addshortcuts"><img alt="" src="img/arrow.svg" /> addShortcuts()</h2>
 <p>Add shortcut definitions, for example as a multi-line string with one shortcut per line:</p>
-<pre><code class="javascript">shortycut.addShortcuts(`
+<pre><code class="language-javascript">shortycut.addShortcuts(`
     [sunnies] Sunglasses   https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
     [ebay]    Search eBay  https://www.ebay.com.au/sch/i.html?_nkw=%s
 `);
 </code></pre>
-
 <p>A few older browsers (like Internet Explorer) don't support the multi-line syntax.
 When using such a browser, the shortcuts need to be passed as an array of strings instead:</p>
-<pre><code class="javascript">shortycut.addShortcuts([
+<pre><code class="language-javascript">shortycut.addShortcuts([
     '[sunnies] Sunglasses   https://www.ebay.com.au/sch/i.html?_nkw=sunglasses',
     '[ebay]    Search eBay  https://www.ebay.com.au/sch/i.html?_nkw=%s'
 ]);
 </code></pre>
-
 <p>See "<a href="file-format.html">File format</a>" and "<a href="shortcut-syntax.html">Shortcut syntax</a>" for further details.</p>
 <h2 id="configure"><img alt="" src="img/arrow.svg" /> configure()</h2>
 <p>Override (some or all of) ShortyCut's built-in default settings:</p>
-<pre><code class="javascript">shortycut.configure({
+<pre><code class="language-javascript">shortycut.configure({
     homepage: {
         suggestions: {
             showFavicons: true
@@ -167,7 +165,6 @@ When using such a browser, the shortcuts need to be passed as an array of string
     }
 });
 </code></pre>
-
 <p>The supported options are described in "<a href="configuration.html">Configuration</a>".
 It is not necessary to pass all of them and the function can be called multiple times.
 When modifying the same settings, subsequent calls override previous ones.</p>
@@ -180,14 +177,13 @@ This can be changed by using <code>andThen()</code> to model dependencies:</p>
                 .andThen('additional-tools.js')
                 .andThen('shortcuts-01.js', 'shortcuts-02.js');
 </code></pre>
-
 <p>Files are loaded from (or relative to) ShortyCut's <code>data</code> folder,
 unless a complete URL (including a protocol like <code>https://</code> or <code>file://</code>) is passed.
 See "<a href="loading-separate-files.html">Loading separate files</a>" for further details.</p>
 <h2 id="tourl"><img alt="" src="img/arrow.svg" /> toUrl()</h2>
 <p>Register a function that generates dynamic links based on the current search term.
 The call to <code>toUrl()</code> returns a virtual link that can be used like any other URL when defining shortcuts:</p>
-<pre><code class="javascript">function mkDocsIssues(searchTerm) {
+<pre><code class="language-javascript">function mkDocsIssues(searchTerm) {
     if (searchTerm.trim().match(/^[0-9]+$/)) {
         return 'https://github.com/mkdocs/mkdocs/issues/%s';
     } else {
@@ -199,7 +195,6 @@ var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
 
 shortycut.addShortcuts('[mkdi] MkDocs Issues ' + mkDocsIssuesUrl`);
 </code></pre>
-
 <p>When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.
 See "<a href="dynamic-links.html">Dynamic links</a>" for details.</p>
               

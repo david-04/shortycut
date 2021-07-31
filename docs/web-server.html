@@ -154,20 +154,18 @@ For all other browsers follow the instructions below.</p>
 It requires a Java runtime environment from Oracle (e.g. <a href="https://openjdk.java.net/">OpenJDK</a>) to be installed.
 The web server is located in the <code>resources</code> folder.
 On Windows, it can be started by double-clicking on <code>web-server.bat</code>.</p>
-<pre><code class="text">shortycut
+<pre><code class="language-text">shortycut
   +-- data
   +-- resources
   |     +-- web-server.bat
   |     +-- web-server.jar
   +-- index.html
 </code></pre>
-
 <p>It requires the environment variable <code>JAVA_HOME</code> or <code>PATH</code> to point to the folder where Java is installed.
 One of them should be set automatically when installing Java.
 On all other operating systems, the web server needs to be started manually via command line:</p>
-<pre><code class="text">javaw -jar web-server.jar
+<pre><code class="language-text">javaw -jar web-server.jar
 </code></pre>
-
 <p>The web server must be running whenever keywords are entered in the browser's address bar.
 It's best to create a start-up task to automatically restart the web server after each reboot.</p>
 <h2 id="using-a-web-hosting-service"><img alt="" src="img/arrow.svg" /> Using a web hosting service</h2>
@@ -175,10 +173,9 @@ It's best to create a start-up task to automatically restart the web server afte
 However, it needs to be re-uploaded over and over again, whenever shortcuts are added, removed, or modified.
 Before uploading it for the first time, open <code>search.xml</code> from the <code>data</code> folder in a text editor
 and update the following two lines:</p>
-<pre><code class="xml">&lt;Image width=&quot;16&quot; height=&quot;16&quot; type=&quot;image/x-icon&quot;&gt;http://localhost:4171/resources/favicon.ico&lt;/Image&gt;
+<pre><code class="language-xml">&lt;Image width=&quot;16&quot; height=&quot;16&quot; type=&quot;image/x-icon&quot;&gt;http://localhost:4171/resources/favicon.ico&lt;/Image&gt;
 &lt;Url type=&quot;text/html&quot; template=&quot;http://localhost:4171/index.html?q={searchTerms}&quot; /&gt;
 </code></pre>
-
 <p>Replace <code>http://localhost:4171/</code> with the domain and path where ShortyCut will eventually be accessed
 (e.g. <code>https://www.my-website.com/shortycut/</code>).
 Then upload the whole ShortyCut folder to the web hosting server.</p>

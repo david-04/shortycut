@@ -140,28 +140,25 @@
               
                 <h1 id="shortcut-syntax"><img alt="" src="img/arrow.svg" /> Shortcut syntax</h1>
 <p>Each shortcut consists of a keyword, a description, and a link:</p>
-<pre><code class="text">[sunnies] Sunglasses at eBay https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
+<pre><code class="language-text">[sunnies] Sunglasses at eBay https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
 </code></pre>
-
 <p>The keyword is the one that's entered on ShortyCut's homepage or in the browser's address bar.
 The description in the middle is optional and can be omitted, but makes it easier to find shortcuts.
 The link at the end of the line is the page that's opened whenever the keyword is used.</p>
 <h2 id="keyword"><img alt="" src="img/arrow.svg" /> Keyword</h2>
 <p>The square brackets (<code>[</code> and <code>]</code>) around keywords are used for readability only.
 They are optional and can be omitted:</p>
-<pre><code class="text">sunnies  Sunglasses at eBay  https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
+<pre><code class="language-text">sunnies  Sunglasses at eBay  https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
 [ebay]   Search eBay         https://www.ebay.com.au/sch/i.html?_nkw=%s
 </code></pre>
-
 <p>Each shortcut can have multiple keywords.
 This allows the link to be opened by entering any one of them.
 Multiple keywords are concatenated with pipe symbols (<code>|</code>) between them.
 When using square brackets (<code>[</code> and <code>]</code>), blanks can be inserted for readability.
 Otherwise, there must be no whitespace between the keywords and the pipe symbols (<code>|</code>):</p>
-<pre><code class="text">s|sunnies     Sunglasses at eBay  https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
+<pre><code class="language-text">s|sunnies     Sunglasses at eBay  https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
 [ e | ebay ]  Search eBay         https://www.ebay.com.au/sch/i.html?_nkw=%s
 </code></pre>
-
 <p>In this example, the sunglasses listing can be opened by entering either <code>s</code> or <code>sunnies</code>,
 while a product search can be started via <code>e</code> or <code>ebay</code>.</p>
 <h2 id="description"><img alt="" src="img/arrow.svg" /> Description</h2>
@@ -172,10 +169,9 @@ Descriptions are used for the full-text search and displayed as part of the sugg
 <p>The last part of the shortcut definition is the link.
 It should always start with the protocol (<code>http://</code> or <code>https://</code>).
 It can also contain the placeholder <code>%s</code> to allow entering a search term alongside the keyword:</p>
-<pre><code class="text">[sunnies] Sunglasses   https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
+<pre><code class="language-text">[sunnies] Sunglasses   https://www.ebay.com.au/sch/i.html?_nkw=sunglasses
 [ebay]    Search eBay  https://www.ebay.com.au/sch/i.html?_nkw=%s
 </code></pre>
-
 <p>In this example, <code>sunnies</code> is a keyword bookmark, because the link doesn't contain any placeholder.
 The keyword is used on its own and always opens the same page (the sunglasses listing).
 On the other hand, the link for <code>ebay</code> does have a placeholder.

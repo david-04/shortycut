@@ -144,60 +144,54 @@ It's better to organize large collections in separate files.</p>
 <h2 id="loading-additional-files"><img alt="" src="img/arrow.svg" /> Loading additional files</h2>
 <p>A common scenario is to have personal and work-related shortcuts.
 Instead of putting all of them into <code>shortcuts.js</code>, separate files can be created:</p>
-<pre><code class="javascript">// File: shortcuts-personal.js
+<pre><code class="language-javascript">// File: shortcuts-personal.js
 
 shortycut.addShortcuts(`
     [cv]  Cat videos    https://www.youtube.com/results?search_query=cats
     [tv]  TV Guide      https://www.yourtv.com.au/guide/
 `);
 </code></pre>
-
-<pre><code class="javascript">// File: shortcuts-work.js
+<pre><code class="language-javascript">// File: shortcuts-work.js
 
 shortycut.addShortcuts(`
     [cm]  Canteen menu  https://www.my-company.com/canteen/menu
     [ts]  Timesheets    https://www.my-company.com/timesheet
 `);
 </code></pre>
-
 <p>When stored in ShortyCut's <code>data</code> folder, these files can be loaded from <code>shortcuts.js</code>:</p>
-<pre><code class="javascript">// File: shortcuts.js
+<pre><code class="language-javascript">// File: shortcuts.js
 
 shortycut.loadJavaScript(
     'shortcuts-personal.js',
     'shortcuts-work.js'
 );
 </code></pre>
-
 <p>Spreading shortcuts across multiple files also allows to easily hide and restore some of them
 by adding or removing the respective files from the <code>loadJavaScript</code> command.</p>
 <h2 id="relative-and-absolute-paths"><img alt="" src="img/arrow.svg" /> Relative and absolute paths</h2>
 <p>By default, <code>loadJavaScript</code> loads the files from ShortyCut's <code>data</code> folder.
 Sometimes it's beneficial to create subfolders and use relative paths:</p>
-<pre><code class="javascript">shortycut.loadJavaScript(
+<pre><code class="language-javascript">shortycut.loadJavaScript(
     'personal/entertainment.js',
     'personal/shopping.js',
     'work/hr-and-policies.js',
     'work/project-matilda.js'
 );
 </code></pre>
-
 <p>Files can also be loaded from the internet or a (shared network) drive
 by using their full address (including the protocol like <code>https://</code> or <code>file://</code>):</p>
-<pre><code class="javascript">shortycut.loadJavaScript(
+<pre><code class="language-javascript">shortycut.loadJavaScript(
     'https://www.my-domain.com/shortycut/my-personal-shortcuts.js',
     'file:///S:/Shared/Finance-Team/ShortyCut/finance-systems.js'
 );
 </code></pre>
-
 <p>Loading files via the network can slow down ShortyCut,
 because it waits until all files have been fully loaded before redirecting or showing the homepage.</p>
 <h2 id="loading-files-in-a-specific-order"><img alt="" src="img/arrow.svg" /> Loading files in a specific order</h2>
 <p>ShortyCut starts to load all files in parallel, even when using separate <code>loadJavaScript</code> commands:</p>
-<pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js');
+<pre><code class="language-javascript">shortycut.loadJavaScript('shortcuts-01.js');
 shortycut.loadJavaScript('shortcuts-02.js', 'shortcuts-03.js');
 </code></pre>
-
 <p>In this example, all three files are loaded simultaneously.
 However, some might load quicker and overtake others along the way.
 This could lead to <code>shortcuts-03.js</code> to effectively come before <code>shortcuts-01.js</code>.</p>
@@ -206,20 +200,18 @@ But their actual order is unpredictable and can be different each time.
 In many cases, that's not a problem, but it can become one when a file overrides keywords
 or uses JavaScript variables and functions that are defined in another file.
 In those cases, <code>andThen</code> can be used to describe dependencies between the files:</p>
-<pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js')
+<pre><code class="language-javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js')
                 .andThen('shortcuts-03.js', 'shortcuts-04.js')
                 .andThen('shortcuts-05.js'                   );
 </code></pre>
-
 <p>This example starts by loading <code>shortcuts-01.js</code> and <code>shortcuts-02.js</code> in parallel.
 When both files have been fully loaded, <code>shortcuts-03.js</code> and <code>shortcuts-04.js</code> are loaded in parallel.
 When those files have both been loaded as well, ShortyCut starts to load<code>shortcuts-05.js</code>.</p>
 <p>For performance reasons, it's best to load as many files in parallel as possible.
 To describe complex dependencies, the same file can be passed to <code>loadJavaScript</code> multiple times:</p>
-<pre><code class="javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js');
+<pre><code class="language-javascript">shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js');
 shortycut.loadJavaScript('shortcuts-01.js').thenLoad( 'shortcuts-03.js');
 </code></pre>
-
 <p>In this example, <code>shortcuts-01.js</code> and <code>shortcuts-02.js</code> are loaded in parallel.
 <code>shortcuts-03.js</code> is loaded after <code>shortcuts-01.js</code> (but independent of <code>shortcuts-02.js</code>).
 Passing the same file to <code>loadJavaScript</code> again does not cause a reload.

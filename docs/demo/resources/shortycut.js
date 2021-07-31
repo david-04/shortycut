@@ -522,10 +522,10 @@ var shortycut;
             }
             var _loop_1 = function (type) {
                 if (this_1.isPrimary || !type.isWebsite) {
-                    for (var _i = 0, _a = this_1.origins.values.filter(function (origin) { return origin.type === type; }); _i < _a.length; _i++) {
-                        var origin_2 = _a[_i];
-                        for (var _b = 0, _c = [[false, false], [true, false], [true, true]]; _b < _c.length; _b++) {
-                            var parameters = _c[_b];
+                    for (var _c = 0, _d = this_1.origins.values.filter(function (origin) { return origin.type === type; }); _c < _d.length; _c++) {
+                        var origin_2 = _d[_c];
+                        for (var _e = 0, _f = [[false, false], [true, false], [true, true]]; _e < _f.length; _e++) {
+                            var parameters = _f[_e];
                             if (origin_2.startNextLoad(parameters[0], parameters[1])) {
                                 return { value: true };
                             }
@@ -682,7 +682,7 @@ var shortycut;
             for (var _i = 0, _a = shortycut.shortcuts.values; _i < _a.length; _i++) {
                 var shortcut = _a[_i];
                 var _loop_2 = function (url) {
-                    var _a = FaviconManager.extractProtocolAndDomain(url), protocol = _a.protocol, domain = _a.domain;
+                    var _d = FaviconManager.extractProtocolAndDomain(url), protocol = _d.protocol, domain = _d.domain;
                     if ('file' !== protocol) {
                         var protocols = this_2.domains.computeIfAbsent(domain, function () { return new Array(); });
                         if (!protocols.filter(function (currentProtocol) { return currentProtocol === protocol; }).length) {
@@ -746,10 +746,20 @@ var shortycut;
         };
         FaviconManager.prototype.getMissingDomains = function () {
             var _this = this;
-            return this.registry.domains.values
+            var _a, _b;
+            var domains = this.registry.domains.values
                 .filter(function (domain) { return domain.isPrimary && domain.isRejected; })
-                .map(function (domain) { return domain.displayName; })
-                .sort(function (domain1, domain2) { return _this.compare(domain1, domain2); });
+                .map(function (domain) { return domain.displayName; });
+            for (var _i = 0, _c = this.registry.domains.values.filter(function (domain) { return domain.isPrimary && domain.isResolved; }); _i < _c.length; _i++) {
+                var domain = _c[_i];
+                while (!domain.resolvedOrigin && domain.parentDomain) {
+                    domain = domain.parentDomain;
+                }
+                if (!((_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.job.url) || !domain.resolvedOrigin.type.isWebsite) {
+                    domains.push(domain.displayName);
+                }
+            }
+            return domains.sort(function (domain1, domain2) { return _this.compare(domain1, domain2); });
         };
         FaviconManager.prototype.getOnlineDomains = function () {
             var _this = this;
@@ -1895,12 +1905,10 @@ var shortycut;
     }());
     shortycut.QueryParameters = QueryParameters;
 })(shortycut || (shortycut = {}));
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 var shortycut;
 (function (shortycut) {
@@ -2283,7 +2291,7 @@ var shortycut;
                 var match = link.segments.getMatch(length);
                 result.computeIfAbsent(match.fingerprint, function () { return match; });
             };
-            for (var _i = 0, _c = __spreadArrays((((_a = this._bookmarks) === null || _a === void 0 ? void 0 : _a.current) || []), ((_b = this.queries) === null || _b === void 0 ? void 0 : _b.current) || []); _i < _c.length; _i++) {
+            for (var _i = 0, _c = __spreadArray(__spreadArray([], (((_a = this._bookmarks) === null || _a === void 0 ? void 0 : _a.current) || [])), ((_b = this.queries) === null || _b === void 0 ? void 0 : _b.current) || []); _i < _c.length; _i++) {
                 var link = _c[_i];
                 _loop_5(link);
             }
@@ -3455,9 +3463,9 @@ var shortycut;
         };
         Shortlist.prototype.populate = function (links, searchTerm) {
             var _this = this;
-            this.links = __spreadArrays([null], links);
+            this.links = __spreadArray([null], links);
             this.searchTerm = searchTerm;
-            this.dom.listItems = __spreadArrays([
+            this.dom.listItems = __spreadArray([
                 this.createHeader()
             ], this.links.slice(1).map(function (link, index) { return _this.createLink(index + 1, link.getHref(_this.searchTerm), link.segments.descriptionHtml, function (event) { return _this.openSelected(event, index + 1); }, shortycut.sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, '')), link.url); }));
             this.dom.shortlist.innerHTML = '';
@@ -3567,6 +3575,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3872,7 +3882,7 @@ var shortycut;
         var properties = ElementProperties.of(type);
         var element = document.createElement(properties.tag);
         element.className = properties.className;
-        return applyCreateProperties.apply(void 0, __spreadArrays([!element.classList.contains('html'), element], args));
+        return applyCreateProperties.apply(void 0, __spreadArray([!element.classList.contains('html'), element], args));
     }
     shortycut.create = create;
     function createImage(url) {
@@ -3880,7 +3890,7 @@ var shortycut;
         for (var _i = 1; _i < arguments.length; _i++) {
             args[_i - 1] = arguments[_i];
         }
-        var image = create.apply(void 0, __spreadArrays(['img'], args));
+        var image = create.apply(void 0, __spreadArray(['img'], args));
         image.src = url;
         return image;
     }
@@ -3919,7 +3929,7 @@ var shortycut;
             if ('function' === typeof arg) {
                 var result = arg(element);
                 if (Array.isArray(result)) {
-                    element = applyCreateProperties.apply(void 0, __spreadArrays([mustSanitize, element], result));
+                    element = applyCreateProperties.apply(void 0, __spreadArray([mustSanitize, element], result));
                 }
                 else if (null !== result && undefined !== result) {
                     element = applyCreateProperties(mustSanitize, element, result);
@@ -3929,7 +3939,7 @@ var shortycut;
                 element.innerHTML += mustSanitize ? arg : sanitize(arg);
             }
             else if (Array.isArray(arg)) {
-                element = applyCreateProperties.apply(void 0, __spreadArrays([mustSanitize, element], arg));
+                element = applyCreateProperties.apply(void 0, __spreadArray([mustSanitize, element], arg));
             }
             else if (arg) {
                 element.appendChild(arg);
@@ -3954,7 +3964,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return '1.2'.replace(/^##.*/, '');
+        return '1.2.1'.replace(/^##.*/, '');
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {

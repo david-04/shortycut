@@ -144,7 +144,7 @@ It can be modified with any text editor.</p>
 <h2 id="standard-format"><img alt="" src="img/arrow.svg" /> Standard format</h2>
 <p>Shortcuts are defined as a JavaScript string with one shortcut per line.
 They need to be placed between the backticks (<code>`</code>) on top and at the bottom of the file:</p>
-<pre><code class="javascript">shortycut.addShortcuts(`
+<pre><code class="language-javascript">shortycut.addShortcuts(`
 
     // Add your shortcut definitions here...
 
@@ -153,7 +153,6 @@ They need to be placed between the backticks (<code>`</code>) on top and at the 
 
 `);
 </code></pre>
-
 <p>Lines that are empty or start with a double-slash (<code>//</code>) are treated as comments and ignored.
 This allows adding notes or temporarily disabling shortcuts without deleting them.</p>
 <p>Backslashes (<code>\</code>), backticks (<code>`</code>) and dollar signs followed by an opening curly bracket (<code>${</code>)
@@ -169,7 +168,7 @@ If that's not possible, put an extra backslash (<code>\</code>) in front of them
 <h2 id="legacy-format"><img alt="" src="img/arrow.svg" /> Legacy format</h2>
 <p>A few browsers like Internet Explorer and Opera Mini do not support the backtick (<code>`</code>) syntax.
 A slightly different format is required to use ShortyCut with those browsers, too:</p>
-<pre><code class="javascript">shortycut.addShortcuts([
+<pre><code class="language-javascript">shortycut.addShortcuts([
 
     // Add your shortcut definitions here...
 
@@ -178,7 +177,6 @@ A slightly different format is required to use ShortyCut with those browsers, to
 
 ]);
 </code></pre>
-
 <p>Each shortcut definition must be surrounded by single quotes (<code>'</code>)
 and followed by a comma (<code>,</code>) at the end of the line.
 Within each line, single quotes (<code>'</code>) and backslashes (<code>\</code>) have a special meaning and are best avoided.

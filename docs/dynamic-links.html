@@ -154,24 +154,22 @@ The MkDocs' issues on GitHub, for example, can be accessed in various ways...</p
   <a href="https://github.com/mkdocs/mkdocs/issues/2163">https://github.com/mkdocs/mkdocs/issues/2163</a></li>
 </ul>
 <p>Creating separate keywords allows to quickly navigate to the most suitable page on a case-by-case basis:</p>
-<pre><code class="javascript">shortycut.addShortcuts(`
+<pre><code class="language-javascript">shortycut.addShortcuts(`
 
     [mkdli] MkDocs » List issues    https://github.com/mkdocs/mkdocs/issues
     [mkdsi] MkDocs » Search issues  https://github.com/mkdocs/mkdocs/issues?q=%s
     [mkdgi] MkDocs » Goto issue     https://github.com/mkdocs/mkdocs/issues/%s
 `);
 </code></pre>
-
 <p>This provides great flexibility but also increases the number of keywords.
 From a usability point of view, it would be better to have only one keyword for all links:</p>
-<pre><code class="javascript">shortycut.addShortcuts(`
+<pre><code class="language-javascript">shortycut.addShortcuts(`
 
     [mkdi]  MkDocs » Issues         https://github.com/mkdocs/mkdocs/issues
     [mkdi]  MkDocs » Search issues  https://github.com/mkdocs/mkdocs/issues?q=%s
     [mkdi]  MkDocs » Goto issue     https://github.com/mkdocs/mkdocs/issues/%s
 `);
 </code></pre>
-
 <p>ShortyCut distinguishes between bookmarks and queries.
 Bookmarks are static links like the issue listing - they always open the same page.
 Queries, on the other hand, contain the <code>%s</code> placeholder and require a search term.
@@ -187,7 +185,7 @@ They analyze the search term and automatically select the most suitable target p
 <h2 id="creating-dynamic-links"><img alt="" src="img/arrow.svg" /> Creating dynamic links</h2>
 <p>Dynamic links are simple JavaScript functions.
 They receive the search term as a parameter and return the applicable link as the result:</p>
-<pre><code class="javascript">function mkDocsIssues(searchTerm) {
+<pre><code class="language-javascript">function mkDocsIssues(searchTerm) {
 
     if (searchTerm.trim().match(/^[0-9]+$/)) {
         return 'https://github.com/mkdocs/mkdocs/issues/%s';
@@ -196,31 +194,27 @@ They receive the search term as a parameter and return the applicable link as th
     }
 }
 </code></pre>
-
 <p>The search term is passed in as regular text (i.e. not URL-encoded).
 Before embedding it into a link, it needs to be passed through <code>encodeURIComponent()</code>.
 However, it's easier to just return a link with the <code>%s</code> placeholder and let ShortyCut insert the search term.</p>
 <p>The next step is to register the function:</p>
-<pre><code class="javascript">var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
+<pre><code class="language-javascript">var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
 </code></pre>
-
 <p>This generates a virtual link, which can be used like any other link when defining shortcuts:</p>
-<pre><code class="javascript">shortycut.addShortcuts(`
+<pre><code class="language-javascript">shortycut.addShortcuts(`
 
     [mkdi]  MkDocs » Issues  https://github.com/mkdocs/mkdocs/issues
     [mkdi]  MkDocs » Issues  ${ mkDocsIssuesUrl }
 `);
 </code></pre>
-
 <p>Interpolation with <code>${</code> and <code>}</code> only works for backtick (multi-line) strings.
 When using the legacy syntax for older browsers, the variable must be appended instead:</p>
-<pre><code class="javascript">shortycut.addShortcuts([
+<pre><code class="language-javascript">shortycut.addShortcuts([
 
     '[mkdi]  MkDocs » Issues    https://github.com/mkdocs/mkdocs/issues',
     '[mkdi]  MkDocs » Issues' + mkDocsIssuesUrl
 ]);
 </code></pre>
-
 <p>With these shortcuts in place, there's only keyword to remember.
 Depending on the search term (if any), it opens the right page straight away.</p>
 <h2 id="favicons"><img alt="" src="img/arrow.svg" /> Favicons</h2>
@@ -238,7 +232,7 @@ which it retrieves by passing the following search terms to the dynamic link fun
 <p>Exceptions are discarded silently and the first valid URL returned is used to determine the favicon.
 Although usually not needed, a preferred domain can be nominated by returning a corresponding link
 when the search term is <code>null</code> or <code>undefined</code>:</p>
-<pre><code class="javascript">function mkDocsIssues(searchTerm) {
+<pre><code class="language-javascript">function mkDocsIssues(searchTerm) {
 
     if (undefined === searchTerm) {
         return 'https://www.mkdocs.org/';
@@ -251,7 +245,6 @@ when the search term is <code>null</code> or <code>undefined</code>:</p>
     }
 }
 </code></pre>
-
 <p>This dynamic link redirects all queries to one of two GitHub pages,
 but uses the favicon of MkDoc's homepage (rather than the one from GitHub).</p>
 <p>There is no need to map the search term <code>null</code> or <code>undefined</code> to a dedicated URL,

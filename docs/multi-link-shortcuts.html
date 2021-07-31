@@ -142,20 +142,18 @@
 <p>Sometimes web pages provide similar or complementing information.
 For example, news websites usually have index pages per category and region.
 Separate keywords can be used to bookmark them individually:</p>
-<pre><code class="text">[news-au]       News » Australia  https://www.theage.com.au/national
+<pre><code class="language-text">[news-au]       News » Australia  https://www.theage.com.au/national
 [news-finance]  News » Finance    https://www.reuters.com/finance
 [news-sports]   News » Sports     https://www.msn.com/en-us/sports
 [news-world]    News » World      https://www.bbc.com/news/world
 </code></pre>
-
 <p>As the number of keyword variations grows, it becomes harder to remember them.
 It's usually easier to assign all related pages to the same keyword:</p>
-<pre><code class="text">[news]          News » Australia  https://www.theage.com.au/national
+<pre><code class="language-text">[news]          News » Australia  https://www.theage.com.au/national
 [news]          News » Finance    https://www.reuters.com/finance
 [news]          News » Sports     https://www.msn.com/en-us/sports
 [news]          News » World      https://www.bbc.com/news/world
 </code></pre>
-
 <p>When entering a keyword with multiple links, ShortyCut shows a list to choose from:</p>
 <p><img alt="" src="img/multi-link-keyword.png" /></p>
 <p>The "Open all" item on top of the list can be used to open all links in new tabs.
@@ -165,30 +163,27 @@ causing ShortyCut to always open new tabs without showing the list first.
 On top of that, each shortcut can override the default behavior and enforce to either show the list or open new tabs.</p>
 <h2 id="show-a-list"><img alt="" src="img/arrow.svg" /> Show a list</h2>
 <p>A question mark (<code>?</code>) in front of links causes the keyword to always show the list:</p>
-<pre><code class="text">[news]  News » Australia  ?https://www.theage.com.au/national
+<pre><code class="language-text">[news]  News » Australia  ?https://www.theage.com.au/national
 [news]  News » Finance    ?https://www.reuters.com/finance
 [news]  News » Sports     ?https://www.msn.com/en-us/sports
 [news]  News » World      ?https://www.bbc.com/news/world
 </code></pre>
-
 <p>In this example, the <code>news</code> keyword will always show the list, even if the default behavior is set to open new tabs.</p>
 <h2 id="open-new-tabs"><img alt="" src="img/arrow.svg" /> Open new tabs</h2>
 <p>A caret (<code>^</code>) in front of links causes the keyword to always open new tabs:</p>
-<pre><code class="text">[news]  News » Australia  ^https://www.theage.com.au/national
+<pre><code class="language-text">[news]  News » Australia  ^https://www.theage.com.au/national
 [news]  News » Finance    ^https://www.reuters.com/finance
 [news]  News » Sports     ^https://www.msn.com/en-us/sports
 [news]  News » World      ^https://www.bbc.com/news/world
 </code></pre>
-
 <p>In this example, the <code>news</code> keyword will always open new tabs, even if the default behavior is set to show the list.</p>
 <h2 id="ignore-previous-links"><img alt="" src="img/arrow.svg" /> Ignore previous links</h2>
 <p>An equals sign (<code>=</code>) in front of a link causes all previous links to be discarded:</p>
-<pre><code class="text">[news]  News » Australia  ?https://www.theage.com.au/national
+<pre><code class="language-text">[news]  News » Australia  ?https://www.theage.com.au/national
 [news]  News » Finance    ?https://www.reuters.com/finance
 [news]  News » Sports     ?https://www.msn.com/en-us/sports
 [news]  News » World      =https://www.bbc.com/news/world
 </code></pre>
-
 <p>In this example, importing the last line will cause ShortyCut to discard all previous links.
 The <code>news</code> keyword is treated as if it had only one link (world news).
 It's the same effect as if the first three lines were not there at all.</p>
@@ -199,12 +194,11 @@ without having to delete (and later restore) the current set of links.</p>
 <h2 id="mixing-behaviors"><img alt="" src="img/arrow.svg" /> Mixing behaviors</h2>
 <p>The equals sign (<code>=</code>) always causes the previous links to be discarded.
 The behavior for the remaining shortcuts is determined only by the last link.</p>
-<pre><code class="text">[news]  News » Australia   https://www.theage.com.au/national
+<pre><code class="language-text">[news]  News » Australia   https://www.theage.com.au/national
 [news]  News » Finance    =https://www.reuters.com/finance
 [news]  News » Sports     ^https://www.msn.com/en-us/sports
 [news]  News » World      ?https://www.bbc.com/news/world
 </code></pre>
-
 <p>In this example, the equals sign (<code>=</code>) in finance news causes the previous link (Australia news) to be discarded.
 The keyword will eventually have three links (finance, sports, and world news).
 A list will be displayed, because the last link (world news) has a question mark (<code>?</code>).

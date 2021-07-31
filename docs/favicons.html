@@ -151,7 +151,7 @@ there are some ways to work around this issue.</p>
 <h2 id="preloading-and-caching"><img alt="" src="img/arrow.svg" /> Preloading and caching</h2>
 <p>ShortyCut can preload favicons and remember their location for future reference.
 This behavior is enabled by default and can be changed through the configuration:</p>
-<pre><code class="javascript">shortycut.configure({
+<pre><code class="language-javascript">shortycut.configure({
     favicons: {
         preloadOnStart: true,
         rememberUrls: true,
@@ -159,7 +159,6 @@ This behavior is enabled by default and can be changed through the configuration
     }
 });
 </code></pre>
-
 <p>When <code>preloadOnStart</code> is set to <code>true</code>, ShortyCut starts loading favicons immediately after it has been opened.
 The images are retained in the browser's cache and can be displayed quickly when needed.
 This creates additional network traffic because it also loads favicons that might not be needed.</p>

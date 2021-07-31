@@ -146,25 +146,22 @@ Input that does not match any keyword is forwarded to a search engine.</p>
 <p>By default, ShortyCut uses DuckDuckGo for web searches.
 It can be switched to any other search engine by adding a shortcut with the keyword <code>defaultsearchengine</code>.
 The link must contain the <code>%s</code> placeholder for the actual search term:</p>
-<pre><code class="text">[defaultsearchengine]   Google   https://www.google.com/search?&amp;q=%s
+<pre><code class="language-text">[defaultsearchengine]   Google   https://www.google.com/search?&amp;q=%s
 </code></pre>
-
 <p>Sometimes it's useful to have shortcuts for different search engines and switch between them on a case-by-case basis
 by using the corresponding keyword:</p>
-<pre><code class="text">[b]  Bing     https://www.bing.com/search?q=%s
+<pre><code class="language-text">[b]  Bing     https://www.bing.com/search?q=%s
 [g]  Google   https://www.google.com/search?&amp;q=%s
 [y]  Yahoo    https://search.yahoo.com/search?p=%s
 </code></pre>
-
 <p>Any existing shortcut can be nominated as the default search engine without assigning the <code>defaultsearchengine</code> keyword,
 by setting the configuration property <a href="configuration.html#defaultsearchenginekeyword">keyword</a> instead:</p>
-<pre><code class="javascript">shortycut.configure({
+<pre><code class="language-javascript">shortycut.configure({
     defaultSearchEngine: {
         keyword: 'g'
     },
 });
 </code></pre>
-
 <p>In this example, the shortcut with the keyword <code>g</code> (Google) is set up as the default search engine.</p>
 <h2 id="disabling-the-search-engine"><img alt="" src="img/arrow.svg" /> Disabling the search engine</h2>
 <p>The default search engine can be disabled to enforce the use of keywords at all times.

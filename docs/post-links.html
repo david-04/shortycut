@@ -146,16 +146,14 @@ As a side effect, these pages can't (and often shouldn't) be bookmarked.
 But in some cases, it's safe and handy to create a shortcut nevertheless.</p>
 <h2 id="link-syntax"><img alt="" src="img/arrow.svg" /> Link syntax</h2>
 <p>A regular link becomes a <code>POST</code> link by appending <code>?POST?</code> followed by the data to be transmitted:</p>
-<pre><code class="text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=secret
+<pre><code class="language-text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=secret
 </code></pre>
-
 <p>In this example, the username <code>shortycut</code> and the password <code>secret</code> would be transmitted
 without showing up in the browser's address bar.
 The fields must be in <code>key=value</code> format and separated by an ampersand (<code>&amp;</code>).
 The placeholder <code>%s</code> can be used like in any other link:</p>
-<pre><code class="text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=%s
+<pre><code class="language-text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=%s
 </code></pre>
-
 <p>In this example, the password needs to be entered alongside the keyword.
 Typing <code>ebay secret</code> in the browser's address bar would attempt to log in user <code>shortycut</code> with the password <code>secret</code>.</p>
 <h2 id="url-encoding"><img alt="" src="img/arrow.svg" /> URL-Encoding</h2>
@@ -163,9 +161,8 @@ Typing <code>ebay secret</code> in the browser's address bar would attempt to lo
 This means that most characters apart from letters and digits can't be used directly.
 One example is the <code>@</code> symbol, which needs to be written as <code>%40</code> instead.
 If the username was <code>me@gmail.com</code>, the login link would look like this:</p>
-<pre><code class="text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=me%40gmail.com&amp;password=%s
+<pre><code class="language-text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=me%40gmail.com&amp;password=%s
 </code></pre>
-
 <p>ShortyCut includes link tools, which can be used to quickly encode any text.
 It's accessed via the burger icon on the upper right-hand side of the homepage:</p>
 <p><img alt="" src="img/menu-link-tools.png" /></p>

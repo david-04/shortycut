@@ -147,20 +147,18 @@ The automatic highlighting does not consider those rules and highlights the wron
 <p>To work around this problem, hotkeys can be explicitly marked when defining shortcuts.
 This is done by putting a designated symbol in front of each hotkey within the description.
 Any symbol can be used, but it must be configured as <a href="configuration.html#shortcutformathotkeymarker">hotkeyMarker</a> first:</p>
-<pre><code class="javascript">shortycut.configure({
+<pre><code class="language-javascript">shortycut.configure({
     shortcutFormat: {
         hotkeyMarker: '_'
     }
 });
 </code></pre>
-
 <p>In this example, the underscore (<code>_</code>) can be used to mark the correct hotkeys:</p>
-<pre><code class="text">[tr] Translate       https://dict.leo.org/ende?search=%s
+<pre><code class="language-text">[tr] Translate       https://dict.leo.org/ende?search=%s
 [ta] The Age         https://www.theage.com.au/
 [tg] _Typing _Games  https://www.typing.com/student/game
 [tc] _Tech_Crunch    https://techcrunch.com
 </code></pre>
-
 <p>It's important that the hotkeys are aligned with the keyword.
 ShortyCut disregards markers if the letters don't match.
 On the other hand, there's no need to mark hotkeys if the automatic highlighting would pick the right ones anyway.
