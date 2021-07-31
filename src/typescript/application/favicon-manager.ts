@@ -624,10 +624,20 @@ namespace shortycut {
 
         public getMissingDomains() {
 
-            return this.registry.domains.values
+            const domains = this.registry.domains.values
                 .filter(domain => domain.isPrimary && domain.isRejected)
-                .map(domain => domain.displayName)
-                .sort((domain1, domain2) => this.compare(domain1, domain2));
+                .map(domain => domain.displayName);
+
+            for (let domain of this.registry.domains.values.filter(domain => domain.isPrimary && domain.isResolved)) {
+                while (!domain.resolvedOrigin && domain.parentDomain) {
+                    domain = domain.parentDomain;
+                }
+                if (!domain.resolvedOrigin?.resolvedFile?.job.url || !domain.resolvedOrigin.type.isWebsite) {
+                    domains.push(domain.displayName)
+                }
+            }
+
+            return domains.sort((domain1, domain2) => this.compare(domain1, domain2));
         }
 
         public getOnlineDomains() {

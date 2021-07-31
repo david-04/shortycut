@@ -1,5 +1,11 @@
 # ![](img/arrow.svg) Release notes
 
+## Version 1.2.1 | 2021-08-01
+
+- Added a CORS header to the [web server](web-server.md) to allow resources to be accessed from all origins
+- Fixed an issue that prevented [domains without favicons](favicons.md#missing-favicons)
+  from being displayed in the list view when using a [fetch service](configuration.md#homepagefaviconsfetchservice)
+
 ## Version 1.2 | 2020-10-09
 
 - Improved the [favicon](favicons.md) loading speed by preloading all images on startup

@@ -74,6 +74,7 @@ public class Server implements HttpHandler {
 
         httpExchange.getResponseHeaders()
                 .set("Content-Type", response.getContentType() + "; charset=" + ENCODING.displayName());
+        httpExchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(response.getStatus(), response.getBody().length);
         try (OutputStream os = httpExchange.getResponseBody()) {
             try {

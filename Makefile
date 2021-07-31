@@ -250,7 +250,7 @@ release : build/$(SHORTYCUT_ZIP)
 		| tr '\a' '\n' \
 		> docs/demo/data/settings.js.tmp
 	mv -f docs/demo/data/settings.js.tmp docs/demo/data/settings.js
-	echo docs/demo/data/shortcuts.s
+	echo docs/demo/data/shortcuts.js
 	cat docs/demo/data/shortcuts.js \
 		| grep -E "^\\s*(//|\\[)" \
 		| sed "s/'/\\\\'/g" \
