@@ -51,19 +51,20 @@ clean :
 build/$(SHORTYCUT_ZIP) : docs \
 						 copyDocsToBuildDirectory \
 						 build/shortycut/data-template/favicons \
-				  		 build/shortycut/data-template/search.xml \
-				    	 build/shortycut/data-template/settings.js \
-					   	 build/shortycut/data-template/shortcuts.js \
-					   	 build/shortycut/data-template/web-server.properties \
-					   	 build/shortycut/resources/arrow.svg \
-					   	 build/shortycut/resources/favicon.ico \
-					   	 build/shortycut/resources/local.svg \
-					   	 build/shortycut/resources/shortycut.css \
-					   	 build/shortycut/resources/shortycut.js \
-					   	 build/shortycut/resources/web-server.bat \
-					   	 build/shortycut/resources/web-server.jar \
-					   	 build/shortycut/index.html \
-					   	 build/shortycut/LICENSE
+						 build/shortycut/data-template/search.xml \
+						 build/shortycut/data-template/settings.js \
+						 build/shortycut/data-template/shortcuts.js \
+						 build/shortycut/data-template/shortycut.d.ts \
+						 build/shortycut/data-template/web-server.properties \
+						 build/shortycut/resources/arrow.svg \
+						 build/shortycut/resources/favicon.ico \
+						 build/shortycut/resources/local.svg \
+						 build/shortycut/resources/shortycut.css \
+						 build/shortycut/resources/shortycut.js \
+						 build/shortycut/resources/web-server.bat \
+						 build/shortycut/resources/web-server.jar \
+						 build/shortycut/index.html \
+						 build/shortycut/LICENSE
 	echo $@
 	rm -f build/$(SHORTYCUT_ZIP)
 	rm -rf build/shortycut/data

@@ -1,5 +1,11 @@
 # ![](img/arrow.svg) Release notes
 
+## Version 1.2.2 | 2021-08-07
+
+- Fixed an issue that caused domains to be listed under [missing favicons](favicons.md#missing-favicons)
+  even if the favicon had already been downloaded
+- Added a TypeScript declaration file (`shortycut.d.ts`) for the ShortyCut API to the data (template) folder
+
 ## Version 1.2.1 | 2021-08-01
 
 - Added a CORS header to the [web server](web-server.md) to allow resources to be accessed from all origins

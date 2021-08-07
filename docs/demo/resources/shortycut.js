@@ -746,16 +746,16 @@ var shortycut;
         };
         FaviconManager.prototype.getMissingDomains = function () {
             var _this = this;
-            var _a, _b;
+            var _a, _b, _c;
             var domains = this.registry.domains.values
                 .filter(function (domain) { return domain.isPrimary && domain.isRejected; })
                 .map(function (domain) { return domain.displayName; });
-            for (var _i = 0, _c = this.registry.domains.values.filter(function (domain) { return domain.isPrimary && domain.isResolved; }); _i < _c.length; _i++) {
-                var domain = _c[_i];
+            for (var _i = 0, _d = this.registry.domains.values.filter(function (domain) { return domain.isPrimary && domain.isResolved; }); _i < _d.length; _i++) {
+                var domain = _d[_i];
                 while (!domain.resolvedOrigin && domain.parentDomain) {
                     domain = domain.parentDomain;
                 }
-                if (!((_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.job.url) || !domain.resolvedOrigin.type.isWebsite) {
+                if (!((_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.job.url) || ((_c = domain.resolvedOrigin) === null || _c === void 0 ? void 0 : _c.type.isFetchService)) {
                     domains.push(domain.displayName);
                 }
             }
@@ -3964,7 +3964,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return '1.2.1'.replace(/^##.*/, '');
+        return '1.2.2'.replace(/^##.*/, '');
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {

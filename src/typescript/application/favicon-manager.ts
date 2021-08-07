@@ -632,7 +632,7 @@ namespace shortycut {
                 while (!domain.resolvedOrigin && domain.parentDomain) {
                     domain = domain.parentDomain;
                 }
-                if (!domain.resolvedOrigin?.resolvedFile?.job.url || !domain.resolvedOrigin.type.isWebsite) {
+                if (!domain.resolvedOrigin?.resolvedFile?.job.url || domain.resolvedOrigin?.type.isFetchService) {
                     domains.push(domain.displayName)
                 }
             }
