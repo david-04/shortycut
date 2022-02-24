@@ -671,7 +671,7 @@ namespace shortycut {
                 }
                 if (domain.resolvedOrigin?.resolvedFile?.job.url && domain.resolvedOrigin.type.isOffline) {
                     const url = domain.resolvedOrigin?.resolvedFile?.job.url;
-                    files.put(url.substr(0 === url.indexOf(prefix) ? prefix.length : 0), url);
+                    files.put(url.substring(0 === url.indexOf(prefix) ? prefix.length : 0), url);
                 }
             }
 

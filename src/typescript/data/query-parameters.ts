@@ -67,9 +67,9 @@ namespace shortycut {
                 for (const parameter of window.location.search.trim().replace(/^\?/, '').trim().split('&')) {
                     const index = parameter.indexOf('=');
                     if (0 < index) {
-                        const key = this.urlDecode(parameter.substr(0, index));
+                        const key = this.urlDecode(parameter.substring(0, index));
                         if (key) {
-                            result.put(key, this.urlDecode(parameter.substr(index + 1)));
+                            result.put(key, this.urlDecode(parameter.substring(index + 1)));
                         }
                     } else {
                         result.put(this.urlDecode(parameter), '');

@@ -22,7 +22,7 @@ namespace shortycut {
     // Exception handler
     //------------------------------------------------------------------------------------------------------------------
 
-    export function handleExceptions(onError: (exception: Exception) => void, action: () => void) {
+    export function handleExceptions(onError: (exception: unknown) => void, action: () => void) {
 
         try {
             action();
@@ -35,15 +35,12 @@ namespace shortycut {
     // Display an error message
     //------------------------------------------------------------------------------------------------------------------
 
-    export function displayError(exception: Exception | string) {
+    export function displayError(exception: unknown) {
         if (exception instanceof Exception) {
             pages.error.populate(exception);
         } else {
             console.error(exception);
-            let message = exception;
-            try {
-                message = exception.toString();
-            } catch (ignored) { }
+            let message = `${exception}`;
             pages.error.populate('Internal error', [
                 create('p', 'An internal error occurred:'),
                 create('p', message)

@@ -1,6 +1,6 @@
 namespace shortycut {
 
-    type ParserCallback = (result: Shortcuts | Exception) => void;
+    type ParserCallback = (result: Shortcuts | unknown) => void;
 
     //------------------------------------------------------------------------------------------------------------------
     // Parse shortcut definitions batch-wise
@@ -18,7 +18,7 @@ namespace shortycut {
         });
     }
 
-    function parseBatch(parser : ShortcutParser, lines: string[], index: number, batchSize: number, shortcuts: Shortcuts, callback: ParserCallback) {
+    function parseBatch(parser: ShortcutParser, lines: string[], index: number, batchSize: number, shortcuts: Shortcuts, callback: ParserCallback) {
 
         handleExceptions(callback, () => {
             if (index < lines.length) {

@@ -58,9 +58,9 @@ namespace shortycut {
             const array = type.split(/(?=[.#:])/).map(token => token.trim()).filter(token => token);
             return new ElementProperties(
                 array[0],
-                array.filter(item => '.' === item.charAt(0)).map(item => item.substr(1)).join(' '),
+                array.filter(item => '.' === item.charAt(0)).map(item => item.substring(1)).join(' '),
                 array.some(item => item === ':html'),
-                array.filter(item => '#' === item.charAt(0)).map(item => item.substr(1))[0]
+                array.filter(item => '#' === item.charAt(0)).map(item => item.substring(1))[0]
             );
         }
     }

@@ -254,7 +254,7 @@ namespace shortycut {
             const input = this.dom.filter.value;
             const splitInput = input.split(/\s+/).filter(word => word);
             const keyword = adjustCase(splitInput[0] ?? '');
-            const postKeywordInput = input.replace(/^\s*/, '').substr(keyword.length);
+            const postKeywordInput = input.replace(/^\s*/, '').substring(keyword.length);
 
             if (keyword) {
 

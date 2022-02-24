@@ -23,8 +23,8 @@ namespace shortycut {
         }
         let index = (caseSensitive ? source : source.toLocaleLowerCase()).indexOf(search);
         while (0 <= index) {
-            result += source.substr(0, index) + replacement;
-            source = source.substr(index + search.length);
+            result += source.substring(0, index) + replacement;
+            source = source.substring(index + search.length);
             index = (caseSensitive ? source : source.toLocaleLowerCase()).indexOf(search);
         }
         return result + source;
@@ -39,7 +39,7 @@ namespace shortycut {
         return !!pattern
             && !!line
             && pattern.length <= line.length
-            && line.substr(0, pattern.length) === pattern;
+            && line.substring(0, pattern.length) === pattern;
     }
 
     export function endsWith(line?: string, pattern?: string): boolean {
@@ -47,7 +47,7 @@ namespace shortycut {
         return !!pattern
             && !!line
             && pattern.length <= line.length
-            && line.substr(line.length - pattern.length, pattern.length) === pattern;
+            && line.substring(line.length - pattern.length, line.length) === pattern;
     }
 
     //------------------------------------------------------------------------------------------------------------------

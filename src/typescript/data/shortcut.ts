@@ -123,8 +123,8 @@ namespace shortycut {
                         }
                         try {
                             return {
-                                key: decodeURIComponent(parameter.substr(0, index)),
-                                value: decodeURIComponent(parameter.substr(index + 1))
+                                key: decodeURIComponent(parameter.substring(0, index)),
+                                value: decodeURIComponent(parameter.substring(index + 1))
                             };
                         } catch (exception) {
                             throw new Exception('Shortcut definition error',
@@ -313,13 +313,13 @@ namespace shortycut {
             if (!config.homepage.suggestions.showHotkeys) {
                 return sanitize(sections.join(''));
             } else if (1 === sections.length) {
-                return this.autoDetectHotkeys(sections[0], this.keyword.substr(lengthOffset), length - lengthOffset);
+                return this.autoDetectHotkeys(sections[0], this.keyword.substring(lengthOffset), length - lengthOffset);
             } else {
                 let result = sanitize(sections[0]);
                 for (let index = 1; index < sections.length; index++) {
                     if (hotkeysMatched < index) {
                         result += create('span.hotkey', sanitize(sections[index].charAt(0))).outerHTML;
-                        result += sanitize(sections[index].substr(1));
+                        result += sanitize(sections[index].substring(1));
                     } else {
                         result += sanitize(sections[index]);
                     }

@@ -1,5 +1,10 @@
 # ![](img/arrow.svg) Release notes
 
+## Version 1.3-alpha | unreleased
+
+- Fixed compiler errors introduced by the latest TypeScript version
+- Replaced deprecated calls to `substr` with `substring`
+
 ## Version 1.2.2 | 2021-08-07
 
 - Fixed an issue that caused domains to be listed under [missing favicons](favicons.md#missing-favicons)

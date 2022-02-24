@@ -124,8 +124,8 @@ namespace shortycut {
 
             const keyword = `${match.keyword}${match.isPartial ? '...' : ''}`;
             const keywordHtml = create('div',
-                create('span.matched', keyword.substr(0, this.level)),
-                create('span.unmatched', keyword.substr(this.level))
+                create('span.matched', keyword.substring(0, this.level)),
+                create('span.unmatched', keyword.substring(this.level))
             ).innerHTML;
 
             return {

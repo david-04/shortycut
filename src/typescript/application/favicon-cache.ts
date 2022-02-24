@@ -205,8 +205,8 @@ namespace shortycut {
                 for (let index = 0, size = data.length; data; size = Math.min(Math.ceil(size / 2), data.length)) {
                     try {
                         for (; data; index++, size = Math.min(size, data.length)) {
-                            this.storage.setItem(this.getStorageKey(index), data.substr(0, size));
-                            data = data.substr(size);
+                            this.storage.setItem(this.getStorageKey(index), data.substring(0, size));
+                            data = data.substring(size);
                         }
                     } catch (exception) {
                         if (size < 100) {

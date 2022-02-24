@@ -39,7 +39,7 @@ namespace shortycut {
                 let hotkey = keywordCaseAdjusted.charAt(keywordIndex);
                 descriptionIndex = descriptionCaseAdjusted.indexOf(hotkey, descriptionIndex);
                 if (descriptionIndex < 0) {
-                    return `${description} ${keyword.substr(keywordIndex)}`;
+                    return `${description} ${keyword.substring(keywordIndex)}`;
                 }
             }
 
@@ -180,9 +180,9 @@ namespace shortycut {
         private splitDescription(description: string, hotkeyPositions: number[]) {
 
             const result = new Array<{ text: string, isHotkey: boolean }>();
-            result.push({ text: description.substr(0, hotkeyPositions[0]), isHotkey: false });
+            result.push({ text: description.substring(0, hotkeyPositions[0]), isHotkey: false });
             for (let index = 0; index < hotkeyPositions.length; index++) {
-                result.push({ text: description.substr(hotkeyPositions[index], 1), isHotkey: true });
+                result.push({ text: description.substring(hotkeyPositions[index], hotkeyPositions[index] + 1), isHotkey: true });
                 const nextIndex = index + 1 < hotkeyPositions.length ? hotkeyPositions[index + 1] : description.length;
                 result.push({ text: description.substring(hotkeyPositions[index] + 1, nextIndex), isHotkey: false });
             }

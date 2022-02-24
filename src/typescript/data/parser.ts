@@ -132,7 +132,7 @@ namespace shortycut {
             }
 
             context.urlOrDynamicLink = url[0].trim();
-            context.description = context.line.substr(0, context.line.length - url[0].length);
+            context.description = context.line.substring(0, context.line.length - url[0].length);
 
             if (0 === context.urlOrDynamicLink.indexOf(dynamicLinkProtocol)) {
                 context.urlOrDynamicLink = startupCache.dynamicLinks.get(context.urlOrDynamicLink);
@@ -160,10 +160,10 @@ namespace shortycut {
                         && 'string' === typeof context.urlOrDynamicLink
                         && startsWith(context.urlOrDynamicLink, symbol)) {
                         context.onMultiLink = onMultiLink;
-                        context.urlOrDynamicLink = context.urlOrDynamicLink.substr(symbol.length).trim();
+                        context.urlOrDynamicLink = context.urlOrDynamicLink.substring(symbol.length).trim();
                         return;
                     } else if (pass && endsWith(context.description, symbol)) {
-                        context.description = context.description.substr(0, context.description.length - symbol.length).trim();
+                        context.description = context.description.substring(0, context.description.length - symbol.length).trim();
                         context.onMultiLink = onMultiLink;
                         return;
                     }
@@ -185,8 +185,8 @@ namespace shortycut {
                 const separator = config.shortcutFormat.url.postIndicator;
                 let index = separator ? adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
                 if (separator && 0 <= index) {
-                    context.postFields = context.urlOrDynamicLink.substr(index + separator.length);
-                    context.urlOrDynamicLink = context.urlOrDynamicLink.substr(0, index);
+                    context.postFields = context.urlOrDynamicLink.substring(index + separator.length);
+                    context.urlOrDynamicLink = context.urlOrDynamicLink.substring(0, index);
                 }
             }
         }
@@ -204,8 +204,8 @@ namespace shortycut {
             } else {
                 const index = context.description.search(/(\s|$)/);
                 return [{
-                    keywords: this.splitKeywords(context, context.description.substr(0, index)),
-                    description: context.description.substr(index).trim()
+                    keywords: this.splitKeywords(context, context.description.substring(0, index)),
+                    description: context.description.substring(index).trim()
                 }];
             }
         }
@@ -233,7 +233,7 @@ namespace shortycut {
             const startIndex = description.indexOf(openingDelimiter);
 
             if (0 <= startIndex) {
-                const nextSegment = description.substr(startIndex + openingDelimiter.length);
+                const nextSegment = description.substring(startIndex + openingDelimiter.length);
                 let endIndex = nextSegment.indexOf(closingDelimiter);
                 if (endIndex < 0) {
                     throw new ParserError(`Missing ${closingDelimiter} after ${openingDelimiter}`, context.line);
@@ -241,8 +241,8 @@ namespace shortycut {
                 return {
                     description: description.substring(0, startIndex),
                     nextSegment: {
-                        keywords: this.splitKeywords(context, nextSegment.substr(0, endIndex)),
-                        description: nextSegment.substr(endIndex + closingDelimiter.length).trim()
+                        keywords: this.splitKeywords(context, nextSegment.substring(0, endIndex)),
+                        description: nextSegment.substring(endIndex + closingDelimiter.length).trim()
                     }
                 };
             }
