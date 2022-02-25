@@ -22,6 +22,7 @@ shortycut.configure({
                 replacePrevious: '=',
                 openInNewTab: '^',
                 showMenu: '?',
+                searchBucket: '#',
                 default: 'showMenu'
             }
         }
@@ -136,6 +137,10 @@ This property defines the character that can be put in front of a link
 to show an interactive list of all links with the same keyword.
 The default value is the question mark (`?`).
 See "[Multi-link shortcuts](multi-link-shortcuts.md#show-a-list)" for details.
+
+## ![](img/arrow.svg) shortcutFormat.url.multiLinkIndicator.searchBucket
+
+This property defines the character that can be put in front of a link to mark it as a searchable item within the keyword. The default value is the hash (`#`). See "[Search buckets](search-buckets.md)" for details.
 
 ## ![](img/arrow.svg) shortcutFormat.url.multiLinkIndicator.default
 

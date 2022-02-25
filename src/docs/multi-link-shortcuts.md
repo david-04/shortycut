@@ -77,7 +77,7 @@ It can be used to override individual keywords when importing shared shortcut co
 It can also be used to temporarily redirect or repurpose a keyword,
 without having to delete (and later restore) the current set of links.
 
-## ![](img/arrow.svg) Mixing behaviors
+##  ![](img/arrow.svg) Mixing behaviors
 
 The equals sign (`=`) always causes the previous links to be discarded.
 The behavior for the remaining shortcuts is determined only by the last link.
@@ -94,3 +94,7 @@ The keyword will eventually have three links (finance, sports, and world news).
 A list will be displayed, because the last link (world news) has a question mark (`?`).
 If it didn't have any indicator, the configured default behavior would apply.
 The caret (`^`) in front of the sports link is always ignored and can be omitted.
+
+## ![](img/arrow.svg) Search buckets
+
+The hash symbol (`#`) in front of a link marks it as "searchable". These links are not directly opened through the keyword but are accessible via full-text search only. Searchable links exist in parallel to the regular links that open new tabs or show an interactive list. Please see "[Search buckets](search-buckets.md)" for a more detailed explanation.

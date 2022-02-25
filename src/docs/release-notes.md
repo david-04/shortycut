@@ -2,10 +2,10 @@
 
 ## Version 1.3-alpha | unreleased
 
-- Added support for search buckets
+- Added support for [search buckets](search-buckets.md)
 - Improved the suggestion list for non-query keywords
-- Fixed Edge-specific rendering issues with the burger icon
-- Fixed compiler errors introduced by the latest TypeScript version
+- Fixed Edge-specific rendering issues with the burger menu icon
+- Fixed type errors introduced by the latest TypeScript version
 - Replaced deprecated calls to `substr` with `substring`
 
 ## Version 1.2.2 | 2021-08-07

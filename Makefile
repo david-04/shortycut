@@ -28,7 +28,7 @@ watch :
 docs : src/html/resources/docs/index.html;
 
 mkd :
-	python -m mkdocs serve -f src/docs/mkdocs.yml 2>&1 \
+	python -m mkdocs serve -f src/mkdocs.yml 2>&1 \
 		| grep -vE '(^\[|Browser Connected|Running task:|Ignore.*worker.js)'
 
 build : build/$(SHORTYCUT_ZIP);
@@ -77,7 +77,7 @@ build/$(SHORTYCUT_ZIP) : docs \
 src/html/resources/docs/index.html : $(wildcard src/docs/* src/docs/*/* src/docs/*/*/*)
 	echo src/html/resources/docs
 	rm -rf src/html/resources/docs
-	-python -m mkdocs build -f src/docs/mkdocs.yml -c 2>&1 \
+	-python -m mkdocs build -f src/mkdocs.yml -c 2>&1 \
 		| grep -vE "(Cleaning site directory|Building documentation to directory|Documentation built in)"
 	@$(foreach file, \
 	           $(patsubst src/docs/%.md, src/html/resources/docs/%.html, $(wildcard src/docs/*.md)) \
@@ -91,7 +91,7 @@ src/html/resources/docs/index.html : $(wildcard src/docs/* src/docs/*/* src/docs
 					| sed 's|>Docs<|>ShortyCut<|g' \
  					> $(file).tmp; \
 			   mv -f $(file).tmp $(file);)
-	rm $(patsubst %, src/html/resources/docs/%, mkdocs.yml sitemap.xml*)
+	rm $(patsubst %, src/html/resources/docs/%, sitemap.xml*)
 	rm -r src/html/resources/docs/fonts
 
 #-----------------------------------------------------------------------------------------------------------------------

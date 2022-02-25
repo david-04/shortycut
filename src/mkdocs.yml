@@ -12,6 +12,7 @@ nav:
       - File format: file-format.md
       - Shortcut syntax: shortcut-syntax.md
       - Multi-link shortcuts: multi-link-shortcuts.md
+      - Search buckets: search-buckets.md
       - POST links: post-links.md
       - Dynamic links: dynamic-links.md
       - Hotkeys: hotkeys.md
@@ -36,9 +37,9 @@ theme:
   titles_only: true
   highlightjs: false
 
-docs_dir:  ./
+docs_dir:  docs
 
-site_dir: ../../src/html/resources/docs
+site_dir: html/resources/docs
 
 extra_css:
   - css/custom.css
