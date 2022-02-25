@@ -17,11 +17,11 @@
 }
 
 #menu .burger-icon div {
-    width: 1.44em;
-    height: 0.2em;
-    background-color: #444444;
-    margin-bottom: 0.24em;
-    border-radius: 0.16em;
+    width: 25px;
+    height: 4px;
+    background-color: #555;
+    margin-bottom: 4px;
+    border-radius: 3px;
 }
 
 #menu .burger-icon:hover {
