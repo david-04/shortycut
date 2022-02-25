@@ -10,9 +10,12 @@ namespace shortycut {
 
         window.addEventListener('error', (exception) => { startupCache.exceptions.push(exception); });
 
-        window.addEventListener('DOMContentLoaded', () => {
+        if (document && document.title !== undefined) {
+            document.title = '...';
+        }
 
-            document.title = 'ShortyCut';
+        window.addEventListener('DOMContentLoaded', () => {
+            document.title = '...';
             ['icon', 'shortcut icon'].forEach(rel => addLink(rel, 'image/x-icon', 'resources/favicon.ico', ''));
             addLink('search', 'application/opensearchdescription+xml', 'data/search.xml', 'ShortyCut');
         });

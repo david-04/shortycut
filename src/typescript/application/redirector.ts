@@ -22,6 +22,7 @@ namespace shortycut {
             const isHomepageKeyword = config.homepage.keywords.some(keyword => keyword === queryParameters.keyword);
 
             if (setup) {
+                document.title = 'ShortyCut';
                 this.showSetupPage(setup);
             } else if (shortcut) {
                 shortcut.replacePlaceholders(queryParameters.searchTerm);
@@ -54,6 +55,7 @@ namespace shortycut {
             } else if (!queryParameters.keyword || !defaultSearchEngine || !config.defaultSearchEngine.useInAddressBar || isHomepageKeyword) {
                 this.alwaysOpenNewTabs = queryParameters.facets.newTabs;
                 this.showRedirectPage = false;
+                document.title = 'ShortyCut';
                 router.goto(pages.home.populate(
                     isHomepageKeyword
                         ? queryParameters.fullQuery.replace(/^\s*[^\s]+/, '').trim()
