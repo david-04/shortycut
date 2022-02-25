@@ -1,7 +1,6 @@
 namespace shortycut {
 
-    export type LinkType = 'query' | 'bookmark';
-    export type ShortcutType = LinkType | 'both';
+    export type ShortcutType = 'query' | 'bookmark' | 'both' | 'none';
 
     export type DynamicLinkFunction = (searchTerm: string) => string;
     export type DynamicLink = { generator: DynamicLinkFunction, urlForFavicon: string };
@@ -27,6 +26,7 @@ namespace shortycut {
         public static readonly REPLACE_PREVIOUS = new OnMultiLink('replacePrevious');
         public static readonly OPEN_IN_NEW_TAB = new OnMultiLink('openInNewTab');
         public static readonly SHOW_MENU = new OnMultiLink('showMenu');
+        public static readonly SEARCH_BUCKET = new OnMultiLink('searchBucket');
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ namespace shortycut {
 
     export class Link {
 
-        public readonly type: LinkType;
+        public readonly isQuery: boolean;
         private _filterSummary?: string;
         private _overridden = false;
         private searchTerm = '';
@@ -45,16 +45,13 @@ namespace shortycut {
             public readonly index: number,
             public readonly segments: Segments,
             public readonly onMultiLink: OnMultiLink,
+            public readonly isSearchable: boolean,
             private urlOrDynamicLink: string | DynamicLink,
             private _postFields?: string
         ) {
-            if ('string' !== typeof this.urlOrDynamicLink
+            this.isQuery = 'string' !== typeof this.urlOrDynamicLink
                 || 0 <= adjustCase(this.urlOrDynamicLink).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
-                || 0 <= adjustCase(this._postFields ?? '').indexOf(config.shortcutFormat.url.searchTermPlaceholder)) {
-                this.type = 'query';
-            } else {
-                this.type = 'bookmark'
-            }
+                || 0 <= adjustCase(this._postFields ?? '').indexOf(config.shortcutFormat.url.searchTermPlaceholder);
         }
 
         public get url() {
@@ -165,8 +162,12 @@ namespace shortycut {
             return this.current[this.current.length - 1].onMultiLink;
         }
 
-        public get type() {
-            return this.current[0].type;
+        public get isQuery() {
+            return this.current[0].isQuery;
+        }
+
+        public get isSearchable() {
+            return this.current[0].isSearchable;
         }
 
         public get filterSummary() {
@@ -343,6 +344,7 @@ namespace shortycut {
 
         private _bookmarks?: Links;
         private _queries?: Links;
+        private _searchable?: Links;
         public readonly all = new Array<{ link: Link, links: Links }>();
 
         public get bookmarks() {
@@ -353,8 +355,18 @@ namespace shortycut {
             return this._queries;
         }
 
-        public get type() {
-            return this._bookmarks ? (this._queries ? 'both' : 'bookmark') : 'query';
+        public get searchable() {
+            return this._searchable;
+        }
+
+        public get type(): ShortcutType {
+            if (this.bookmarks) {
+                return this.queries ? 'both' : 'bookmark';
+            } else if (this.queries) {
+                return 'query';
+            } else {
+                return 'none';
+            }
         }
 
         constructor(
@@ -378,11 +390,14 @@ namespace shortycut {
                 keyword,
                 this.all.length,
                 new Segments(segments),
-                onMultiLink,
+                OnMultiLink.SEARCH_BUCKET === onMultiLink ? OnMultiLink.getDefault() : onMultiLink,
+                OnMultiLink.SEARCH_BUCKET === onMultiLink,
                 urlOrDynamicLink,
                 postParameters
             );
-            if ('query' === link.type) {
+            if (link.isSearchable) {
+                this._searchable = this.createOrAdd(link, this._searchable);
+            } else if (link.isQuery) {
                 this._queries = this.createOrAdd(link, this._queries);
             } else {
                 this._bookmarks = this.createOrAdd(link, this._bookmarks);

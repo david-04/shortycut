@@ -26,6 +26,7 @@ namespace shortycut {
         description: string;
         descriptionLowerCase: string;
         shortcut: Shortcut;
+        isSearchable: boolean;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -95,7 +96,6 @@ namespace shortycut {
                     .filter(shortcut => this.level < shortcut.keyword.length && shortcut.keyword.length <= maxLength)
                     .forEach(shortcut => shortcuts.push(shortcut));
 
-
                 for (const shortcut of shortcuts) {
                     for (const match of shortcut.getSegmentMatches(this.level)) {
                         const nonPartialMatch = matches.values.filter(item => item.match.keyword === match.keyword)[0];
@@ -128,11 +128,15 @@ namespace shortycut {
                 create('span.unmatched', keyword.substring(this.level))
             ).innerHTML;
 
+            const descriptionHtmlSuffix = !match.isPartial && shortcuts[0].searchable
+                ? ` <span class='more-indicator-text'>${Segments.SEPARATOR_HTML} ...</span>`
+                : '';
+
             return {
                 type: this.level === match.keyword.length ? 'match' : (match.isPartial ? 'segment' : 'suggestion'),
                 keyword: match.keyword,
                 keywordHtml,
-                descriptionHtml: match.descriptionHtml,
+                descriptionHtml: match.descriptionHtml + descriptionHtmlSuffix,
                 shortcutType: this.getShortcutType(shortcuts),
                 shortcut: shortcuts[0],
                 hidesMoreChildren: match.hidesMoreChildren
@@ -148,8 +152,10 @@ namespace shortycut {
                 } else {
                     return 'bookmark';
                 }
-            } else {
+            } else if (shortcuts.some(shortcut => 'query' === shortcut.type)) {
                 return 'query';
+            } else {
+                return 'none';
             }
         }
     }
@@ -178,14 +184,16 @@ namespace shortycut {
         // Perform a full-text search
         //--------------------------------------------------------------------------------------------------------------
 
-        public fullTextSearch(searchTerms: string[]) {
+        public fullTextSearch(searchTerms: string[], keyword?: string) {
 
             const result = new Array<Suggestion>();
             for (const item of this.allLinks) {
                 if (this.maxResults <= result.length) {
                     return result;
                 }
-                this.createSuggestion(searchTerms, item, result);
+                if (!keyword || (item.keyword === keyword && item.isSearchable)) {
+                    this.createSuggestion(searchTerms, item, result);
+                }
             }
             if (this.maxResults < result.length) {
                 result.length = this.maxResults;
@@ -211,7 +219,7 @@ namespace shortycut {
                 keyword: searchableLink.keyword,
                 keywordHtml: this.highlightMatch(searchableLink.keyword, keywordMask),
                 descriptionHtml: this.highlightMatch(searchableLink.description, descriptionMask),
-                shortcutType: searchableLink.link.type,
+                shortcutType: searchableLink.link.isQuery ? 'query' : 'bookmark',
                 shortcut: searchableLink.shortcut,
                 link: searchableLink.link,
                 hidesMoreChildren: false
@@ -285,7 +293,8 @@ namespace shortycut {
                 keywordLowerCase: item.link.keyword.toLocaleLowerCase(),
                 description: item.link.segments.descriptionPlaceholder,
                 descriptionLowerCase: item.link.segments.descriptionPlaceholder.toLowerCase(),
-                shortcut: shortcuts.get(item.link.keyword)
+                shortcut: shortcuts.get(item.link.keyword),
+                isSearchable: item.link.isSearchable
             }));
         }
     }

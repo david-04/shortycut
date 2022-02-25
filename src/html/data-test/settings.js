@@ -16,6 +16,7 @@ shortycut.configure({
                 replacePrevious: '=',
                 openInNewTab: '^',
                 showMenu: '?',
+                searchBucket: '#',
                 default: 'showMenu'
             }
         }

@@ -88,6 +88,19 @@ var shortcuts = [
     '[defaultsearchengine] Default search engine                            http:// Default search engine %s',
 
     '[post] post                                                            http:// ?POST?query=%s',
+
+    '[a] AWS [t] Test                                                       http:// AWS Test Home',
+    '[a] AWS [t] Test [] queue-1                                           #http:// AWS Test Queue 1',
+    '[a] AWS [t] Test [] queue-1-deadletter                                #http:// AWS Test Queue 1 Dead Letter',
+    '[a] AWS [t] Test [] queue-2                                           #http:// AWS Test Queue 2',
+    '[a] AWS [t] Test [] queue-2-deadletter                                #http:// AWS Test Queue 2 Dead Letter',
+
+    '[a] AWS [p] Prod                                                       http:// AWS Prod Home',
+    '[a] AWS [p] Prod [] queue-1                                           #http:// AWS Prod Queue 1',
+    '[a] AWS [p] Prod [] queue-1-deadletter                                #http:// AWS Prod Queue 1 Dead Letter',
+    '[a] AWS [p] Prod [] queue-2                                           #http:// AWS Prod Queue 2',
+    '[a] AWS [p] Prod [] queue-2-deadletter                                #http:// AWS Prod Queue 2 Dead Letter',
+
 ];
 
 var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');

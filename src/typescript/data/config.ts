@@ -22,6 +22,7 @@ namespace shortycut {
                     replacePrevious: '=',
                     openInNewTab: '^',
                     showMenu: '?',
+                    searchBucket: '#',
                     default: 'showMenu'
                 }
             }
@@ -83,7 +84,8 @@ namespace shortycut {
         replacePrevious?: string;
         openInNewTab?: string;
         showMenu?: string;
-        default: 'replacePreviousDefinition' | 'openInNewTab' | 'showMenu';
+        searchBucket?: string;
+        default: 'replacePreviousDefinition' | 'openInNewTab' | 'showMenu' | 'searchBucket';
     }
 
     interface HomepageConfig {
@@ -227,12 +229,18 @@ namespace shortycut {
             [
                 startsWith(onMultiLink.openInNewTab, onMultiLink.replacePrevious)
                 || startsWith(onMultiLink.openInNewTab, onMultiLink.showMenu)
+                || startsWith(onMultiLink.openInNewTab, onMultiLink.searchBucket)
                 || startsWith(onMultiLink.replacePrevious, onMultiLink.openInNewTab)
                 || startsWith(onMultiLink.replacePrevious, onMultiLink.showMenu)
+                || startsWith(onMultiLink.replacePrevious, onMultiLink.searchBucket)
                 || startsWith(onMultiLink.showMenu, onMultiLink.openInNewTab)
-                || startsWith(onMultiLink.showMenu, onMultiLink.replacePrevious),
-                'The symbols for replacePreviousDefinition, openInNewTab or showMenu must not be (partially) identical',
-                ['openInNewTab', 'replacePreviousDefinition', 'showMenu']
+                || startsWith(onMultiLink.showMenu, onMultiLink.replacePrevious)
+                || startsWith(onMultiLink.showMenu, onMultiLink.searchBucket)
+                || startsWith(onMultiLink.searchBucket, onMultiLink.openInNewTab)
+                || startsWith(onMultiLink.searchBucket, onMultiLink.replacePrevious)
+                || startsWith(onMultiLink.searchBucket, onMultiLink.showMenu),
+                'The symbols for replacePreviousDefinition, openInNewTab, showMenu or searchBucket must not be (partially) identical',
+                ['openInNewTab', 'replacePreviousDefinition', 'showMenu', 'searchBucket']
             ],
             [
                 config.homepage.keywords.some(shortcut => !shortcut.trim()),

@@ -195,7 +195,7 @@ namespace shortycut {
                 if (-1 === this.selectedIndex) {
                     this.redirect(mode);
                 } else {
-                    this.applySuggestion(mode, isRightArrow);
+                    this.applySuggestion(this.selectedIndex, mode, isRightArrow);
                 }
                 event.preventDefault();
                 return false;
@@ -263,12 +263,17 @@ namespace shortycut {
                 if (!postKeywordInput) {
                     this.suggestions.push(...this.filter.keywordSearch(keyword, postKeywordInput));
                 } else if (shortcut) {
-                    if (shortcut.queries && 1 < splitInput.length && shortcut.queries) {
-                        this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
-                    } else if (shortcut.bookmarks) {
-                        this.suggestions.push(this.createSuggestion(shortcut, 'match', shortcut.type));
-                    } else {
-                        this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
+                    if (shortcut.searchable) {
+                        this.suggestions.push(...this.createSearchBucketSuggestions(shortcut, splitInput.slice(1)));
+                    }
+                    if (!this.suggestions.length) {
+                        if (shortcut.queries && 1 < splitInput.length && shortcut.queries) {
+                            this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
+                        } else if (shortcut.bookmarks) {
+                            this.suggestions.push(this.createSuggestion(shortcut, 'match', shortcut.type));
+                        } else {
+                            this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
+                        }
                     }
                 }
                 if (!this.suggestions.length) {
@@ -293,10 +298,26 @@ namespace shortycut {
             this.updateInputFieldHighlight();
         }
 
+        private createSearchBucketSuggestions(shortcut: Shortcut, searchTerms: string[]): Suggestion[] {
+            const suggestions = this.filter.fullTextSearch(searchTerms, shortcut.keyword);
+            if (suggestions.length) {
+                if (shortcut.queries) {
+                    return [...suggestions, this.createSuggestion(shortcut, 'suggestion', 'query')];
+                } else if (shortcut.bookmarks) {
+                    return [...suggestions, this.createSuggestion(shortcut, 'suggestion', 'bookmark')];
+                } else {
+                    return suggestions;
+                }
+            } else if (shortcut.queries) {
+                return [this.createSuggestion(shortcut, 'match', 'query')];
+            } else if (shortcut.bookmarks) {
+                return [this.createSuggestion(shortcut, 'match', 'bookmark')];
+            }
+            return suggestions;
+        }
+
         private createSuggestion(shortcut: Shortcut, type: SuggestionType, shortcutType: ShortcutType): Suggestion {
-
             const links = 'bookmark' === shortcutType ? shortcut.bookmarks! : shortcut.queries!;
-
             return {
                 type,
                 keyword: shortcut.keyword,
@@ -324,7 +345,11 @@ namespace shortycut {
                         create('div.description:html', this.getDescription(suggestion))
                     ], rowContent => rowContent.addEventListener('click', (event: MouseEvent) => {
                         this.selectSuggestion(index);
-                        this.applySuggestion(event.ctrlKey ? RedirectMode.NEW_TAB : RedirectMode.PRESERVE_HISTORY, false);
+                        this.applySuggestion(
+                            this.selectedIndex,
+                            event.ctrlKey ? RedirectMode.NEW_TAB : RedirectMode.PRESERVE_HISTORY,
+                            false
+                        );
                     }))
                 ])
             );
@@ -416,28 +441,47 @@ namespace shortycut {
         // Accept a suggestion via return key
         //--------------------------------------------------------------------------------------------------------------
 
-        private applySuggestion(mode: RedirectMode, viaRightArrow: boolean) {
+        private applySuggestion(selectedIndex: number, mode: RedirectMode, viaRightArrow: boolean) {
 
-            const suggestion = this.suggestions[this.selectedIndex];
+            const suggestion = this.suggestions[selectedIndex];
             const shortcut = suggestion.shortcut;
 
             if (suggestion.type === 'segment' || (viaRightArrow && suggestion.hidesMoreChildren)) {
                 this.applyFilter(viaRightArrow && suggestion.hidesMoreChildren);
             } else if (suggestion.type === 'search-result') {
-                if (suggestion.link?.type === 'query') {
+                if (suggestion.link?.isQuery) {
                     const searchTerm = prompt('Search term')?.trim();
                     if (searchTerm) {
-                        redirector.redirect([suggestion.link], suggestion.link.onMultiLink, searchTerm, mode);
+                        redirector.redirect(
+                            [suggestion.link],
+                            viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink,
+                            searchTerm,
+                            mode
+                        );
                     }
-                } else if (suggestion.link?.type === 'bookmark') {
-                    redirector.redirect([suggestion.link], suggestion.link.onMultiLink, '', mode);
+                } else if (suggestion.link) {
+                    redirector.redirect(
+                        [suggestion.link],
+                        viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink,
+                        '',
+                        mode
+                    );
                 }
             } else if (shortcut.bookmarks) {
-                redirector.redirect(shortcut.bookmarks.current, shortcut.bookmarks.onMultiLink, '', mode);
+                redirector.redirect(
+                    shortcut.bookmarks.current,
+                    viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : shortcut.bookmarks.onMultiLink,
+                    '',
+                    mode
+                );
             } else if (shortcut.queries) {
                 const searchTerm = prompt('Search term')?.trim();
                 if (searchTerm) {
-                    redirector.redirect(shortcut.queries.current, shortcut.queries!.onMultiLink, searchTerm, mode);
+                    redirector.redirect(
+                        shortcut.queries.current,
+                        viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : shortcut.queries!.onMultiLink,
+                        searchTerm,
+                        mode);
                 }
             }
         }
@@ -452,6 +496,10 @@ namespace shortycut {
             const keyword = adjustCase(input.replace(/\s.*/, ''));
             const shortcut = shortcuts.get(keyword);
             let searchTerm: string | undefined = input.replace(/^[^\s]*\s*/, '');
+
+            if (searchTerm && shortcut.searchable && this.suggestions.length) {
+                return this.applySuggestion(0, mode, false);
+            }
 
             if (!shortcut?.bookmarks && shortcut?.queries && !searchTerm) {
                 searchTerm = searchTerm || prompt('Search term')?.trim();
@@ -477,7 +525,7 @@ namespace shortycut {
                 redirector.redirect(defaultSearchEngine.queries.current, defaultSearchEngine.queries.onMultiLink, input, mode);
             } else if (this.suggestions.length) {
                 this.selectedIndex = 0;
-                this.applySuggestion(mode, false);
+                this.applySuggestion(this.selectedIndex, mode, false);
             }
         }
 
