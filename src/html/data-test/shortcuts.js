@@ -101,6 +101,9 @@ var shortcuts = [
     '[a] AWS [p] Prod [] queue-2                                           #http:// AWS Prod Queue 2',
     '[a] AWS [p] Prod [] queue-2-deadletter                                #http:// AWS Prod Queue 2 Dead Letter',
 
+    '[confluence] Confluence                                                http:// Confluence home',
+    '[docs] Confluence Page 1                                               http:// Confluence page 1',
+    '[docs] Confluence Page 2                                               http:// Confluence page 2',
 ];
 
 var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');

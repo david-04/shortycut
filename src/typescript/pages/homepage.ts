@@ -252,7 +252,7 @@ namespace shortycut {
             this.suggestions.length = 0;
 
             const input = this.dom.filter.value;
-            const splitInput = input.split(/\s+/).filter(word => word);
+            const splitInput = input.split(/\s+/).map(word => word.trim()).filter(word => word);
             const keyword = adjustCase(splitInput[0] ?? '');
             const postKeywordInput = input.replace(/^\s*/, '').substring(keyword.length);
 
@@ -269,10 +269,8 @@ namespace shortycut {
                     if (!this.suggestions.length) {
                         if (shortcut.queries && 1 < splitInput.length && shortcut.queries) {
                             this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
-                        } else if (shortcut.bookmarks) {
-                            this.suggestions.push(this.createSuggestion(shortcut, 'match', shortcut.type));
-                        } else {
-                            this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
+                        } else if (shortcut.bookmarks && !postKeywordInput) {
+                            this.suggestions.push(this.createSuggestion(shortcut, 'match', 'bookmark'));
                         }
                     }
                 }
@@ -303,8 +301,6 @@ namespace shortycut {
             if (suggestions.length) {
                 if (shortcut.queries) {
                     return [...suggestions, this.createSuggestion(shortcut, 'suggestion', 'query')];
-                } else if (shortcut.bookmarks) {
-                    return [...suggestions, this.createSuggestion(shortcut, 'suggestion', 'bookmark')];
                 } else {
                     return suggestions;
                 }
@@ -495,9 +491,10 @@ namespace shortycut {
             const input = this.dom.filter.value.trim();
             const keyword = adjustCase(input.replace(/\s.*/, ''));
             const shortcut = shortcuts.get(keyword);
+            const postKeywordInput = input.replace(/^\s*/, '').substring(keyword.length);
             let searchTerm: string | undefined = input.replace(/^[^\s]*\s*/, '');
 
-            if (searchTerm && shortcut.searchable && this.suggestions.length) {
+            if (postKeywordInput && (shortcut.searchable || !shortcut.queries) && this.suggestions.length) {
                 return this.applySuggestion(0, mode, false);
             }
 

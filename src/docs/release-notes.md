@@ -3,6 +3,8 @@
 ## Version 1.3-alpha | unreleased
 
 - Added support for search buckets
+- Improved the suggestion list for non-query keywords
+- Fixed Edge-specific rendering issues with the burger icon
 - Fixed compiler errors introduced by the latest TypeScript version
 - Replaced deprecated calls to `substr` with `substring`
 
