@@ -80,7 +80,7 @@ namespace shortycut {
             } else if (Array.isArray(arg)) {
                 element = applyCreateProperties(mustSanitize, element, ...arg);
             } else if (arg) {
-                element.appendChild(arg as any);
+                element.appendChild(arg);
             }
         }
 

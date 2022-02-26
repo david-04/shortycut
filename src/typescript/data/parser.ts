@@ -7,12 +7,12 @@ namespace shortycut {
     class ParserContext {
 
         // input data
-        public line: string = '';
+        public line = '';
 
         // extracted components
-        public description: string = '';
+        public description = '';
         public urlOrDynamicLink: string | DynamicLink = '';
-        public isStandardProtocol: boolean = false;
+        public isStandardProtocol = false;
         public onMultiLink: OnMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
         public postFields?: string;
 
@@ -27,7 +27,7 @@ namespace shortycut {
     export class ShortcutParser {
 
         private KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', dynamicLinkProtocol];
-        private KNOWN_PROTOCOLS_REGEXP = new RegExp(`(${this.KNOWN_PROTOCOLS.join('|')})://.*\$`, 'i');
+        private KNOWN_PROTOCOLS_REGEXP = new RegExp(`(${this.KNOWN_PROTOCOLS.join('|')})://.*$`, 'i');
 
         //--------------------------------------------------------------------------------------------------------------
         // Parse all shortcut definitions
@@ -78,7 +78,7 @@ namespace shortycut {
             this.splitDescriptionAndUrl(context);
             this.parseOnMultiLink(context);
             this.parsePostFields(context);
-            let keywords = this.formKeywords(context, this.parseKeywordsAndDescription(context));
+            const keywords = this.formKeywords(context, this.parseKeywordsAndDescription(context));
             let hasKeywords = false;
 
             keywords.entries.filter(entry => entry.key).forEach(entry => {
@@ -155,7 +155,7 @@ namespace shortycut {
 
             for (let pass = 0; pass < 2; pass++) {
                 for (const onMultiLink of OnMultiLink.values) {
-                    let symbol = (multiLinkIndicator as any)[onMultiLink.key] as string;
+                    const symbol = (multiLinkIndicator as any)[onMultiLink.key] as string;
                     if (!pass && context.isStandardProtocol
                         && 'string' === typeof context.urlOrDynamicLink
                         && startsWith(context.urlOrDynamicLink, symbol)) {
@@ -183,7 +183,7 @@ namespace shortycut {
 
             if ('string' === typeof context.urlOrDynamicLink) {
                 const separator = config.shortcutFormat.url.postIndicator;
-                let index = separator ? adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
+                const index = separator ? adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
                 if (separator && 0 <= index) {
                     context.postFields = context.urlOrDynamicLink.substring(index + separator.length);
                     context.urlOrDynamicLink = context.urlOrDynamicLink.substring(0, index);
@@ -228,13 +228,13 @@ namespace shortycut {
 
         private splitNextSegment(context: ParserContext, description: string) {
 
-            const openingDelimiter = config.shortcutFormat.keyword.openingDelimiter!;
-            const closingDelimiter = config.shortcutFormat.keyword.closingDelimiter!;
+            const openingDelimiter = assertNotNull(config.shortcutFormat.keyword.openingDelimiter);
+            const closingDelimiter = assertNotNull(config.shortcutFormat.keyword.closingDelimiter);
             const startIndex = description.indexOf(openingDelimiter);
 
             if (0 <= startIndex) {
                 const nextSegment = description.substring(startIndex + openingDelimiter.length);
-                let endIndex = nextSegment.indexOf(closingDelimiter);
+                const endIndex = nextSegment.indexOf(closingDelimiter);
                 if (endIndex < 0) {
                     throw new ParserError(`Missing ${closingDelimiter} after ${openingDelimiter}`, context.line);
                 }
@@ -271,9 +271,9 @@ namespace shortycut {
 
         private formKeywords(context: ParserContext, segments: Array<{ keywords: string[], description: string }>) {
 
-            let result = new Hashtable<Array<Segment>>();
+            const result = new Hashtable<Array<Segment>>();
+            const keyword = new Array<string>();
             let hasMoreCombinations = true;
-            let keyword = new Array<string>();
 
             for (let index = 0; index < segments.length; index++) {
                 context.combination[index] = 0;
@@ -281,7 +281,7 @@ namespace shortycut {
 
             while (hasMoreCombinations) {
 
-                let array = new Array<Segment>();
+                const array = new Array<Segment>();
                 for (let index = 0; index < segments.length; index++) {
                     keyword[index] = segments[index].keywords[context.combination[index]] ?? '';
                     array.push(this.createSegment(keyword[index], segments[index].description));
@@ -298,7 +298,7 @@ namespace shortycut {
                         context.combination[index] = 0;
                     }
                 }
-            };
+            }
 
             return result;
         }

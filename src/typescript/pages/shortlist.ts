@@ -7,7 +7,7 @@ namespace shortycut {
     export class Shortlist implements Page {
 
         private readonly dom = {
-            shortlist: document.getElementById('shortlist')!!,
+            shortlist: assertNotNull(document.getElementById('shortlist')),
             listItems: new Array<HTMLElement>()
         };
 
@@ -120,8 +120,8 @@ namespace shortycut {
                 return false;
             }
 
-            let id = document.activeElement?.id || '';
-            let current = id.match(/^shortlist[0-9]+$/) ? parseInt(id.replace(/shortlist/, '')) : -1;
+            const id = document.activeElement?.id || '';
+            const current = id.match(/^shortlist[0-9]+$/) ? parseInt(id.replace(/shortlist/, '')) : -1;
 
             if ('Enter' === event.key) {
                 if (0 === current) {

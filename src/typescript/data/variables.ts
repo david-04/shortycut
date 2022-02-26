@@ -51,8 +51,8 @@ namespace shortycut {
         }
 
         public hideAllExcept(page: Page | null) {
-            Object.keys(this.pages).map(key => {
-                const value = (this.pages as any)[key] as Page | Function | null;
+            Object.keys(this.pages).forEach(key => {
+                const value = (this.pages as any)[key] as Page | null;
                 if (value && value !== page && 'object' === typeof value && 'function' === typeof value.hide) {
                     value.hide();
                 }

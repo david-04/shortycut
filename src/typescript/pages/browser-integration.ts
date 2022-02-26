@@ -44,13 +44,13 @@ namespace shortycut {
                 this.dom.webServerRequired.style.display = 'block';
             }
 
-            const baseFolder = window.location.href.replace(/[?#].*/, '').replace(/\/+([^\/]+\.[^\/]+)?$/, '');
+            const baseFolder = window.location.href.replace(/[?#].*/, '').replace(/\/+([^/]+\.[^/]+)?$/, '');
             this.dom.openSearch.href = `${baseFolder}/data/search.xml`;
             this.dom.openSearch.innerHTML = sanitize(`${baseFolder}/data/search.xml`);
 
             this.dom.popUp.addEventListener('click', () => {
                 for (let index = 0; index < 2; index++) {
-                    let popUp = window.open('');
+                    const popUp = window.open('');
                     if (popUp?.document) {
                         popUp.document.write([
                             'This window was opened by ShortyCut.',
@@ -88,19 +88,17 @@ namespace shortycut {
         public addEventHandlers() {
             Object.keys(this.dom.facets)
                 .map(key => (this.dom.facets as any)[key] as HTMLInputElement)
-                .forEach(checkbox => checkbox.addEventListener('click', this.updateHomepageLink)
-            );
+                .forEach(checkbox => checkbox.addEventListener('click', this.updateHomepageLink));
         }
 
         public removeEventHandlers() {
             Object.keys(this.dom.facets)
                 .map(key => (this.dom.facets as any)[key] as HTMLInputElement)
-                .forEach(checkbox => checkbox.removeEventListener('click', this.updateHomepageLink)
-            );
+                .forEach(checkbox => checkbox.removeEventListener('click', this.updateHomepageLink));
         }
 
         private updateHomepageLink() {
-            let facets = Object.keys(this.dom.facets)
+            const facets = Object.keys(this.dom.facets)
                 .filter(facet => ((this.dom.facets as any)[facet] as HTMLInputElement).checked)
                 .map(facet => 'noFocus' === facet ? 'no-focus' : facet)
                 .map(facet => 'newTabs' === facet ? 'new-tabs' : facet);

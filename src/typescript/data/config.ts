@@ -140,7 +140,7 @@ namespace shortycut {
     function migrateConfig(config: any) {
 
         // homepage.suggestions.faviconFolders => favicons.localFolders
-        let faviconFolders = config?.homepage?.suggestions?.faviconFolders as string | Array<String> | null | undefined;
+        const faviconFolders = config?.homepage?.suggestions?.faviconFolders as string | Array<string> | null | undefined;
         if (faviconFolders) {
             delete config.homepage.suggestions.faviconFolders;
             config.favicons = config.favicons ?? {};
@@ -155,14 +155,14 @@ namespace shortycut {
 
     function mergeConfig(target: object, patch: object, patchRoot: object) {
 
-        for (let key in patch) {
+        for (const key in patch) {
 
-            let targetValue = (target as any)[key];
+            const targetValue = (target as any)[key];
             let patchValue = (patch as any)[key];
 
             [
                 [
-                    !target.hasOwnProperty(key),
+                    !Object.prototype.hasOwnProperty.call(target, key),
                     'is not supported'
                 ],
                 [
@@ -301,19 +301,19 @@ namespace shortycut {
     function renderJson(config: object, properties: string[]) {
         replaceRegexpFunctionsAndUndefinedValues(config);
         let result = sanitize(JSON.stringify(config, undefined, 4));
-        for (let property of properties) {
+        for (const property of properties) {
             result = replaceAll(result, `&quot;${property}&quot;`, `&quot;<span class='jsonError'>${property}</span>&quot;`, true);
         }
         return result
     }
 
     function replaceRegexpFunctionsAndUndefinedValues(object: any) {
-        for (let key in object) {
+        for (const key in object) {
             if (object[key]) {
                 if (object[key] instanceof RegExp) {
                     object[key] = `/${(object[key] as RegExp).source}/`;
                 } else if ('function' === typeof object[key]) {
-                    object[key] = (object[key] as Function).toString();
+                    object[key] = object[key].toString();
                 } else if ('object' === typeof object[key]) {
                     replaceRegexpFunctionsAndUndefinedValues(object[key])
                 }

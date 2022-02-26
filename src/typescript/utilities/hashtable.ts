@@ -74,7 +74,7 @@ namespace shortycut {
             return this.values.map(value => callback(value));
         }
 
-        public forEach(callback: CallbackKeyValueHashtable<T, any>) {
+        public forEach(callback: CallbackKeyValueHashtable<T, unknown>) {
             this.entries.forEach(entry => callback(entry.key, entry.value, this));
         }
     }

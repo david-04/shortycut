@@ -183,7 +183,6 @@
 
 #home .suggestions .description .key,
 #home .suggestions .row:not(.selected) .description .hotkey {
-    border: 1px solid #666666;
     background-color: white;
     color: black;
     border: 1px solid #666666;

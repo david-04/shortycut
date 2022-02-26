@@ -8,7 +8,7 @@ namespace shortycut {
 
         private readonly dom = {
             filter: document.querySelector('#home .input') as HTMLInputElement,
-            home: document.querySelector('#home')!! as HTMLDivElement,
+            home: document.querySelector('#home') as HTMLDivElement,
             suggestions: document.querySelector('#home .suggestions') as HTMLElement,
             headerRow: document.querySelector('#home > .row') as HTMLElement,
             rows: new Array<HTMLElement>(),
@@ -31,7 +31,7 @@ namespace shortycut {
         private selectedIndex = -1;
         private originalInput = '';
         private previousInput?: string;
-        private lastCancelClearFilterEvent: number = -1;
+        private lastCancelClearFilterEvent = -1;
         private clearFilterJob?: number;
 
         //--------------------------------------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ namespace shortycut {
 
         private onKeyBody(event: KeyboardEvent) {
 
-            var isRightArrow = ('ArrowRight' === event.key || 'Right' === event.key)
+            const isRightArrow = ('ArrowRight' === event.key || 'Right' === event.key)
                 && 0 <= this.selectedIndex
                 && (
                     this.suggestions[this.selectedIndex].hidesMoreChildren
@@ -247,7 +247,7 @@ namespace shortycut {
             this.applyFilter();
         }
 
-        private applyFilter(autoSelectFirstRow: boolean = false) {
+        private applyFilter(autoSelectFirstRow = false) {
 
             this.suggestions.length = 0;
 
@@ -313,7 +313,7 @@ namespace shortycut {
         }
 
         private createSuggestion(shortcut: Shortcut, type: SuggestionType, shortcutType: ShortcutType): Suggestion {
-            const links = 'bookmark' === shortcutType ? shortcut.bookmarks! : shortcut.queries!;
+            const links = 'bookmark' === shortcutType ? assertNotNull(shortcut.bookmarks) : assertNotNull(shortcut.queries);
             return {
                 type,
                 keyword: shortcut.keyword,
@@ -475,7 +475,7 @@ namespace shortycut {
                 if (searchTerm) {
                     redirector.redirect(
                         shortcut.queries.current,
-                        viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : shortcut.queries!.onMultiLink,
+                        viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : assertNotNull(shortcut.queries).onMultiLink,
                         searchTerm,
                         mode);
                 }

@@ -5,11 +5,7 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export class FaviconCacheEntry {
-
-        public constructor(
-            public fileName: string,
-            public lastAccessed: number
-        ) { };
+        public constructor(public fileName: string, public lastAccessed: number) { }
     }
 
     //------------------------------------------------------------------------------------------------------------------

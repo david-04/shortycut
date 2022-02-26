@@ -10,7 +10,7 @@ namespace shortycut {
         private setupComplete = false;
 
         private readonly dom = {
-            setup : document.querySelector('#setup') as HTMLElement,
+            setup: document.querySelector('#setup') as HTMLElement,
             error: document.querySelector('#setup .error') as HTMLElement,
             rootPath: document.querySelector('#setup .root-path') as HTMLElement,
             header: document.querySelector('#setup h1') as HTMLElement,
@@ -40,7 +40,7 @@ namespace shortycut {
 
             let indexPath = 'shortycut';
             if (0 === window.location.href.search(/^(file:\/{2}|[a-z]:|\/)/i)) {
-                indexPath = window.location.href.replace(/^file:\/+/, '').replace(/\/?(index\.html)?([\?#].*)?$/, '');
+                indexPath = window.location.href.replace(/^file:\/+/, '').replace(/\/?(index\.html)?([?#].*)?$/, '');
                 if (':' === indexPath.charAt(1)) {
                     indexPath = indexPath.replace(/\//g, '\\');
                 }

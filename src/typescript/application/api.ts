@@ -14,7 +14,7 @@ namespace shortycut {
 
     export function addShortcuts(...shortcuts: (string | string[])[]) {
 
-        for (let item of shortcuts) {
+        for (const item of shortcuts) {
             if (Array.isArray(item)) {
                 item.forEach(item => startupCache.shortcuts.push(item));
             } else {
@@ -48,7 +48,7 @@ namespace shortycut {
 
         let invalidUrl: string | undefined = undefined;
 
-        for (let searchTerm of [undefined, null, '', '1']) {
+        for (const searchTerm of [undefined, null, '', '1']) {
             try {
                 const url = dynamicLinkFunction(searchTerm as any)?.trim();
                 if (url) {
@@ -60,7 +60,9 @@ namespace shortycut {
                         invalidUrl = `${name}(${parameter}) => ${url}`;
                     }
                 }
-            } catch (ignored) { }
+            } catch (exception) {
+                // try the next search term
+            }
         }
 
         if (invalidUrl) {

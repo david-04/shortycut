@@ -222,10 +222,7 @@ namespace shortycut {
 
     export class Segment {
 
-        constructor(
-            public readonly keyword: string,
-            public readonly sections: string[]
-        ) { };
+        constructor(public readonly keyword: string, public readonly sections: string[]) { }
 
         public get description() {
             return this.sections.join('');

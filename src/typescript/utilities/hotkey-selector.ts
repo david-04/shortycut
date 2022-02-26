@@ -36,7 +36,7 @@ namespace shortycut {
             let descriptionIndex = 0;
 
             for (let keywordIndex = 0; keywordIndex < keywordCaseAdjusted.length; keywordIndex++) {
-                let hotkey = keywordCaseAdjusted.charAt(keywordIndex);
+                const hotkey = keywordCaseAdjusted.charAt(keywordIndex);
                 descriptionIndex = descriptionCaseAdjusted.indexOf(hotkey, descriptionIndex);
                 if (descriptionIndex < 0) {
                     return `${description} ${keyword.substring(keywordIndex)}`;
@@ -54,7 +54,7 @@ namespace shortycut {
 
             const candidates = new Array<HotkeyCandidates>();
             const keywordCaseAdjusted = adjustCase(keyword);
-            let descriptionCaseAdjusted = adjustCase(description);
+            const descriptionCaseAdjusted = adjustCase(description);
 
             for (let keywordIndex = 0; keywordIndex < keywordCaseAdjusted.length; keywordIndex++) {
                 const hotkey = keywordCaseAdjusted.charAt(keywordIndex);

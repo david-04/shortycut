@@ -62,7 +62,7 @@ namespace shortycut {
         }
 
         private getCurrentHistoryIndex() {
-            let index = parseInt(window.location.hash.replace('#', ''));
+            const index = parseInt(window.location.hash.replace('#', ''));
             return Math.min(Math.max(isNaN(index) ? 0 : index, 0), this.history.length - 1);
         }
 

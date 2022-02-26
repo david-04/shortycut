@@ -1,12 +1,10 @@
 # ![](img/arrow.svg) Release notes
 
-## Version 1.3-alpha | unreleased
+## Version 1.3-DEV | not released yet
 
 - Added support for [search buckets](search-buckets.md)
 - Improved the suggestion list for non-query keywords
-- Fixed Edge-specific rendering issues with the burger menu icon
-- Fixed type errors introduced by the latest TypeScript version
-- Replaced deprecated calls to `substr` with `substring`
+- Performed technical maintenance (linting, deprecations, updated typings)
 
 ## Version 1.2.2 | 2021-08-07
 

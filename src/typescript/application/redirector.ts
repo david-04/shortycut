@@ -68,7 +68,7 @@ namespace shortycut {
                 defaultSearchEngine.replacePlaceholders(queryParameters.fullQuery);
                 const links = defaultSearchEngine.queries?.current || defaultSearchEngine.bookmarks?.current;
                 this.redirect(
-                    links!,
+                    assertNotNull(links),
                     OnMultiLink.OPEN_IN_NEW_TAB,
                     queryParameters.fullQuery,
                     RedirectMode.ERASE_HISTORY

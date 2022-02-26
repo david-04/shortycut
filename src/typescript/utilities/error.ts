@@ -40,7 +40,7 @@ namespace shortycut {
             pages.error.populate(exception);
         } else {
             console.error(exception);
-            let message = `${exception}`;
+            const message = `${exception}`;
             pages.error.populate('Internal error', [
                 create('p', 'An internal error occurred:'),
                 create('p', message)
@@ -60,7 +60,7 @@ namespace shortycut {
 
         public constructor(...htmlElements: HTMLElement[]) {
             this.htmlElements = htmlElements;
-        };
+        }
 
         public toHtml() {
             return create('div.description', this.htmlElements);
@@ -83,9 +83,11 @@ namespace shortycut {
     // Run and ignore errors
     //------------------------------------------------------------------------------------------------------------------
 
-    export function runAndIgnoreErrors(callback: () => any) {
+    export function runAndIgnoreErrors(callback: () => void) {
         try {
             callback();
-        } catch (ignored) { }
+        } catch (exception) {
+            // ignored
+        }
     }
 }

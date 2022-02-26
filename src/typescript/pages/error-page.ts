@@ -8,7 +8,7 @@ namespace shortycut {
 
         private dom = {
             error: document.querySelector('#error') as HTMLElement,
-            title: document.querySelector('#error .title')!! as HTMLElement,
+            title: document.querySelector('#error .title') as HTMLElement,
             message: document.querySelector('#error .message') as HTMLElement
         }
 

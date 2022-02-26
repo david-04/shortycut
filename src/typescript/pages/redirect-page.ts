@@ -8,7 +8,7 @@ namespace shortycut {
 
         private readonly dom = {
             redirect: document.querySelector('#redirect') as HTMLElement,
-            title: document.querySelector('#redirect .title')!! as HTMLElement,
+            title: document.querySelector('#redirect .title') as HTMLElement,
             url: document.querySelector('#redirect .url') as HTMLElement,
         };
 

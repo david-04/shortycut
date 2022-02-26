@@ -1,4 +1,4 @@
-declare var __SHORTYCUT_BODY_INNER_HTML: string;
+declare const __SHORTYCUT_BODY_INNER_HTML: string;
 
 namespace shortycut {
 
@@ -54,7 +54,7 @@ namespace shortycut {
         const self = window.location.href.replace(/[?#].*$/, '');
         document.body.innerHTML = document.body.innerHTML.replace(/self:\/\//g, self);
 
-        shortycut.initializeVariables();
+        initializeVariables();
         applyAndValidateConfig();
 
         if (!startupCache.config.length && !queryParameters.setup) {

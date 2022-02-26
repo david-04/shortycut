@@ -563,7 +563,7 @@ namespace shortycut {
 
         public static extractProtocolAndDomain(url: string) {
             return {
-                protocol: url.match(/^([a-z]+:\/\/)?/i)![0].replace(/:.*/, '').toLocaleLowerCase() || 'http',
+                protocol: assertNotNull(url.match(/^([a-z]+:\/\/)?/i))[0].replace(/:.*/, '').toLocaleLowerCase() || 'http',
                 domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, '').replace(/\/.*/, '').toLowerCase()
             };
         }

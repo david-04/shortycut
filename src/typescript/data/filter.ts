@@ -241,10 +241,12 @@ namespace shortycut {
 
         private highlightMatch(text: string, mask: Array<boolean>) {
 
-            let result = new Array<string>();
+            const result = new Array<string>();
             for (let start = 0; start < mask.length; start++) {
                 let end = start + 1;
-                for (; end < mask.length && mask[end - 1] === mask[end]; end++) { }
+                for (; end < mask.length && mask[end - 1] === mask[end]; end++) {
+                    // find the end index
+                }
                 let section = sanitize(text.substring(start, end));
                 if (mask[start]) {
                     section = `<span class='matched-substring'>${section}</span>`;
@@ -267,7 +269,7 @@ namespace shortycut {
         private static initializeDictionary() {
             return new DictionaryItem(
                 0, shortcuts.values.sort(
-                    comparing(s => (s.bookmarks?.current ?? s.queries!.current)[0].segments.description)
+                    comparing(s => (s.bookmarks?.current ?? assertNotNull(s.queries).current)[0].segments.description)
                 )
             );
         }
