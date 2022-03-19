@@ -10,9 +10,7 @@ namespace shortycut {
 
         handleExceptions(callback, () => {
             const lines = new Array<string>();
-            for (let index = 0; index < startupCache.shortcuts.length; index++) {
-                lines.push(...startupCache.shortcuts[index].split(/\r?\n/));
-            }
+            startupCache.shortcuts.forEach(shortcut => lines.push(...shortcut.split(/\r?\n/)));
             const parser = new ShortcutParser();
             parseBatch(parser, lines, 0, 2000, shortcuts, callback);
         });

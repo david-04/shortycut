@@ -27,9 +27,9 @@ namespace shortycut {
             this.queryParameters = this.getQueryParameters();
 
             this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, '').replace(/\+/g, ' ');
-            this.keyword = adjustCase(this.fullQuery).replace(/\s.*$/, '');
+            this.keyword = adjustCase(this.fullQuery).replace(/\s.*/, '');
             this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, '');
-            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, '').match(/^[0-9]+$/)
+            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, '').match(/^\d+$/)
                 ? parseInt(this.queryParameters.getOrDefault(QueryParameters.INDEX, ''))
                 : undefined;
             this.setup = this.queryParameters.get(QueryParameters.SETUP);

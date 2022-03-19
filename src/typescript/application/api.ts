@@ -14,11 +14,11 @@ namespace shortycut {
 
     export function addShortcuts(...shortcuts: (string | string[])[]) {
 
-        for (const item of shortcuts) {
-            if (Array.isArray(item)) {
-                item.forEach(item => startupCache.shortcuts.push(item));
+        for (const shortcut of shortcuts) {
+            if (Array.isArray(shortcut)) {
+                shortcut.forEach(item => startupCache.shortcuts.push(item));
             } else {
-                startupCache.shortcuts.push(item);
+                startupCache.shortcuts.push(shortcut);
             }
         }
     }
@@ -26,6 +26,8 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
     // Create a virtual URL that points to a function which dynamically generates the actual link at runtime
     //------------------------------------------------------------------------------------------------------------------
+
+    let dynamicLinkIndex = 0;
 
     export function toUrl(dynamicLinkFunction: DynamicLinkFunction) {
 
@@ -36,7 +38,7 @@ namespace shortycut {
             );
         }
 
-        const key = `${dynamicLinkProtocol}://${startupCache.dynamicLinks.size}-${Math.random()}`;
+        const key = `${dynamicLinkProtocol}://${startupCache.dynamicLinks.size}-${dynamicLinkIndex++}`;
         startupCache.dynamicLinks.put(key, {
             generator: dynamicLinkFunction,
             urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
@@ -49,20 +51,11 @@ namespace shortycut {
         let invalidUrl: string | undefined = undefined;
 
         for (const searchTerm of [undefined, null, '', '1']) {
-            try {
-                const url = dynamicLinkFunction(searchTerm as any)?.trim();
-                if (url) {
-                    if (isUrl(url)) {
-                        return url;
-                    } else if (!invalidUrl) {
-                        const name = (dynamicLinkFunction as any)?.name || 'function';
-                        const parameter = undefined === searchTerm || null === searchTerm ? `${searchTerm}` : `'${searchTerm}'`;
-                        invalidUrl = `${name}(${parameter}) => ${url}`;
-                    }
-                }
-            } catch (exception) {
-                // try the next search term
+            const result = getDynamicLinkUrl(dynamicLinkFunction, searchTerm);
+            if (result.url) {
+                return result.url;
             }
+            invalidUrl = invalidUrl || result.invalidUrl;
         }
 
         if (invalidUrl) {
@@ -73,6 +66,28 @@ namespace shortycut {
         }
 
         return 'file:///';
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Try to get the dynamic link for the given search term - and ignore exceptions
+    //------------------------------------------------------------------------------------------------------------------
+
+    function getDynamicLinkUrl(dynamicLinkFunction: DynamicLinkFunction, searchTerm?: string | null) {
+        try {
+            const url = dynamicLinkFunction(searchTerm as any)?.trim();
+            if (url) {
+                if (isUrl(url)) {
+                    return { url };
+                } else {
+                    const name = (dynamicLinkFunction as any)?.name || 'function';
+                    const parameter = undefined === searchTerm || null === searchTerm ? `${searchTerm}` : `'${searchTerm}'`;
+                    return { invalidUrl: `${name}(${parameter}) => ${url}` };
+                }
+            }
+        } catch (exception) {
+            // try the next search term
+        }
+        return {};
     }
 
     //------------------------------------------------------------------------------------------------------------------

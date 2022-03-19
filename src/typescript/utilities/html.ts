@@ -5,7 +5,6 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function sanitize(content: string): string {
-
         if ('string' !== typeof content) {
             return content;
         } else {
@@ -22,7 +21,6 @@ namespace shortycut {
     export type CreateElementProperties = CreateElementConsumer | Element | string | Element[] | string[] | (Element | string)[];
 
     export function create(type: string, ...args: CreateElementProperties[]): HTMLElement {
-
         const properties = ElementProperties.of(type);
         const element = document.createElement(properties.tag);
         element.className = properties.className;
@@ -30,7 +28,6 @@ namespace shortycut {
     }
 
     export function createImage(url: string, ...args: CreateElementProperties[]): HTMLElement {
-
         const image = create('img', ...args) as HTMLImageElement;
         image.src = url;
         return image;
@@ -47,7 +44,9 @@ namespace shortycut {
             public readonly id?: string) { }
 
         private static get cache() {
-            return ElementProperties._cache = ElementProperties._cache ?? new Hashtable<ElementProperties>();
+            const cache = ElementProperties._cache ?? new Hashtable<ElementProperties>();
+            ElementProperties._cache = cache;
+            return cache;
         }
 
         public static of(type: string) {

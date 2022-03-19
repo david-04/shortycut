@@ -26,8 +26,7 @@ namespace shortycut {
 
     export class ShortcutParser {
 
-        private KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', dynamicLinkProtocol];
-        private KNOWN_PROTOCOLS_REGEXP = new RegExp(`(${this.KNOWN_PROTOCOLS.join('|')})://.*$`, 'i');
+        private KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', dynamicLinkProtocol].map(p => `${p}://`);
 
         //--------------------------------------------------------------------------------------------------------------
         // Parse all shortcut definitions
@@ -121,18 +120,10 @@ namespace shortycut {
 
         private splitDescriptionAndUrl(context: ParserContext) {
 
-            let url = context.line.match(this.KNOWN_PROTOCOLS_REGEXP);
-            context.isStandardProtocol = !!url;
-            url = url || context.line.match(/[a-z]+:\/\/.*$/i);
-            if (!url) {
-                throw new ParserError(
-                    'Unable to retrieve the link (make sure it starts with a protocol like https://)',
-                    context.line
-                );
-            }
-
-            context.urlOrDynamicLink = url[0].trim();
-            context.description = context.line.substring(0, context.line.length - url[0].length);
+            let { url, isStandardProtocol } = this.getUrl(context.line);
+            context.isStandardProtocol = isStandardProtocol;
+            context.urlOrDynamicLink = url;
+            context.description = context.line.substring(0, context.line.length - url.length);
 
             if (0 === context.urlOrDynamicLink.indexOf(dynamicLinkProtocol)) {
                 context.urlOrDynamicLink = startupCache.dynamicLinks.get(context.urlOrDynamicLink);
@@ -143,6 +134,62 @@ namespace shortycut {
                     );
                 }
             }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Get the line's URL
+        //--------------------------------------------------------------------------------------------------------------
+
+        private getUrl(line: string) {
+            const lineLowerCase = line.toLowerCase();
+            return this.getStandardProtocolUrl(line, lineLowerCase)
+                || this.getNonStandardProtocolUrl(line, lineLowerCase);
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Get the line's standard protocol URL (if found)
+        //--------------------------------------------------------------------------------------------------------------
+
+        private getStandardProtocolUrl(line: string, lineLowerCase: string) {
+            const index = this.KNOWN_PROTOCOLS
+                .map(protocol => lineLowerCase.indexOf(protocol))
+                .filter(matchIndex => 0 <= matchIndex)
+                .reduce((a, b) => a < b ? a : b, line.length)
+            if (index < line.length) {
+                return { isStandardProtocol: true, url: line.substring(index) }
+            } else {
+                return undefined;
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Get the line's non-standard protocol URL (if found)
+        //--------------------------------------------------------------------------------------------------------------
+
+        private getNonStandardProtocolUrl(line: string, lineLowerCase: string) {
+            let offset = 0;
+            while (offset < line.length) {
+                const index = line.indexOf('://', offset);
+                if (0 < index) {
+                    if ('a' <= lineLowerCase.charAt(index - 1) && lineLowerCase.charAt(index - 1) <= 'z') {
+                        let start = index - 1;
+                        while (0 < start
+                            && 'a' <= lineLowerCase.charAt(start - 1)
+                            && lineLowerCase.charAt(start - 1) <= 'z') {
+                            start--;
+                        }
+                        return { isStandardProtocol: false, url: line.substring(start) };
+                    } else {
+                        offset = index + 3;
+                    }
+                } else {
+                    offset = line.length;
+                }
+            }
+
+            throw new ParserError(
+                'Unable to retrieve the link (make sure it starts with a protocol like https://)', line
+            );
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -252,8 +299,8 @@ namespace shortycut {
 
         private splitKeywords(context: ParserContext, keywords: string) {
             const result = new Array<string>();
-            for (let keyword of keywords.split(config.shortcutFormat.keyword.separator || /\s+/)) {
-                keyword = keyword.trim();
+            for (const originalKeyword of keywords.split(config.shortcutFormat.keyword.separator || /\s+/)) {
+                const keyword = originalKeyword.trim();
                 if (keyword) {
                     if (keyword.match(/\s/)) {
                         throw new ParserError(`The keyword "${keyword}" contains whitespace`, context.line);
@@ -317,13 +364,16 @@ namespace shortycut {
                     .split(marker)
                     .map(item => replaceAll(item, '\n', `${marker}${marker}`, true));
 
-                for (let index = 1; index < sections.length; index++) {
+                let repeat = false;
+                for (let index = 1; index < sections.length; index = index + (repeat ? 0 : 1)) {
                     const keywordChar = adjustCase(keyword.charAt(index - 1));
                     const sectionChar = adjustCase(sections[index].charAt(0));
                     if (keywordChar !== sectionChar) {
                         sections[index - 1] += sections[index];
                         sections.splice(index, 1);
-                        index--;
+                        repeat = true;
+                    } else {
+                        repeat = false;
                     }
                 }
                 return new Segment(keyword, keyword.length + 1 === sections.length ? sections : [sections.join('')]);

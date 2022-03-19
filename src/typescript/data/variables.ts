@@ -60,35 +60,51 @@ namespace shortycut {
         }
 
         public get error() {
-            return this.pages.error = this.pages.error ?? new ErrorPage();
+            const error = this.pages.error ?? new ErrorPage()
+            this.pages.error = error;
+            return error;
         }
 
         public get browserIntegration() {
-            return this.pages.browserIntegration = this.pages.browserIntegration ?? new BrowserIntegration();
+            const browserIntegration = this.pages.browserIntegration ?? new BrowserIntegration();
+            this.pages.browserIntegration = browserIntegration;
+            return browserIntegration;
         }
 
         public get home() {
-            return this.pages.home = this.pages.home ?? new Homepage();
+            const home = this.pages.home ?? new Homepage();
+            this.pages.home = home;
+            return home;
         }
 
         public get linkTools() {
-            return this.pages.linkTools = this.pages.linkTools ?? new LinkTools();
+            const linkTools = this.pages.linkTools ?? new LinkTools();
+            this.pages.linkTools = linkTools;
+            return linkTools;
         }
 
         public get faviconTools() {
-            return this.pages.faviconTools = this.pages.faviconTools ?? new FaviconTools();
+            const faviconTools = this.pages.faviconTools ?? new FaviconTools();
+            this.pages.faviconTools = faviconTools;
+            return faviconTools;
         }
 
         public get redirect() {
-            return this.pages.redirect = this.pages.redirect ?? new RedirectPage();
+            const redirect = this.pages.redirect ?? new RedirectPage();
+            this.pages.redirect = redirect;
+            return redirect;
         }
 
         public get setup() {
-            return this.pages.setup = this.pages.setup ?? new SetupInstructions();
+            const setup = this.pages.setup ?? new SetupInstructions();
+            this.pages.setup = setup;
+            return setup;
         }
 
         public get shortlist() {
-            return this.pages.shortlist = this.pages.shortlist ?? new Shortlist();
+            const shortlist = this.pages.shortlist ?? new Shortlist();
+            this.pages.shortlist = shortlist;
+            return shortlist;
         }
     }
 
@@ -109,7 +125,9 @@ namespace shortycut {
 
         private _dynamicLinks?: Hashtable<DynamicLink>;
         public get dynamicLinks() {
-            return this._dynamicLinks = this._dynamicLinks ?? new Hashtable<DynamicLink>();
+            const dynamicLinks = this._dynamicLinks ?? new Hashtable<DynamicLink>();
+            this._dynamicLinks = dynamicLinks;
+            return dynamicLinks;
         }
     }
 

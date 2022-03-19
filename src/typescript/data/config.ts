@@ -118,9 +118,9 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function applyAndValidateConfig() {
-        for (let index = 0; index < startupCache.config.length; index++) {
-            migrateConfig(startupCache.config[index]);
-            mergeConfig(config, startupCache.config[index], startupCache.config[index]);
+        for (const currentConfig of startupCache.config) {
+            migrateConfig(currentConfig);
+            mergeConfig(config, currentConfig, currentConfig);
         }
         validateConfig();
         if (!config.shortcutFormat.keyword.caseSensitive) {
@@ -160,28 +160,7 @@ namespace shortycut {
             const targetValue = (target as any)[key];
             let patchValue = (patch as any)[key];
 
-            [
-                [
-                    !Object.prototype.hasOwnProperty.call(target, key),
-                    'is not supported'
-                ],
-                [
-                    isObject(targetValue) && !isObject(patchValue),
-                    'must be a nested object'
-                ],
-                [
-                    targetValue instanceof Array && (!patchValue || !(patchValue instanceof Array)),
-                    'must be an array'
-                ],
-                [
-                    'boolean' === typeof targetValue && 'boolean' != typeof patchValue,
-                    'must be boolean (true or false)'
-                ],
-                [
-                    isStringy(targetValue) && !isStringy(patchValue),
-                    'must be a string'
-                ],
-            ].forEach(rule => throwConfigExceptionIf(!!rule[0], `Property ${key} ${rule[1]}`, [key], patchRoot));
+            validateBeforeConfigMerge(key, target, targetValue, patchValue);
 
             if (patchValue && 'object' === typeof patchValue && !(patchValue instanceof Array)) {
                 mergeConfig(targetValue, patchValue, patchRoot);
@@ -195,6 +174,31 @@ namespace shortycut {
                 (target as any)[key] = 'string' === typeof patchValue ? patchValue.trim() : patchValue
             }
         }
+    }
+
+    function validateBeforeConfigMerge(key: string, target: object, targetValue: any, patchValue: any) {
+        return [
+            [
+                !Object.prototype.hasOwnProperty.call(target, key),
+                'is not supported'
+            ],
+            [
+                isObject(targetValue) && !isObject(patchValue),
+                'must be a nested object'
+            ],
+            [
+                targetValue instanceof Array && (!patchValue || !(patchValue instanceof Array)),
+                'must be an array'
+            ],
+            [
+                'boolean' === typeof targetValue && 'boolean' != typeof patchValue,
+                'must be boolean (true or false)'
+            ],
+            [
+                isStringy(targetValue) && !isStringy(patchValue),
+                'must be a string'
+            ],
+        ];
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -247,7 +251,7 @@ namespace shortycut {
                 'help must not contain empty strings (but the array can be empty)',
                 ['homepageKeywords']
             ],
-        ].forEach(value => throwConfigExceptionIf(!!value[0] as boolean, value[1] as string, value[2] as string[]));
+        ].forEach(value => throwConfigExceptionIf(!!value[0], value[1] as string, value[2] as string[]));
     }
 
     //------------------------------------------------------------------------------------------------------------------

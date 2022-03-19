@@ -33,7 +33,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public add(url: string, dependencies?: JavaScriptFile[]) {
-            const file = this.files.computeIfAbsent(url, url => new JavaScriptFile(url, []));
+            const file = this.files.computeIfAbsent(url, requestedUrl => new JavaScriptFile(requestedUrl, []));
             dependencies?.forEach(dependency => file.dependencies.push(dependency));
             this.checkDependenciesAndLoadFiles();
             return file;

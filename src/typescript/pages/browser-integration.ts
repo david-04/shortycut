@@ -44,9 +44,9 @@ namespace shortycut {
                 this.dom.webServerRequired.style.display = 'block';
             }
 
-            const baseFolder = window.location.href.replace(/[?#].*/, '').replace(/\/+([^/]+\.[^/]+)?$/, '');
-            this.dom.openSearch.href = `${baseFolder}/data/search.xml`;
-            this.dom.openSearch.innerHTML = sanitize(`${baseFolder}/data/search.xml`);
+            const baseFolder = getWindowLocationPath();
+            this.dom.openSearch.href = `${baseFolder}data/search.xml`;
+            this.dom.openSearch.innerHTML = sanitize(`${baseFolder}data/search.xml`);
 
             this.dom.popUp.addEventListener('click', () => {
                 for (let index = 0; index < 2; index++) {

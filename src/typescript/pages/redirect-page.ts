@@ -31,7 +31,6 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public show() {
-            //this.dom.redirect.style.display = 'flex';
             document.body.append(create('div:html', '&nbsp;'));
         }
 

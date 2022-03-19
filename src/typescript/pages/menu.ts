@@ -144,7 +144,7 @@ namespace shortycut {
 
         public onDocumentation(event: MouseEvent) {
             this.closeMenu();
-            const url = window.location.href.replace(/[#?].*/, '').replace(/\/?[^/]+\.[^/]+$/, '') + '/resources/docs/index.html';
+            const url = getWindowLocationPath() + 'resources/docs/index.html';
             if (queryParameters.facets.newTabs) {
                 window.open(url);
             } else {

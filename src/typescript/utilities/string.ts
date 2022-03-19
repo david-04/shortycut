@@ -7,7 +7,6 @@ namespace shortycut {
     export function adjustCase(text: string): string;
     export function adjustCase(text?: string): string | undefined;
     export function adjustCase(text?: string): string | undefined {
-
         return (text && !config.shortcutFormat.keyword.caseSensitive) ? text.toLowerCase() : text;
     }
 
@@ -16,7 +15,6 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function replaceAll(source: string, search: string, replacement: string, caseSensitive: boolean) {
-
         let result = '';
         if (!caseSensitive) {
             search = search.toLocaleLowerCase();
@@ -35,7 +33,6 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function startsWith(line?: string, pattern?: string): boolean {
-
         return !!pattern
             && !!line
             && pattern.length <= line.length
@@ -43,7 +40,6 @@ namespace shortycut {
     }
 
     export function endsWith(line?: string, pattern?: string): boolean {
-
         return !!pattern
             && !!line
             && pattern.length <= line.length

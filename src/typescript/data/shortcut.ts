@@ -151,7 +151,7 @@ namespace shortycut {
 
         public addLink(link: Link) {
             if (this.current.length && link.onMultiLink === OnMultiLink.REPLACE_PREVIOUS) {
-                this.current.forEach(link => link.markAsOverridden());
+                this.current.forEach(currentLink => currentLink.markAsOverridden());
                 this.overridden.push(...this.current);
                 this.current.length = 0
             }
@@ -171,10 +171,9 @@ namespace shortycut {
         }
 
         public get filterSummary() {
-            if (!this._filterSummary) {
-                this._filterSummary = this.current.map(link => link.filterSummary).join(' ');
-            }
-            return this._filterSummary;
+            const filterSummary = this._filterSummary ?? this.current.map(link => link.filterSummary).join(' ');
+            this._filterSummary = filterSummary;
+            return filterSummary;
         }
 
         public replacePlaceholders(searchTerm: string) {
@@ -182,7 +181,9 @@ namespace shortycut {
         }
 
         public get descriptionHtml() {
-            return this._descriptionHtml = this._descriptionHtml ?? this.calculateDescriptionHtml();
+            const descriptionHtml = this._descriptionHtml ?? this.calculateDescriptionHtml();
+            this._descriptionHtml = descriptionHtml;
+            return descriptionHtml;
         }
 
         private calculateDescriptionHtml() {
@@ -246,18 +247,24 @@ namespace shortycut {
         }
 
         public get descriptionHtml() {
-            return this._descriptionHtml = this._descriptionHtml ??
-                this.segments.map(segment => sanitize(segment.description)).join(Segments.SEPARATOR_HTML);
+            const descriptionHtml = this._descriptionHtml ??
+                this.segments.map(segment => sanitize(segment.description)).join(Segments.SEPARATOR_HTML)
+            this._descriptionHtml = descriptionHtml;
+            return descriptionHtml;
         }
 
         public get description() {
-            return this._description = this._description
+            const description = this._description
                 ?? this.segments.map(segment => segment.description).join(Segments.SEPARATOR_TEXT);
+            this._description = description;
+            return description;
         }
 
         public get descriptionPlaceholder() {
-            return this._descriptionPlaceholder = this._descriptionPlaceholder
+            const descriptionPlaceholder = this._descriptionPlaceholder
                 ?? this.segments.map(segment => segment.description).join(Segments.SEPARATOR_PLACEHOLDER);
+            this._descriptionPlaceholder = descriptionPlaceholder;
+            return descriptionPlaceholder;
         }
     }
 
@@ -284,19 +291,20 @@ namespace shortycut {
                         const description = this.getDescription(segment.sections, length - lengthOffset, lengthOffset, length);
                         this.descriptionHtml += `${this.descriptionHtml ? Segments.SEPARATOR_HTML : ''}${description}`;
                     }
-                    this.fingerprint +=
-                        (config.shortcutFormat.keyword.openingDelimiter || '[') +
-                        segment.keyword +
-                        (config.shortcutFormat.keyword.closingDelimiter || ']');
-                    if (index + 1 !== segments.length) {
-                        this.fingerprint += segment.description.trim().toLocaleLowerCase();
-                    }
+                    this.fingerprint += MatchingSegment.getFingerprint(segment, index + 1 !== segments.length);
                     lengthOffset += segment.keyword.length;
                 } else {
                     this.isPartial = true;
                     break;
                 }
             }
+        }
+
+        private static getFingerprint(segment: Segment, appendDescription: boolean) {
+            const openingDelimiter = config.shortcutFormat.keyword.openingDelimiter || '[';
+            const closingDelimiter = config.shortcutFormat.keyword.closingDelimiter || ']';
+            const suffix = appendDescription ? segment.description.trim().toLocaleLowerCase() : '';
+            return openingDelimiter + segment.keyword + closingDelimiter + suffix;
         }
 
         private countSegmentsToDisplay(segments: Segment[]) {

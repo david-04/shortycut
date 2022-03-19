@@ -51,33 +51,35 @@ namespace shortycut {
         if ("undefined" !== typeof __SHORTYCUT_BODY_INNER_HTML) {
             document.body.innerHTML = __SHORTYCUT_BODY_INNER_HTML;
         }
-        const self = window.location.href.replace(/[?#].*$/, '');
+        const self = window.location.href.replace(/[?#].*/, '');
         document.body.innerHTML = document.body.innerHTML.replace(/self:\/\//g, self);
 
         initializeVariables();
         applyAndValidateConfig();
 
         if (!startupCache.config.length && !queryParameters.setup) {
-            window.location.href = `${window.location.href.replace(/[#?].*$/, '')}?${QueryParameters.SETUP}=welcome`;
+            window.location.href = `${window.location.href.replace(/[#?].*/, '')}?${QueryParameters.SETUP}=welcome`;
             return;
         }
 
-        parseShortcuts(result => handleExceptions(displayError, () => {
-            if (result instanceof Exception) {
-                throw result;
-            } else {
-                if (queryParameters.facets.newTabs) {
-                    const links = document.getElementsByTagName('a');
-                    for (let index = 0; index < links.length; index++) {
-                        const link = links.item(index);
-                        if (link) {
-                            link.target = '_blank';
-                        }
+        parseShortcuts(result => handleExceptions(displayError, () => onParseShortcutsComplete(result)));
+    }
+
+    function onParseShortcutsComplete(result: unknown) {
+        if (result instanceof Exception) {
+            throw result;
+        } else {
+            if (queryParameters.facets.newTabs) {
+                const links = document.getElementsByTagName('a');
+                for (let index = 0; index < links.length; index++) {
+                    const link = links.item(index);
+                    if (link) {
+                        link.target = '_blank';
                     }
                 }
-                faviconManager = new FaviconManager();
-                redirector.processQuery();
             }
-        }));
+            faviconManager = new FaviconManager();
+            redirector.processQuery();
+        }
     }
 }

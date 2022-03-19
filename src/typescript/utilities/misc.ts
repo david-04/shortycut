@@ -5,7 +5,11 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function comparator<T>(a: T, b: T) {
-        return a < b ? -1 : (a === b ? 0 : 1);
+        if (a < b) {
+            return -1;
+        } else {
+            return a === b ? 0 : 1
+        }
     }
 
     export function comparing<T, R>(fieldSelector?: (object: T) => R) {
@@ -29,16 +33,14 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function supportsBacktickSyntax() {
-        const key = 'shortycutBrowserTest';
-        const value = 'success';
         try {
-            eval('window["' + key + '"] = `' + value + '`');
+            eval('window["shortycutBrowserTest"] = `success`');
         } catch (exception) {
             // ignored
         }
-        const supportsBacktickSyntax = value === (window as any)[key];
-        delete (window as any)[key];
-        return supportsBacktickSyntax;
+        const valueMatches = 'success' === (window as any)['shortycutBrowserTest'];
+        delete (window as any)['shortycutBrowserTest'];
+        return valueMatches;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -57,11 +59,30 @@ namespace shortycut {
 
     export function assertNotNull<T>(value: T): Exclude<T, null | undefined> {
         if (undefined === value) {
-            throw 'Value is undefined';
+            throw new Error('Value is undefined');
         } else if (null === value) {
-            throw 'Value is null';
+            throw new Error('Value is null');
         } else {
             return value as Exclude<T, null | undefined>;
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Get the current URL's base path (without the file)
+    //------------------------------------------------------------------------------------------------------------------
+
+    export function getWindowLocationPath() {
+        const url = window.location.href.replace(/[#?].*/, '');
+        const index = url.lastIndexOf('/');
+        const lastPathSegment = url.substring(index + 1);
+        if (lastPathSegment) {
+            if (0 <= lastPathSegment.indexOf('.')) {
+                return url.substring(0, index + 1);
+            } else {
+                return `${url}/`;
+            }
+        } else {
+            return url;
         }
     }
 }

@@ -40,7 +40,10 @@ namespace shortycut {
 
             let indexPath = 'shortycut';
             if (0 === window.location.href.search(/^(file:\/{2}|[a-z]:|\/)/i)) {
-                indexPath = window.location.href.replace(/^file:\/+/, '').replace(/\/?(index\.html)?([?#].*)?$/, '');
+                indexPath = getWindowLocationPath()
+                    .replace(/^file:\/+/, '')
+                    .replace(/[?#].*/, '')
+                    .replace(/\/$/, '');
                 if (':' === indexPath.charAt(1)) {
                     indexPath = indexPath.replace(/\//g, '\\');
                 }

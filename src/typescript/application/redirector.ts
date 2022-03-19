@@ -25,31 +25,7 @@ namespace shortycut {
                 document.title = 'ShortyCut';
                 this.showSetupPage(setup);
             } else if (shortcut) {
-                shortcut.replacePlaceholders(queryParameters.searchTerm);
-                if (queryParameters.index && shortcut.all[queryParameters.index]) {
-                    this.redirect(
-                        [shortcut.all[queryParameters.index].link],
-                        OnMultiLink.OPEN_IN_NEW_TAB,
-                        queryParameters.searchTerm,
-                        RedirectMode.ERASE_HISTORY
-                    );
-                } else if (shortcut.queries && (queryParameters.searchTerm || !shortcut.bookmarks)) {
-                    this.redirect(
-                        shortcut.queries.current,
-                        shortcut.queries.onMultiLink,
-                        queryParameters.searchTerm,
-                        RedirectMode.ERASE_HISTORY
-                    );
-                } else if (shortcut.bookmarks) {
-                    this.redirect(
-                        shortcut.bookmarks.current,
-                        shortcut.bookmarks.onMultiLink,
-                        queryParameters.searchTerm,
-                        RedirectMode.ERASE_HISTORY
-                    );
-                } else {
-                    throw new Exception('Internal error', 'Found no links to use for redirection');
-                }
+                this.redirectShortcut(shortcut);
             } else if (isUrl(queryParameters.fullQuery)) {
                 this.openUrl(queryParameters.fullQuery, RedirectMode.ERASE_HISTORY);
             } else if (!queryParameters.keyword || !defaultSearchEngine || !config.defaultSearchEngine.useInAddressBar || isHomepageKeyword) {
@@ -73,6 +49,34 @@ namespace shortycut {
                     queryParameters.fullQuery,
                     RedirectMode.ERASE_HISTORY
                 );
+            }
+        }
+
+        private redirectShortcut(shortcut: Shortcut) {
+            shortcut.replacePlaceholders(queryParameters.searchTerm);
+            if (queryParameters.index && shortcut.all[queryParameters.index]) {
+                this.redirect(
+                    [shortcut.all[queryParameters.index].link],
+                    OnMultiLink.OPEN_IN_NEW_TAB,
+                    queryParameters.searchTerm,
+                    RedirectMode.ERASE_HISTORY
+                );
+            } else if (shortcut.queries && (queryParameters.searchTerm || !shortcut.bookmarks)) {
+                this.redirect(
+                    shortcut.queries.current,
+                    shortcut.queries.onMultiLink,
+                    queryParameters.searchTerm,
+                    RedirectMode.ERASE_HISTORY
+                );
+            } else if (shortcut.bookmarks) {
+                this.redirect(
+                    shortcut.bookmarks.current,
+                    shortcut.bookmarks.onMultiLink,
+                    queryParameters.searchTerm,
+                    RedirectMode.ERASE_HISTORY
+                );
+            } else {
+                throw new Exception('Internal error', 'Found no links to use for redirection');
             }
         }
 

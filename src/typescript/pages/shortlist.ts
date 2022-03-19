@@ -121,7 +121,7 @@ namespace shortycut {
             }
 
             const id = document.activeElement?.id || '';
-            const current = id.match(/^shortlist[0-9]+$/) ? parseInt(id.replace(/shortlist/, '')) : -1;
+            const current = id.match(/^shortlist\d+$/) ? parseInt(id.replace(/shortlist/, '')) : -1;
 
             if ('Enter' === event.key) {
                 if (0 === current) {

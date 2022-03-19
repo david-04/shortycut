@@ -63,7 +63,9 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private get children() {
-            return this._children = this._children ?? this.initializeChildren();
+            const children = this._children ?? this.initializeChildren()
+            this._children = children;
+            return children;
         }
 
         private initializeChildren() {
@@ -83,41 +85,45 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private childSuggestions(maxResults: number, postKeywordInput: string) {
-
             if (!this._suggestions) {
+                const shortcuts = this.getChildShortcuts(postKeywordInput ? this.level : 999);
+                this._suggestions = this.calculateChildSuggestions(maxResults, shortcuts)
+            }
+            return this._suggestions;
+        }
 
-                const matches = new Hashtable<{ match: MatchingSegment, shortcuts: Shortcut[] }>();
-                let count = 0;
-                const maxLength = postKeywordInput ? this.level : 999;
-                const shortcuts = this.shortcuts.filter(shortcut =>
-                    this.level === shortcut.keyword.length && shortcut.keyword.length <= maxLength
-                );
-                this.shortcuts
-                    .filter(shortcut => this.level < shortcut.keyword.length && shortcut.keyword.length <= maxLength)
-                    .forEach(shortcut => shortcuts.push(shortcut));
-
-                for (const shortcut of shortcuts) {
-                    for (const match of shortcut.getSegmentMatches(this.level)) {
-                        const nonPartialMatch = matches.values.filter(item => item.match.keyword === match.keyword)[0];
-                        if (nonPartialMatch) {
-                            nonPartialMatch.match.hidesMoreChildren = true;
-                            continue;
-                        }
-                        matches.computeIfAbsent(match.fingerprint, () => { count++; return { match, shortcuts: [] } })
-                            .shortcuts.push(shortcut);
-                        if (maxResults <= count) {
-                            break;
-                        }
+        private calculateChildSuggestions(maxResults: number, shortcuts: Shortcut[]) {
+            const matches = new Hashtable<{ match: MatchingSegment, shortcuts: Shortcut[] }>();
+            let count = 0;
+            for (const shortcut of shortcuts) {
+                for (const match of shortcut.getSegmentMatches(this.level)) {
+                    const nonPartialMatch = matches.values.filter(item => item.match.keyword === match.keyword)[0];
+                    if (nonPartialMatch) {
+                        nonPartialMatch.match.hidesMoreChildren = true;
+                        continue;
                     }
+                    matches.computeIfAbsent(match.fingerprint, () => { count++; return { match, shortcuts: [] } })
+                        .shortcuts.push(shortcut);
                     if (maxResults <= count) {
                         break;
                     }
                 }
-
-                this._suggestions = matches.values.map(match => this.createChildSuggestion(match.match, match.shortcuts));
+                if (maxResults <= count) {
+                    break;
+                }
             }
 
-            return this._suggestions;
+            return matches.values.map(match => this.createChildSuggestion(match.match, match.shortcuts));
+        }
+
+        private getChildShortcuts(maxLength: number) {
+            const shortcuts = this.shortcuts.filter(shortcut =>
+                this.level === shortcut.keyword.length && shortcut.keyword.length <= maxLength
+            );
+            this.shortcuts
+                .filter(shortcut => this.level < shortcut.keyword.length && shortcut.keyword.length <= maxLength)
+                .forEach(shortcut => shortcuts.push(shortcut));
+            return shortcuts;
         }
 
         private createChildSuggestion(match: MatchingSegment, shortcuts: Shortcut[]): Suggestion {
@@ -132,8 +138,9 @@ namespace shortycut {
                 ? ` <span class='more-indicator-text'>${Segments.SEPARATOR_HTML} ...</span>`
                 : '';
 
+            const segmentOrSuggestion = match.isPartial ? 'segment' : 'suggestion';
             return {
-                type: this.level === match.keyword.length ? 'match' : (match.isPartial ? 'segment' : 'suggestion'),
+                type: this.level === match.keyword.length ? 'match' : segmentOrSuggestion,
                 keyword: match.keyword,
                 keywordHtml,
                 descriptionHtml: match.descriptionHtml + descriptionHtmlSuffix,
@@ -242,8 +249,9 @@ namespace shortycut {
         private highlightMatch(text: string, mask: Array<boolean>) {
 
             const result = new Array<string>();
-            for (let start = 0; start < mask.length; start++) {
-                let end = start + 1;
+            let end = 0;
+            for (let start = 0; start < mask.length; start = end) {
+                end = start + 1;
                 for (; end < mask.length && mask[end - 1] === mask[end]; end++) {
                     // find the end index
                 }
@@ -252,7 +260,6 @@ namespace shortycut {
                     section = `<span class='matched-substring'>${section}</span>`;
                 }
                 result.push(section);
-                start = end - 1;
             }
 
             return replaceAll(result.join(''), Segments.SEPARATOR_PLACEHOLDER, Segments.SEPARATOR_HTML, false);
@@ -263,7 +270,9 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private get dictionary() {
-            return (Filter._dictionary = Filter._dictionary ?? Filter.initializeDictionary());
+            const dictionary = Filter._dictionary ?? Filter.initializeDictionary();
+            Filter._dictionary = dictionary;
+            return dictionary;
         }
 
         private static initializeDictionary() {
@@ -279,7 +288,9 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private get allLinks() {
-            return (Filter._allLinks = Filter._allLinks ?? Filter.initializeLinks());
+            const allLinks = Filter._allLinks ?? Filter.initializeLinks()
+            Filter._allLinks = allLinks;
+            return allLinks;
         }
 
         private static initializeLinks(): Array<SearchableLink> {
@@ -288,7 +299,8 @@ namespace shortycut {
             shortcuts.values.forEach(shortcut =>
                 result.push(...shortcut.all.filter(item => this.includeOverriddenShortcuts || !item.link.overridden))
             );
-            return result.sort(comparing((item => item.link.segments.description))).map(item => ({
+            result.sort(comparing((item => item.link.segments.description)));
+            return result.map(item => ({
                 link: item.link,
                 links: item.links,
                 keyword: item.link.keyword,

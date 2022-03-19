@@ -163,8 +163,7 @@ namespace shortycut {
 
             const cache = new Hashtable<Hashtable<FaviconCacheEntry>>();
             const table = data.split(FaviconCache.LINE_SEPARATOR).map(line => line.split(FaviconCache.COLUMN_SEPARATOR));
-            for (let index = 0; index < table.length; index++) {
-                const row = table[index];
+            for (const row of table) {
                 if (1 === row.length % 3) {
                     const origins = cache.computeIfAbsent(row[0], () => new Hashtable<FaviconCacheEntry>());
                     for (let offset = 1; offset + 2 < row.length; offset += 3) {
@@ -182,9 +181,8 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private deleteStorage() {
-
             if (this.storage) {
-                for (let index = 0; true; index++) {
+                for (let index = 0; ; index++) {
                     const key = this.getStorageKey(index);
                     if (!this.storage.getItem(key)) {
                         break;
@@ -195,40 +193,44 @@ namespace shortycut {
         }
 
         private writeStorage(data: string) {
-
             if (this.storage) {
                 this.deleteStorage();
-                for (let index = 0, size = data.length; data; size = Math.min(Math.ceil(size / 2), data.length)) {
+                let index = 0;
+                let size = data.length
+                while (data) {
                     try {
-                        for (; data; index++, size = Math.min(size, data.length)) {
+                        while (data) {
                             this.storage.setItem(this.getStorageKey(index), data.substring(0, size));
                             data = data.substring(size);
+                            size = Math.min(size, data.length);
+                            index++;
                         }
                     } catch (exception) {
                         if (size < 100) {
                             throw exception;
                         }
                     }
+                    size = Math.min(Math.ceil(size / 2), data.length);
                 }
             }
         }
 
         private readStorage() {
-
             let result = '';
-            let segment: string | null;
             if (this.storage) {
-                for (let index = 0; segment = this.storage.getItem(this.getStorageKey(index)); index++) {
+                for (let index = 0, segment = this.storage.getItem(this.getStorageKey(index));
+                    segment; segment = this.storage.getItem(this.getStorageKey(index++))) {
                     result += segment;
                 }
             }
             return result;
         }
 
+
         private canWriteToStorage() {
 
             const key = this.getStorageKey(-1);
-            const value = `${Math.random()}`;
+            const value = "0.8802878642890799";
             let canWrite = false;
             runAndIgnoreErrors(() => {
                 if (this.storage) {

@@ -31,7 +31,9 @@ namespace shortycut {
         }
 
         public computeIfAbsent(key: string, supplier: (((key: string) => T) | (() => T))): T {
-            return this.data[key] = this.data[key] ?? supplier(key);
+            const value = this.data[key] ?? supplier(key)
+            this.data[key] = value;
+            return value;
         }
 
         public delete(key: string) {
