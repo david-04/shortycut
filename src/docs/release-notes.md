@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) Release notes
 
-## Version 1.3-DEV | not released yet
+## Version 1.3 | 2022-09-11
 
 - Added support for [search buckets](search-buckets.md)
 - Improved the suggestion list for non-query keywords

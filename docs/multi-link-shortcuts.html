@@ -24,7 +24,6 @@
   
   <script src="js/jquery-2.1.1.min.js" defer></script>
   <script src="js/modernizr-2.8.3.min.js" defer></script> 
-  
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -38,7 +37,7 @@
         <a href="index.html" class="icon icon-home"> ShortyCut</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -64,6 +63,8 @@
                     <li class="toctree-l1"><a class="reference internal" href="shortcut-syntax.html">Shortcut syntax</a>
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="multi-link-shortcuts.html">Multi-link shortcuts</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="search-buckets.html">Search buckets</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="post-links.html">POST links</a>
                     </li>
@@ -111,7 +112,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href=".">ShortyCut</a>
+        <a href="index.html">ShortyCut</a>
       </nav>
 
       
@@ -119,7 +120,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".">ShortyCut</a> &raquo;</li>
+    <li><a href="index.html">ShortyCut</a> &raquo;</li>
     
       
         
@@ -135,6 +136,7 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
@@ -204,6 +206,8 @@ The keyword will eventually have three links (finance, sports, and world news).
 A list will be displayed, because the last link (world news) has a question mark (<code>?</code>).
 If it didn't have any indicator, the configured default behavior would apply.
 The caret (<code>^</code>) in front of the sports link is always ignored and can be omitted.</p>
+<h2 id="search-buckets"><img alt="" src="img/arrow.svg" /> Search buckets</h2>
+<p>The hash symbol (<code>#</code>) in front of a link marks it as "searchable". These links are not directly opened through the keyword but are accessible via full-text search only. Searchable links exist in parallel to the regular links that open new tabs or show an interactive list. Please see "<a href="search-buckets.html">Search buckets</a>" for a more detailed explanation.</p>
               
             </div>
           </div>
@@ -211,7 +215,7 @@ The caret (<code>^</code>) in front of the sports link is always ignored and can
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="post-links.html" class="btn btn-neutral float-right" title="POST links">Next  &#x25BA;</a>
+        <a href="search-buckets.html" class="btn btn-neutral float-right" title="Search buckets">Next  &#x25BA;</a>
       
       
         <a href="shortcut-syntax.html" class="btn btn-neutral" title="Shortcut syntax">&#x25C4;  Previous</a>
@@ -237,17 +241,18 @@ The caret (<code>^</code>) in front of the sports link is always ignored and can
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="shortcut-syntax.html" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="post-links.html" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="shortcut-syntax.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="search-buckets.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
     <script src="js/theme.js" defer></script>
       <script src="search/main.js" defer></script>
     <script defer>
