@@ -7,21 +7,25 @@ namespace shortycut {
     export class Homepage implements Page {
 
         private readonly dom = {
-            filter: document.querySelector('#home .input') as HTMLInputElement,
-            home: document.querySelector('#home') as HTMLDivElement,
-            suggestions: document.querySelector('#home .suggestions') as HTMLElement,
-            headerRow: document.querySelector('#home > .row') as HTMLElement,
+            filter: document.querySelector("#home .input") as HTMLInputElement,
+            home: document.querySelector("#home") as HTMLDivElement,
+            suggestions: document.querySelector("#home .suggestions") as HTMLElement,
+            headerRow: document.querySelector("#home > .row") as HTMLElement,
             rows: new Array<HTMLElement>(),
             notification: {
-                self: document.querySelector('#home .notification') as HTMLElement,
+                self: document.querySelector("#home .notification") as HTMLElement,
                 welcome: {
-                    self: document.querySelector('#home .notification .welcome') as HTMLElement,
-                    newTabs: document.querySelector('#home .notification .welcome .new-tabs') as HTMLElement,
+                    self: document.querySelector("#home .notification .welcome") as HTMLElement,
+                    newTabs: document.querySelector("#home .notification .welcome .new-tabs") as HTMLElement,
                 },
-                applicationErrors: document.querySelector('#home .notification .application-errors') as HTMLElement,
-                noShortcutsNoError: document.querySelector('#home .notification .no-shortcuts-no-error') as HTMLElement,
-                errorWithBacktickSupport: document.querySelector('#home .notification .error-with-backtick-support') as HTMLElement,
-                errorWithoutBacktickSupport: document.querySelector('#home .notification .error-without-backtick-support') as HTMLElement,
+                applicationErrors: document.querySelector("#home .notification .application-errors") as HTMLElement,
+                noShortcutsNoError: document.querySelector("#home .notification .no-shortcuts-no-error") as HTMLElement,
+                errorWithBacktickSupport: document.querySelector(
+                    "#home .notification .error-with-backtick-support"
+                ) as HTMLElement,
+                errorWithoutBacktickSupport: document.querySelector(
+                    "#home .notification .error-without-backtick-support"
+                ) as HTMLElement,
             }
         };
 
@@ -29,7 +33,7 @@ namespace shortycut {
         private readonly filter = new Filter(Homepage.MAX_SUGGESTIONS);
         private suggestions = new Array<Suggestion>();
         private selectedIndex = -1;
-        private originalInput = '';
+        private originalInput = "";
         private previousInput?: string;
         private lastCancelClearFilterEvent = -1;
         private clearFilterJob?: number;
@@ -57,42 +61,42 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public populate(query?: string) {
-            this.dom.filter.value = query ?? '';
+            this.dom.filter.value = query ?? "";
             this.previousInput = undefined;
-            this.originalInput = '';
-            this.dom.suggestions.innerHTML = '';
+            this.originalInput = "";
+            this.dom.suggestions.innerHTML = "";
             this.selectSuggestion(-1);
             this.onFilterChanged();
             if (queryParameters.facets.noFocus) {
-                this.dom.headerRow.classList.add('no-focus');
+                this.dom.headerRow.classList.add("no-focus");
             }
             return this;
         }
 
         public populateNotification() {
             if (startupCache.initializationErrors.length) {
-                this.dom.notification.applicationErrors.innerHTML = create('div.header',
+                this.dom.notification.applicationErrors.innerHTML = create("div.header",
                     1 === startupCache.initializationErrors.length
-                        ? 'An error occurred during initialization'
-                        : 'Errors occurred during initialization'
+                        ? "An error occurred during initialization"
+                        : "Errors occurred during initialization"
                 ).outerHTML;
                 startupCache.initializationErrors
                     .map(error => error.toHtml())
                     .forEach(element => this.dom.notification.applicationErrors.appendChild(element));
-                this.dom.notification.applicationErrors.style.display = 'block';
+                this.dom.notification.applicationErrors.style.display = "block";
             } else if (0 === shortcuts.size) {
                 if (startupCache.exceptions.length) {
                     if (supportsBacktickSyntax()) {
-                        this.dom.notification.errorWithBacktickSupport.style.display = 'block';
+                        this.dom.notification.errorWithBacktickSupport.style.display = "block";
                     } else {
-                        this.dom.notification.errorWithoutBacktickSupport.style.display = 'block';
+                        this.dom.notification.errorWithoutBacktickSupport.style.display = "block";
                     }
                 } else {
-                    this.dom.notification.noShortcutsNoError.style.display = 'block';
+                    this.dom.notification.noShortcutsNoError.style.display = "block";
                 }
             } else if (isDemoMode()) {
-                this.dom.notification.welcome.newTabs.style.display = queryParameters.facets.newTabs ? 'none' : 'block';
-                this.dom.notification.welcome.self.style.display = 'block';
+                this.dom.notification.welcome.newTabs.style.display = queryParameters.facets.newTabs ? "none" : "block";
+                this.dom.notification.welcome.self.style.display = "block";
             }
         }
 
@@ -102,14 +106,14 @@ namespace shortycut {
 
         public show() {
             this.addEventHandlers();
-            this.dom.home.style.display = 'flex';
+            this.dom.home.style.display = "flex";
             this.dom.filter.focus();
             this.updateFaviconManagerParameters(true);
         }
 
         public hide() {
             this.removeEventHandlers();
-            this.dom.home.style.display = 'none';
+            this.dom.home.style.display = "none";
             this.updateFaviconManagerParameters(false);
         }
 
@@ -118,39 +122,39 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private addEventHandlers() {
-            ['change', 'keydown', 'input'].forEach(event =>
+            ["change", "keydown", "input"].forEach(event =>
                 this.dom.filter.addEventListener(event, this.onFilterChanged)
             );
-            ['focus', 'blur'].forEach(event =>
+            ["focus", "blur"].forEach(event =>
                 [window, document, document.body, this.dom.filter].forEach(element =>
                     element.addEventListener(event, this.onFocusEvent)
                 )
             );
             if (queryParameters.facets.noFocus) {
-                ['mousedown', 'keydown', 'blur'].forEach(event =>
+                ["mousedown", "keydown", "blur"].forEach(event =>
                     window.addEventListener(event, this.cancelClearFilter)
                 );
-                this.dom.filter.addEventListener('blur', this.scheduleClearFilter);
+                this.dom.filter.addEventListener("blur", this.scheduleClearFilter);
             }
-            document.addEventListener('keydown', this.onKeyBody);
+            document.addEventListener("keydown", this.onKeyBody);
         }
 
         private removeEventHandlers() {
-            ['change', 'keydown', 'input'].forEach(event =>
+            ["change", "keydown", "input"].forEach(event =>
                 this.dom.filter.removeEventListener(event, this.onFilterChanged)
             );
-            ['focus', 'blur'].forEach(event =>
+            ["focus", "blur"].forEach(event =>
                 [window, document, document.body, this.dom.filter].forEach(element =>
                     element.removeEventListener(event, this.onFocusEvent)
                 )
             );
             if (queryParameters.facets.noFocus) {
-                ['mousedown', 'keydown', 'blur'].forEach(event =>
+                ["mousedown", "keydown", "blur"].forEach(event =>
                     window.removeEventListener(event, this.cancelClearFilter)
                 );
-                this.dom.filter.removeEventListener('blur', this.scheduleClearFilter);
+                this.dom.filter.removeEventListener("blur", this.scheduleClearFilter);
             }
-            document.removeEventListener('keydown', this.onKeyBody);
+            document.removeEventListener("keydown", this.onKeyBody);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -159,30 +163,30 @@ namespace shortycut {
 
         private onKeyBody(event: KeyboardEvent) {
 
-            const isRightArrow = ('ArrowRight' === event.key || 'Right' === event.key)
+            const isRightArrow = ("ArrowRight" === event.key || "Right" === event.key)
                 && 0 <= this.selectedIndex
                 && (
                     this.suggestions[this.selectedIndex].hidesMoreChildren
-                    || 'segment' === this.suggestions[this.selectedIndex].type
+                    || "segment" === this.suggestions[this.selectedIndex].type
                 );
 
             if (!queryParameters.facets.noFocus) {
                 this.dom.filter.focus();
             }
 
-            if ('Escape' === event.key || 'Esc' === event.key) {
+            if ("Escape" === event.key || "Esc" === event.key) {
                 return this.onEscape(event);
-            } else if ('ArrowDown' === event.key || 'Down' === event.key) {
+            } else if ("ArrowDown" === event.key || "Down" === event.key) {
                 this.selectSuggestion(this.selectedIndex + 1);
                 event.preventDefault();
                 return false;
-            } else if ('ArrowUp' === event.key || 'Up' === event.key) {
+            } else if ("ArrowUp" === event.key || "Up" === event.key) {
                 this.selectSuggestion(this.selectedIndex - 1);
                 event.preventDefault();
                 return false;
-            } else if ('Enter' === event.key || isRightArrow) {
+            } else if ("Enter" === event.key || isRightArrow) {
                 return this.onEnter(event, isRightArrow);
-            } else if ('q' === event.key && event.ctrlKey) {
+            } else if ("q" === event.key && event.ctrlKey) {
                 this.dom.filter.focus();
             }
             return true;
@@ -251,7 +255,7 @@ namespace shortycut {
             if (!queryParameters.facets.noFocus || this.dom.filter.value) {
                 this.dom.filter.focus();
             }
-            this.dom.filter.value = '';
+            this.dom.filter.value = "";
             this.applyFilter();
         }
 
@@ -261,8 +265,8 @@ namespace shortycut {
 
             const input = this.dom.filter.value;
             const splitInput = input.split(/\s+/).map(word => word.trim()).filter(word => word);
-            const keyword = adjustCase(splitInput[0] ?? '');
-            const postKeywordInput = input.replace(/^\s*/, '').substring(keyword.length);
+            const keyword = adjustCase(splitInput[0] ?? "");
+            const postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
 
             if (keyword) {
                 const shortcut = shortcuts.get(keyword);
@@ -272,8 +276,12 @@ namespace shortycut {
             this.renderSuggestions(input, autoSelectFirstRow);
         }
 
-        private collectSuggestions(keyword: string, splitInput: string[], postKeywordInput: string, shortcut?: Shortcut) {
-            if (!postKeywordInput) {
+        private collectSuggestions(
+            keyword: string, splitInput: string[], postKeywordInput: string, shortcut?: Shortcut
+        ) {
+            if (shortcut && shortcut.queries && postKeywordInput) {
+                this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
+            } else if (!postKeywordInput) {
                 this.suggestions.push(...this.filter.keywordSearch(keyword, postKeywordInput));
             } else if (shortcut) {
                 if (shortcut.searchable) {
@@ -281,9 +289,9 @@ namespace shortycut {
                 }
                 if (!this.suggestions.length) {
                     if (shortcut.queries && 1 < splitInput.length && shortcut.queries) {
-                        this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
+                        this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
                     } else if (shortcut.bookmarks && !postKeywordInput) {
-                        this.suggestions.push(this.createSuggestion(shortcut, 'match', 'bookmark'));
+                        this.suggestions.push(this.createSuggestion(shortcut, "match", "bookmark"));
                     }
                 }
             }
@@ -298,15 +306,16 @@ namespace shortycut {
             this.previousInput = input;
             if (autoSelectFirstRow && 0 < this.suggestions.length) {
                 this.selectedIndex = 0;
-                this.dom.rows[0].classList.add('selected');
+                this.dom.rows[0].classList.add("selected");
             } else {
                 this.selectedIndex = -1;
-                this.dom.headerRow.classList.add('selected');
+                this.dom.headerRow.classList.add("selected");
             }
 
-            this.dom.notification.self.style.display = 0 < this.suggestions.length || this.dom.filter.value.trim().length
-                ? 'none'
-                : 'block';
+            this.dom.notification.self.style.display =
+                0 < this.suggestions.length || this.dom.filter.value.trim().length
+                    ? "none"
+                    : "block";
             this.updateInputFieldHighlight();
         }
 
@@ -314,20 +323,22 @@ namespace shortycut {
             const suggestions = this.filter.fullTextSearch(searchTerms, shortcut.keyword);
             if (suggestions.length) {
                 if (shortcut.queries) {
-                    return [...suggestions, this.createSuggestion(shortcut, 'suggestion', 'query')];
+                    return [...suggestions, this.createSuggestion(shortcut, "suggestion", "query")];
                 } else {
                     return suggestions;
                 }
             } else if (shortcut.queries) {
-                return [this.createSuggestion(shortcut, 'match', 'query')];
+                return [this.createSuggestion(shortcut, "match", "query")];
             } else if (shortcut.bookmarks) {
-                return [this.createSuggestion(shortcut, 'match', 'bookmark')];
+                return [this.createSuggestion(shortcut, "match", "bookmark")];
             }
             return suggestions;
         }
 
         private createSuggestion(shortcut: Shortcut, type: SuggestionType, shortcutType: ShortcutType): Suggestion {
-            const links = 'bookmark' === shortcutType ? assertNotNull(shortcut.bookmarks) : assertNotNull(shortcut.queries);
+            const links = "bookmark" === shortcutType
+                ? assertNotNull(shortcut.bookmarks)
+                : assertNotNull(shortcut.queries);
             return {
                 type,
                 keyword: shortcut.keyword,
@@ -344,16 +355,18 @@ namespace shortycut {
             this.updateFaviconManagerParameters(true);
             this.dom.rows = this.suggestions.map((suggestion, index) =>
                 create(`div.row.${suggestion.type}.${suggestion.shortcutType}`, [
-                    create('div.cursor', create('img.icon', element => (element as HTMLImageElement).src = 'resources/arrow.svg')),
-                    create('div.row-content', [
+                    create("div.cursor", create("img.icon", element =>
+                        (element as HTMLImageElement).src = "resources/arrow.svg"
+                    )),
+                    create("div.row-content", [
                         config.homepage.suggestions.showKeywords
-                            ? create('div.keyword:html', suggestion.keywordHtml)
-                            : '',
+                            ? create("div.keyword:html", suggestion.keywordHtml)
+                            : "",
                         config.homepage.suggestions.showFavicons
                             ? faviconManager.getFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
-                            : '',
-                        create('div.description:html', this.getDescription(suggestion))
-                    ], rowContent => rowContent.addEventListener('click', (event: MouseEvent) => {
+                            : "",
+                        create("div.description:html", this.getDescription(suggestion))
+                    ], rowContent => rowContent.addEventListener("click", (event: MouseEvent) => {
                         this.selectSuggestion(index);
                         this.applySuggestion(
                             this.selectedIndex,
@@ -363,27 +376,27 @@ namespace shortycut {
                     }))
                 ])
             );
-            this.dom.suggestions.innerHTML = '';
+            this.dom.suggestions.innerHTML = "";
             this.dom.rows.forEach(row => this.dom.suggestions.appendChild(row));
 
             if (Homepage.MAX_SUGGESTIONS <= this.suggestions.length) {
-                this.dom.suggestions.classList.add('truncated');
+                this.dom.suggestions.classList.add("truncated");
             } else {
-                this.dom.suggestions.classList.remove('truncated');
+                this.dom.suggestions.classList.remove("truncated");
             }
         }
 
         private getDescription(suggestion: Suggestion) {
-            if (suggestion.hidesMoreChildren || suggestion.type === 'segment') {
-                return create('div:html', [
+            if (suggestion.hidesMoreChildren || suggestion.type === "segment") {
+                return create("div:html", [
                     suggestion.descriptionHtml,
-                    ' ',
-                    create('span.more-indicator-text:html',
+                    " ",
+                    create("span.more-indicator-text:html",
                         `${Segments.SEPARATOR_HTML} ...`
                     ),
-                    create('span.more-indicator-key:html',
-                        create('span.key:html', '&rarr;'),
-                        ' more'
+                    create("span.more-indicator-key:html",
+                        create("span.key:html", "&rarr;"),
+                        " more"
                     )
                 ]);
             } else {
@@ -395,19 +408,19 @@ namespace shortycut {
 
             const hasInput = !!this.dom.filter.value.trim();
             const canUseSearchEngine = defaultSearchEngine && config.defaultSearchEngine.useOnHomepage;
-            const focusOnSuggestion = this.selectedIndex != -1;
+            const focusOnSuggestion = this.selectedIndex !== -1;
             const hasFullTextSearchSuggestions = !!this.suggestions.length;
-            const hasMatches = !!this.suggestions.filter(suggestion => suggestion.type != 'search-result').length;
+            const hasMatches = !!this.suggestions.filter(suggestion => suggestion.type !== "search-result").length;
 
             if (!hasInput || canUseSearchEngine || focusOnSuggestion || hasMatches) {
-                this.dom.filter.classList.remove('error');
-                this.dom.filter.classList.remove('warning');
+                this.dom.filter.classList.remove("error");
+                this.dom.filter.classList.remove("warning");
             } else if (hasFullTextSearchSuggestions) {
-                this.dom.filter.classList.remove('error');
-                this.dom.filter.classList.add('warning');
+                this.dom.filter.classList.remove("error");
+                this.dom.filter.classList.add("warning");
             } else {
-                this.dom.filter.classList.add('error');
-                this.dom.filter.classList.remove('warning');
+                this.dom.filter.classList.add("error");
+                this.dom.filter.classList.remove("warning");
             }
         }
 
@@ -425,16 +438,16 @@ namespace shortycut {
                     this.originalInput = this.dom.filter.value;
                 }
 
-                (this.dom.rows[this.selectedIndex] ?? this.dom.headerRow).classList.remove('selected');
+                (this.dom.rows[this.selectedIndex] ?? this.dom.headerRow).classList.remove("selected");
                 this.selectedIndex = index;
-                (this.dom.rows[this.selectedIndex] ?? this.dom.headerRow).classList.add('selected');
+                (this.dom.rows[this.selectedIndex] ?? this.dom.headerRow).classList.add("selected");
 
                 if (-1 === this.selectedIndex) {
                     this.previousInput = this.dom.filter.value = this.originalInput;
                 } else {
                     const suggestion = this.suggestions[this.selectedIndex];
                     const keyword = this.suggestions[this.selectedIndex].keyword;
-                    if (suggestion.type !== 'segment' && suggestion.shortcutType !== 'bookmark') {
+                    if (suggestion.type !== "segment" && suggestion.shortcutType !== "bookmark") {
                         this.previousInput = `${keyword} `;
                     } else {
                         this.previousInput = keyword;
@@ -456,19 +469,19 @@ namespace shortycut {
             const suggestion = this.suggestions[selectedIndex];
             const shortcut = suggestion.shortcut;
 
-            if (suggestion.type === 'segment' || (viaRightArrow && suggestion.hidesMoreChildren)) {
+            if (suggestion.type === "segment" || (viaRightArrow && suggestion.hidesMoreChildren)) {
                 this.applyFilter(viaRightArrow && suggestion.hidesMoreChildren);
-            } else if (suggestion.type === 'search-result') {
+            } else if (suggestion.type === "search-result") {
                 this.applySearchResult(suggestion, viaRightArrow, mode);
             } else if (shortcut.bookmarks) {
                 redirector.redirect(
                     shortcut.bookmarks.current,
                     viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : shortcut.bookmarks.onMultiLink,
-                    '',
+                    "",
                     mode
                 );
             } else if (shortcut.queries) {
-                const searchTerm = prompt('Search term')?.trim();
+                const searchTerm = prompt("Search term")?.trim();
                 if (searchTerm) {
                     redirector.redirect(
                         shortcut.queries.current,
@@ -481,7 +494,7 @@ namespace shortycut {
 
         private applySearchResult(suggestion: Suggestion, viaRightArrow: boolean, mode: RedirectMode) {
             if (suggestion.link?.isQuery) {
-                const searchTerm = prompt('Search term')?.trim();
+                const searchTerm = prompt("Search term")?.trim();
                 if (searchTerm) {
                     redirector.redirect(
                         [suggestion.link],
@@ -494,7 +507,7 @@ namespace shortycut {
                 redirector.redirect(
                     [suggestion.link],
                     viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink,
-                    '',
+                    "",
                     mode
                 );
             }
@@ -507,17 +520,17 @@ namespace shortycut {
         private redirect(mode: RedirectMode) {
 
             const input = this.dom.filter.value.trim();
-            const keyword = adjustCase(input.replace(/\s.*/, ''));
+            const keyword = adjustCase(input.replace(/\s.*/, ""));
             const shortcut = shortcuts.get(keyword);
-            const postKeywordInput = input.replace(/^\s*/, '').substring(keyword.length);
-            let searchTerm: string | undefined = input.replace(/^[^\s]*\s*/, '');
+            const postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
+            let searchTerm: string | undefined = input.replace(/^[^\s]*\s*/, "");
 
             if (postKeywordInput && (shortcut.searchable || !shortcut.queries) && this.suggestions.length) {
                 return this.applySuggestion(0, mode, false);
             }
 
             if (!shortcut?.bookmarks && shortcut?.queries && !searchTerm) {
-                searchTerm = searchTerm || prompt('Search term')?.trim();
+                searchTerm = searchTerm || prompt("Search term")?.trim();
                 if (!searchTerm) {
                     return;
                 }
@@ -530,9 +543,9 @@ namespace shortycut {
         private performRedirect(input: string, keyword: string, searchTerm: string, mode: RedirectMode, links?: Links) {
             if (links) {
                 if (1 < links.current.length && RedirectMode.NEW_TAB === mode) {
-                    const url = window.location.href.replace(/[?#].*/, '');
+                    const url = window.location.href.replace(/[?#].*/, "");
                     const query = encodeURIComponent(`${keyword} ${searchTerm}`.trim());
-                    redirector.openUrl(`${url}?${QueryParameters.QUERY}=${query}`, mode)
+                    redirector.openUrl(`${url}?${QueryParameters.QUERY}=${query}`, mode);
                 } else {
                     redirector.redirect(links.current, links.onMultiLink, searchTerm, mode);
                 }
@@ -540,7 +553,12 @@ namespace shortycut {
                 redirector.openUrl(input, mode);
             } else if (defaultSearchEngine?.queries && config.defaultSearchEngine.useOnHomepage) {
                 defaultSearchEngine.replacePlaceholders(input);
-                redirector.redirect(defaultSearchEngine.queries.current, defaultSearchEngine.queries.onMultiLink, input, mode);
+                redirector.redirect(
+                    defaultSearchEngine.queries.current,
+                    defaultSearchEngine.queries.onMultiLink,
+                    input,
+                    mode
+                );
             } else if (this.suggestions.length) {
                 this.selectedIndex = 0;
                 this.applySuggestion(this.selectedIndex, mode, false);

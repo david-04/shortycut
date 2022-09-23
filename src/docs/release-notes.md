@@ -1,5 +1,9 @@
 # ![](img/arrow.svg) Release notes
 
+## Version 1.3.1 | 2022-09-23
+
+- Tweaked the homepage's suggestion filter (avoiding unnecessary full-text searches)
+
 ## Version 1.3 | 2022-09-11
 
 - Added support for [search buckets](search-buckets.md)

@@ -2822,27 +2822,27 @@ var shortycut;
     var Homepage = (function () {
         function Homepage() {
             this.dom = {
-                filter: document.querySelector('#home .input'),
-                home: document.querySelector('#home'),
-                suggestions: document.querySelector('#home .suggestions'),
-                headerRow: document.querySelector('#home > .row'),
+                filter: document.querySelector("#home .input"),
+                home: document.querySelector("#home"),
+                suggestions: document.querySelector("#home .suggestions"),
+                headerRow: document.querySelector("#home > .row"),
                 rows: new Array(),
                 notification: {
-                    self: document.querySelector('#home .notification'),
+                    self: document.querySelector("#home .notification"),
                     welcome: {
-                        self: document.querySelector('#home .notification .welcome'),
-                        newTabs: document.querySelector('#home .notification .welcome .new-tabs'),
+                        self: document.querySelector("#home .notification .welcome"),
+                        newTabs: document.querySelector("#home .notification .welcome .new-tabs"),
                     },
-                    applicationErrors: document.querySelector('#home .notification .application-errors'),
-                    noShortcutsNoError: document.querySelector('#home .notification .no-shortcuts-no-error'),
-                    errorWithBacktickSupport: document.querySelector('#home .notification .error-with-backtick-support'),
-                    errorWithoutBacktickSupport: document.querySelector('#home .notification .error-without-backtick-support'),
+                    applicationErrors: document.querySelector("#home .notification .application-errors"),
+                    noShortcutsNoError: document.querySelector("#home .notification .no-shortcuts-no-error"),
+                    errorWithBacktickSupport: document.querySelector("#home .notification .error-with-backtick-support"),
+                    errorWithoutBacktickSupport: document.querySelector("#home .notification .error-without-backtick-support"),
                 }
             };
             this.filter = new shortycut.Filter(Homepage.MAX_SUGGESTIONS);
             this.suggestions = new Array();
             this.selectedIndex = -1;
-            this.originalInput = '';
+            this.originalInput = "";
             this.lastCancelClearFilterEvent = -1;
             this.onKeyBody = this.onKeyBody.bind(this);
             this.onFilterChanged = this.onFilterChanged.bind(this);
@@ -2856,118 +2856,118 @@ var shortycut;
             return true;
         };
         Homepage.prototype.populate = function (query) {
-            this.dom.filter.value = query !== null && query !== void 0 ? query : '';
+            this.dom.filter.value = query !== null && query !== void 0 ? query : "";
             this.previousInput = undefined;
-            this.originalInput = '';
-            this.dom.suggestions.innerHTML = '';
+            this.originalInput = "";
+            this.dom.suggestions.innerHTML = "";
             this.selectSuggestion(-1);
             this.onFilterChanged();
             if (shortycut.queryParameters.facets.noFocus) {
-                this.dom.headerRow.classList.add('no-focus');
+                this.dom.headerRow.classList.add("no-focus");
             }
             return this;
         };
         Homepage.prototype.populateNotification = function () {
             var _this = this;
             if (shortycut.startupCache.initializationErrors.length) {
-                this.dom.notification.applicationErrors.innerHTML = shortycut.create('div.header', 1 === shortycut.startupCache.initializationErrors.length
-                    ? 'An error occurred during initialization'
-                    : 'Errors occurred during initialization').outerHTML;
+                this.dom.notification.applicationErrors.innerHTML = shortycut.create("div.header", 1 === shortycut.startupCache.initializationErrors.length
+                    ? "An error occurred during initialization"
+                    : "Errors occurred during initialization").outerHTML;
                 shortycut.startupCache.initializationErrors
                     .map(function (error) { return error.toHtml(); })
                     .forEach(function (element) { return _this.dom.notification.applicationErrors.appendChild(element); });
-                this.dom.notification.applicationErrors.style.display = 'block';
+                this.dom.notification.applicationErrors.style.display = "block";
             }
             else if (0 === shortycut.shortcuts.size) {
                 if (shortycut.startupCache.exceptions.length) {
                     if (shortycut.supportsBacktickSyntax()) {
-                        this.dom.notification.errorWithBacktickSupport.style.display = 'block';
+                        this.dom.notification.errorWithBacktickSupport.style.display = "block";
                     }
                     else {
-                        this.dom.notification.errorWithoutBacktickSupport.style.display = 'block';
+                        this.dom.notification.errorWithoutBacktickSupport.style.display = "block";
                     }
                 }
                 else {
-                    this.dom.notification.noShortcutsNoError.style.display = 'block';
+                    this.dom.notification.noShortcutsNoError.style.display = "block";
                 }
             }
             else if (shortycut.isDemoMode()) {
-                this.dom.notification.welcome.newTabs.style.display = shortycut.queryParameters.facets.newTabs ? 'none' : 'block';
-                this.dom.notification.welcome.self.style.display = 'block';
+                this.dom.notification.welcome.newTabs.style.display = shortycut.queryParameters.facets.newTabs ? "none" : "block";
+                this.dom.notification.welcome.self.style.display = "block";
             }
         };
         Homepage.prototype.show = function () {
             this.addEventHandlers();
-            this.dom.home.style.display = 'flex';
+            this.dom.home.style.display = "flex";
             this.dom.filter.focus();
             this.updateFaviconManagerParameters(true);
         };
         Homepage.prototype.hide = function () {
             this.removeEventHandlers();
-            this.dom.home.style.display = 'none';
+            this.dom.home.style.display = "none";
             this.updateFaviconManagerParameters(false);
         };
         Homepage.prototype.addEventHandlers = function () {
             var _this = this;
-            ['change', 'keydown', 'input'].forEach(function (event) {
+            ["change", "keydown", "input"].forEach(function (event) {
                 return _this.dom.filter.addEventListener(event, _this.onFilterChanged);
             });
-            ['focus', 'blur'].forEach(function (event) {
+            ["focus", "blur"].forEach(function (event) {
                 return [window, document, document.body, _this.dom.filter].forEach(function (element) {
                     return element.addEventListener(event, _this.onFocusEvent);
                 });
             });
             if (shortycut.queryParameters.facets.noFocus) {
-                ['mousedown', 'keydown', 'blur'].forEach(function (event) {
+                ["mousedown", "keydown", "blur"].forEach(function (event) {
                     return window.addEventListener(event, _this.cancelClearFilter);
                 });
-                this.dom.filter.addEventListener('blur', this.scheduleClearFilter);
+                this.dom.filter.addEventListener("blur", this.scheduleClearFilter);
             }
-            document.addEventListener('keydown', this.onKeyBody);
+            document.addEventListener("keydown", this.onKeyBody);
         };
         Homepage.prototype.removeEventHandlers = function () {
             var _this = this;
-            ['change', 'keydown', 'input'].forEach(function (event) {
+            ["change", "keydown", "input"].forEach(function (event) {
                 return _this.dom.filter.removeEventListener(event, _this.onFilterChanged);
             });
-            ['focus', 'blur'].forEach(function (event) {
+            ["focus", "blur"].forEach(function (event) {
                 return [window, document, document.body, _this.dom.filter].forEach(function (element) {
                     return element.removeEventListener(event, _this.onFocusEvent);
                 });
             });
             if (shortycut.queryParameters.facets.noFocus) {
-                ['mousedown', 'keydown', 'blur'].forEach(function (event) {
+                ["mousedown", "keydown", "blur"].forEach(function (event) {
                     return window.removeEventListener(event, _this.cancelClearFilter);
                 });
-                this.dom.filter.removeEventListener('blur', this.scheduleClearFilter);
+                this.dom.filter.removeEventListener("blur", this.scheduleClearFilter);
             }
-            document.removeEventListener('keydown', this.onKeyBody);
+            document.removeEventListener("keydown", this.onKeyBody);
         };
         Homepage.prototype.onKeyBody = function (event) {
-            var isRightArrow = ('ArrowRight' === event.key || 'Right' === event.key)
+            var isRightArrow = ("ArrowRight" === event.key || "Right" === event.key)
                 && 0 <= this.selectedIndex
                 && (this.suggestions[this.selectedIndex].hidesMoreChildren
-                    || 'segment' === this.suggestions[this.selectedIndex].type);
+                    || "segment" === this.suggestions[this.selectedIndex].type);
             if (!shortycut.queryParameters.facets.noFocus) {
                 this.dom.filter.focus();
             }
-            if ('Escape' === event.key || 'Esc' === event.key) {
+            if ("Escape" === event.key || "Esc" === event.key) {
                 return this.onEscape(event);
             }
-            else if ('ArrowDown' === event.key || 'Down' === event.key) {
+            else if ("ArrowDown" === event.key || "Down" === event.key) {
                 this.selectSuggestion(this.selectedIndex + 1);
                 event.preventDefault();
                 return false;
             }
-            else if ('ArrowUp' === event.key || 'Up' === event.key) {
+            else if ("ArrowUp" === event.key || "Up" === event.key) {
                 this.selectSuggestion(this.selectedIndex - 1);
                 event.preventDefault();
                 return false;
             }
-            else if ('Enter' === event.key || isRightArrow) {
+            else if ("Enter" === event.key || isRightArrow) {
                 return this.onEnter(event, isRightArrow);
             }
-            else if ('q' === event.key && event.ctrlKey) {
+            else if ("q" === event.key && event.ctrlKey) {
                 this.dom.filter.focus();
             }
             return true;
@@ -3027,7 +3027,7 @@ var shortycut;
             if (!shortycut.queryParameters.facets.noFocus || this.dom.filter.value) {
                 this.dom.filter.focus();
             }
-            this.dom.filter.value = '';
+            this.dom.filter.value = "";
             this.applyFilter();
         };
         Homepage.prototype.applyFilter = function (autoSelectFirstRow) {
@@ -3036,8 +3036,8 @@ var shortycut;
             this.suggestions.length = 0;
             var input = this.dom.filter.value;
             var splitInput = input.split(/\s+/).map(function (word) { return word.trim(); }).filter(function (word) { return word; });
-            var keyword = shortycut.adjustCase((_a = splitInput[0]) !== null && _a !== void 0 ? _a : '');
-            var postKeywordInput = input.replace(/^\s*/, '').substring(keyword.length);
+            var keyword = shortycut.adjustCase((_a = splitInput[0]) !== null && _a !== void 0 ? _a : "");
+            var postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
             if (keyword) {
                 var shortcut = shortycut.shortcuts.get(keyword);
                 this.collectSuggestions(keyword, splitInput, postKeywordInput, shortcut);
@@ -3046,7 +3046,10 @@ var shortycut;
         };
         Homepage.prototype.collectSuggestions = function (keyword, splitInput, postKeywordInput, shortcut) {
             var _a, _b, _c;
-            if (!postKeywordInput) {
+            if (shortcut && shortcut.queries && postKeywordInput) {
+                this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
+            }
+            else if (!postKeywordInput) {
                 (_a = this.suggestions).push.apply(_a, this.filter.keywordSearch(keyword, postKeywordInput));
             }
             else if (shortcut) {
@@ -3055,10 +3058,10 @@ var shortycut;
                 }
                 if (!this.suggestions.length) {
                     if (shortcut.queries && 1 < splitInput.length && shortcut.queries) {
-                        this.suggestions.push(this.createSuggestion(shortcut, 'match', 'query'));
+                        this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
                     }
                     else if (shortcut.bookmarks && !postKeywordInput) {
-                        this.suggestions.push(this.createSuggestion(shortcut, 'match', 'bookmark'));
+                        this.suggestions.push(this.createSuggestion(shortcut, "match", "bookmark"));
                     }
                 }
             }
@@ -3072,37 +3075,40 @@ var shortycut;
             this.previousInput = input;
             if (autoSelectFirstRow && 0 < this.suggestions.length) {
                 this.selectedIndex = 0;
-                this.dom.rows[0].classList.add('selected');
+                this.dom.rows[0].classList.add("selected");
             }
             else {
                 this.selectedIndex = -1;
-                this.dom.headerRow.classList.add('selected');
+                this.dom.headerRow.classList.add("selected");
             }
-            this.dom.notification.self.style.display = 0 < this.suggestions.length || this.dom.filter.value.trim().length
-                ? 'none'
-                : 'block';
+            this.dom.notification.self.style.display =
+                0 < this.suggestions.length || this.dom.filter.value.trim().length
+                    ? "none"
+                    : "block";
             this.updateInputFieldHighlight();
         };
         Homepage.prototype.createSearchBucketSuggestions = function (shortcut, searchTerms) {
             var suggestions = this.filter.fullTextSearch(searchTerms, shortcut.keyword);
             if (suggestions.length) {
                 if (shortcut.queries) {
-                    return __spreadArray(__spreadArray([], suggestions, true), [this.createSuggestion(shortcut, 'suggestion', 'query')], false);
+                    return __spreadArray(__spreadArray([], suggestions, true), [this.createSuggestion(shortcut, "suggestion", "query")], false);
                 }
                 else {
                     return suggestions;
                 }
             }
             else if (shortcut.queries) {
-                return [this.createSuggestion(shortcut, 'match', 'query')];
+                return [this.createSuggestion(shortcut, "match", "query")];
             }
             else if (shortcut.bookmarks) {
-                return [this.createSuggestion(shortcut, 'match', 'bookmark')];
+                return [this.createSuggestion(shortcut, "match", "bookmark")];
             }
             return suggestions;
         };
         Homepage.prototype.createSuggestion = function (shortcut, type, shortcutType) {
-            var links = 'bookmark' === shortcutType ? shortycut.assertNotNull(shortcut.bookmarks) : shortycut.assertNotNull(shortcut.queries);
+            var links = "bookmark" === shortcutType
+                ? shortycut.assertNotNull(shortcut.bookmarks)
+                : shortycut.assertNotNull(shortcut.queries);
             return {
                 type: type,
                 keyword: shortcut.keyword,
@@ -3118,37 +3124,39 @@ var shortycut;
             this.updateFaviconManagerParameters(true);
             this.dom.rows = this.suggestions.map(function (suggestion, index) {
                 return shortycut.create("div.row.".concat(suggestion.type, ".").concat(suggestion.shortcutType), [
-                    shortycut.create('div.cursor', shortycut.create('img.icon', function (element) { return element.src = 'resources/arrow.svg'; })),
-                    shortycut.create('div.row-content', [
+                    shortycut.create("div.cursor", shortycut.create("img.icon", function (element) {
+                        return element.src = "resources/arrow.svg";
+                    })),
+                    shortycut.create("div.row-content", [
                         shortycut.config.homepage.suggestions.showKeywords
-                            ? shortycut.create('div.keyword:html', suggestion.keywordHtml)
-                            : '',
+                            ? shortycut.create("div.keyword:html", suggestion.keywordHtml)
+                            : "",
                         shortycut.config.homepage.suggestions.showFavicons
                             ? shortycut.faviconManager.getFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
-                            : '',
-                        shortycut.create('div.description:html', _this.getDescription(suggestion))
-                    ], function (rowContent) { return rowContent.addEventListener('click', function (event) {
+                            : "",
+                        shortycut.create("div.description:html", _this.getDescription(suggestion))
+                    ], function (rowContent) { return rowContent.addEventListener("click", function (event) {
                         _this.selectSuggestion(index);
                         _this.applySuggestion(_this.selectedIndex, event.ctrlKey ? shortycut.RedirectMode.NEW_TAB : shortycut.RedirectMode.PRESERVE_HISTORY, false);
                     }); })
                 ]);
             });
-            this.dom.suggestions.innerHTML = '';
+            this.dom.suggestions.innerHTML = "";
             this.dom.rows.forEach(function (row) { return _this.dom.suggestions.appendChild(row); });
             if (Homepage.MAX_SUGGESTIONS <= this.suggestions.length) {
-                this.dom.suggestions.classList.add('truncated');
+                this.dom.suggestions.classList.add("truncated");
             }
             else {
-                this.dom.suggestions.classList.remove('truncated');
+                this.dom.suggestions.classList.remove("truncated");
             }
         };
         Homepage.prototype.getDescription = function (suggestion) {
-            if (suggestion.hidesMoreChildren || suggestion.type === 'segment') {
-                return shortycut.create('div:html', [
+            if (suggestion.hidesMoreChildren || suggestion.type === "segment") {
+                return shortycut.create("div:html", [
                     suggestion.descriptionHtml,
-                    ' ',
-                    shortycut.create('span.more-indicator-text:html', "".concat(shortycut.Segments.SEPARATOR_HTML, " ...")),
-                    shortycut.create('span.more-indicator-key:html', shortycut.create('span.key:html', '&rarr;'), ' more')
+                    " ",
+                    shortycut.create("span.more-indicator-text:html", "".concat(shortycut.Segments.SEPARATOR_HTML, " ...")),
+                    shortycut.create("span.more-indicator-key:html", shortycut.create("span.key:html", "&rarr;"), " more")
                 ]);
             }
             else {
@@ -3158,20 +3166,20 @@ var shortycut;
         Homepage.prototype.updateInputFieldHighlight = function () {
             var hasInput = !!this.dom.filter.value.trim();
             var canUseSearchEngine = shortycut.defaultSearchEngine && shortycut.config.defaultSearchEngine.useOnHomepage;
-            var focusOnSuggestion = this.selectedIndex != -1;
+            var focusOnSuggestion = this.selectedIndex !== -1;
             var hasFullTextSearchSuggestions = !!this.suggestions.length;
-            var hasMatches = !!this.suggestions.filter(function (suggestion) { return suggestion.type != 'search-result'; }).length;
+            var hasMatches = !!this.suggestions.filter(function (suggestion) { return suggestion.type !== "search-result"; }).length;
             if (!hasInput || canUseSearchEngine || focusOnSuggestion || hasMatches) {
-                this.dom.filter.classList.remove('error');
-                this.dom.filter.classList.remove('warning');
+                this.dom.filter.classList.remove("error");
+                this.dom.filter.classList.remove("warning");
             }
             else if (hasFullTextSearchSuggestions) {
-                this.dom.filter.classList.remove('error');
-                this.dom.filter.classList.add('warning');
+                this.dom.filter.classList.remove("error");
+                this.dom.filter.classList.add("warning");
             }
             else {
-                this.dom.filter.classList.add('error');
-                this.dom.filter.classList.remove('warning');
+                this.dom.filter.classList.add("error");
+                this.dom.filter.classList.remove("warning");
             }
         };
         Homepage.prototype.selectSuggestion = function (index) {
@@ -3181,16 +3189,16 @@ var shortycut;
                 if (-1 === this.selectedIndex) {
                     this.originalInput = this.dom.filter.value;
                 }
-                ((_a = this.dom.rows[this.selectedIndex]) !== null && _a !== void 0 ? _a : this.dom.headerRow).classList.remove('selected');
+                ((_a = this.dom.rows[this.selectedIndex]) !== null && _a !== void 0 ? _a : this.dom.headerRow).classList.remove("selected");
                 this.selectedIndex = index;
-                ((_b = this.dom.rows[this.selectedIndex]) !== null && _b !== void 0 ? _b : this.dom.headerRow).classList.add('selected');
+                ((_b = this.dom.rows[this.selectedIndex]) !== null && _b !== void 0 ? _b : this.dom.headerRow).classList.add("selected");
                 if (-1 === this.selectedIndex) {
                     this.previousInput = this.dom.filter.value = this.originalInput;
                 }
                 else {
                     var suggestion = this.suggestions[this.selectedIndex];
                     var keyword = this.suggestions[this.selectedIndex].keyword;
-                    if (suggestion.type !== 'segment' && suggestion.shortcutType !== 'bookmark') {
+                    if (suggestion.type !== "segment" && suggestion.shortcutType !== "bookmark") {
                         this.previousInput = "".concat(keyword, " ");
                     }
                     else {
@@ -3206,17 +3214,17 @@ var shortycut;
             var _a;
             var suggestion = this.suggestions[selectedIndex];
             var shortcut = suggestion.shortcut;
-            if (suggestion.type === 'segment' || (viaRightArrow && suggestion.hidesMoreChildren)) {
+            if (suggestion.type === "segment" || (viaRightArrow && suggestion.hidesMoreChildren)) {
                 this.applyFilter(viaRightArrow && suggestion.hidesMoreChildren);
             }
-            else if (suggestion.type === 'search-result') {
+            else if (suggestion.type === "search-result") {
                 this.applySearchResult(suggestion, viaRightArrow, mode);
             }
             else if (shortcut.bookmarks) {
-                shortycut.redirector.redirect(shortcut.bookmarks.current, viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : shortcut.bookmarks.onMultiLink, '', mode);
+                shortycut.redirector.redirect(shortcut.bookmarks.current, viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : shortcut.bookmarks.onMultiLink, "", mode);
             }
             else if (shortcut.queries) {
-                var searchTerm = (_a = prompt('Search term')) === null || _a === void 0 ? void 0 : _a.trim();
+                var searchTerm = (_a = prompt("Search term")) === null || _a === void 0 ? void 0 : _a.trim();
                 if (searchTerm) {
                     shortycut.redirector.redirect(shortcut.queries.current, viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : shortycut.assertNotNull(shortcut.queries).onMultiLink, searchTerm, mode);
                 }
@@ -3225,27 +3233,27 @@ var shortycut;
         Homepage.prototype.applySearchResult = function (suggestion, viaRightArrow, mode) {
             var _a, _b;
             if ((_a = suggestion.link) === null || _a === void 0 ? void 0 : _a.isQuery) {
-                var searchTerm = (_b = prompt('Search term')) === null || _b === void 0 ? void 0 : _b.trim();
+                var searchTerm = (_b = prompt("Search term")) === null || _b === void 0 ? void 0 : _b.trim();
                 if (searchTerm) {
                     shortycut.redirector.redirect([suggestion.link], viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink, searchTerm, mode);
                 }
             }
             else if (suggestion.link) {
-                shortycut.redirector.redirect([suggestion.link], viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink, '', mode);
+                shortycut.redirector.redirect([suggestion.link], viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink, "", mode);
             }
         };
         Homepage.prototype.redirect = function (mode) {
             var _a;
             var input = this.dom.filter.value.trim();
-            var keyword = shortycut.adjustCase(input.replace(/\s.*/, ''));
+            var keyword = shortycut.adjustCase(input.replace(/\s.*/, ""));
             var shortcut = shortycut.shortcuts.get(keyword);
-            var postKeywordInput = input.replace(/^\s*/, '').substring(keyword.length);
-            var searchTerm = input.replace(/^[^\s]*\s*/, '');
+            var postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
+            var searchTerm = input.replace(/^[^\s]*\s*/, "");
             if (postKeywordInput && (shortcut.searchable || !shortcut.queries) && this.suggestions.length) {
                 return this.applySuggestion(0, mode, false);
             }
             if (!(shortcut === null || shortcut === void 0 ? void 0 : shortcut.bookmarks) && (shortcut === null || shortcut === void 0 ? void 0 : shortcut.queries) && !searchTerm) {
-                searchTerm = searchTerm || ((_a = prompt('Search term')) === null || _a === void 0 ? void 0 : _a.trim());
+                searchTerm = searchTerm || ((_a = prompt("Search term")) === null || _a === void 0 ? void 0 : _a.trim());
                 if (!searchTerm) {
                     return;
                 }
@@ -3256,7 +3264,7 @@ var shortycut;
         Homepage.prototype.performRedirect = function (input, keyword, searchTerm, mode, links) {
             if (links) {
                 if (1 < links.current.length && shortycut.RedirectMode.NEW_TAB === mode) {
-                    var url = window.location.href.replace(/[?#].*/, '');
+                    var url = window.location.href.replace(/[?#].*/, "");
                     var query = encodeURIComponent("".concat(keyword, " ").concat(searchTerm).trim());
                     shortycut.redirector.openUrl("".concat(url, "?").concat(shortycut.QueryParameters.QUERY, "=").concat(query), mode);
                 }
@@ -4158,7 +4166,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return '1.3'.replace(/^##.*/, '');
+        return '1.3.1'.replace(/^##.*/, '');
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {
