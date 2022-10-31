@@ -2,6 +2,8 @@ namespace shortycut {
 
     type ParserCallback = (result: Shortcuts | unknown) => void;
 
+    const SHORTCUTS_PER_BATCH = 2_000;
+
     //------------------------------------------------------------------------------------------------------------------
     // Parse shortcut definitions batch-wise
     //------------------------------------------------------------------------------------------------------------------
@@ -12,11 +14,18 @@ namespace shortycut {
             const lines = new Array<string>();
             startupCache.shortcuts.forEach(shortcut => lines.push(...shortcut.split(/\r?\n/)));
             const parser = new ShortcutParser();
-            parseBatch(parser, lines, 0, 2000, shortcuts, callback);
+            parseBatch(parser, lines, 0, SHORTCUTS_PER_BATCH, shortcuts, callback);
         });
     }
 
-    function parseBatch(parser: ShortcutParser, lines: string[], index: number, batchSize: number, shortcuts: Shortcuts, callback: ParserCallback) {
+    function parseBatch(
+        parser: ShortcutParser,
+        lines: string[],
+        index: number,
+        batchSize: number,
+        shortcuts: Shortcuts,
+        callback: ParserCallback
+    ) {
 
         handleExceptions(callback, () => {
             if (index < lines.length) {

@@ -1,6 +1,8 @@
 namespace shortycut {
 
-    export type SuggestionType = 'match' | 'suggestion' | 'segment' | 'search-result';
+    export type SuggestionType = "match" | "suggestion" | "segment" | "search-result";
+
+    const MAX_LEVEL = 999;
 
     //------------------------------------------------------------------------------------------------------------------
     // Data structures
@@ -22,7 +24,7 @@ namespace shortycut {
 
         link: Link;
         keyword: string;
-        keywordLowerCase: string
+        keywordLowerCase: string;
         description: string;
         descriptionLowerCase: string;
         shortcut: Shortcut;
@@ -63,7 +65,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private get children() {
-            const children = this._children ?? this.initializeChildren()
+            const children = this._children ?? this.initializeChildren();
             this._children = children;
             return children;
         }
@@ -72,11 +74,11 @@ namespace shortycut {
             const dictionary = new Hashtable<DictionaryItem>();
             this.shortcuts.forEach(shortcut => {
                 if (this.level < shortcut.keyword.length) {
-                    const letter = shortcut.keyword ? shortcut.keyword.charAt(this.level) : '';
+                    const letter = shortcut.keyword ? shortcut.keyword.charAt(this.level) : "";
                     dictionary.computeIfAbsent(letter, () => new DictionaryItem(this.level + 1, []))
                         .shortcuts.push(shortcut);
                 }
-            })
+            });
             return dictionary;
         }
 
@@ -86,14 +88,14 @@ namespace shortycut {
 
         private childSuggestions(maxResults: number, postKeywordInput: string) {
             if (!this._suggestions) {
-                const shortcuts = this.getChildShortcuts(postKeywordInput ? this.level : 999);
-                this._suggestions = this.calculateChildSuggestions(maxResults, shortcuts)
+                const shortcuts = this.getChildShortcuts(postKeywordInput ? this.level : MAX_LEVEL);
+                this._suggestions = this.calculateChildSuggestions(maxResults, shortcuts);
             }
             return this._suggestions;
         }
 
         private calculateChildSuggestions(maxResults: number, shortcuts: Shortcut[]) {
-            const matches = new Hashtable<{ match: MatchingSegment, shortcuts: Shortcut[] }>();
+            const matches = new Hashtable<{ match: MatchingSegment, shortcuts: Shortcut[]; }>();
             let count = 0;
             for (const shortcut of shortcuts) {
                 for (const match of shortcut.getSegmentMatches(this.level)) {
@@ -102,8 +104,10 @@ namespace shortycut {
                         nonPartialMatch.match.hidesMoreChildren = true;
                         continue;
                     }
-                    matches.computeIfAbsent(match.fingerprint, () => { count++; return { match, shortcuts: [] } })
-                        .shortcuts.push(shortcut);
+                    matches.computeIfAbsent(match.fingerprint, () => {
+                        count++;
+                        return { match, shortcuts: [] };
+                    }).shortcuts.push(shortcut);
                     if (maxResults <= count) {
                         break;
                     }
@@ -128,19 +132,19 @@ namespace shortycut {
 
         private createChildSuggestion(match: MatchingSegment, shortcuts: Shortcut[]): Suggestion {
 
-            const keyword = `${match.keyword}${match.isPartial ? '...' : ''}`;
-            const keywordHtml = create('div',
-                create('span.matched', keyword.substring(0, this.level)),
-                create('span.unmatched', keyword.substring(this.level))
+            const keyword = `${match.keyword}${match.isPartial ? "..." : ""}`;
+            const keywordHtml = create("div",
+                create("span.matched", keyword.substring(0, this.level)),
+                create("span.unmatched", keyword.substring(this.level))
             ).innerHTML;
 
             const descriptionHtmlSuffix = !match.isPartial && shortcuts[0].searchable
-                ? ` <span class='more-indicator-text'>${Segments.SEPARATOR_HTML} ...</span>`
-                : '';
+                ? ` <span class="more-indicator-text">${Segments.SEPARATOR_HTML} ...</span>`
+                : "";
 
-            const segmentOrSuggestion = match.isPartial ? 'segment' : 'suggestion';
+            const segmentOrSuggestion = match.isPartial ? "segment" : "suggestion";
             return {
-                type: this.level === match.keyword.length ? 'match' : segmentOrSuggestion,
+                type: this.level === match.keyword.length ? "match" : segmentOrSuggestion,
                 keyword: match.keyword,
                 keywordHtml,
                 descriptionHtml: match.descriptionHtml + descriptionHtmlSuffix,
@@ -151,18 +155,18 @@ namespace shortycut {
         }
 
         private getShortcutType(shortcuts: Shortcut[]): ShortcutType {
-            if (shortcuts.some(shortcut => 'both' === shortcut.type)) {
-                return 'both';
-            } else if (shortcuts.some(shortcut => 'bookmark' === shortcut.type)) {
-                if (shortcuts.some(shortcut => 'query' === shortcut.type)) {
-                    return 'both';
+            if (shortcuts.some(shortcut => "both" === shortcut.type)) {
+                return "both";
+            } else if (shortcuts.some(shortcut => "bookmark" === shortcut.type)) {
+                if (shortcuts.some(shortcut => "query" === shortcut.type)) {
+                    return "both";
                 } else {
-                    return 'bookmark';
+                    return "bookmark";
                 }
-            } else if (shortcuts.some(shortcut => 'query' === shortcut.type)) {
-                return 'query';
+            } else if (shortcuts.some(shortcut => "query" === shortcut.type)) {
+                return "query";
             } else {
-                return 'none';
+                return "none";
             }
         }
     }
@@ -210,11 +214,11 @@ namespace shortycut {
 
         private createSuggestion(searchTerms: string[], searchableLink: SearchableLink, result: Array<Suggestion>) {
 
-            const keywordMask = searchableLink.keyword.split('').map(() => false);
-            const descriptionMask = searchableLink.description.split('').map(() => false);
+            const keywordMask = searchableLink.keyword.split("").map(() => false);
+            const descriptionMask = searchableLink.description.split("").map(() => false);
 
             for (const searchTerm of searchTerms) {
-                let matched = this.markMatch(searchTerm, searchableLink.keywordLowerCase, keywordMask)
+                let matched = this.markMatch(searchTerm, searchableLink.keywordLowerCase, keywordMask);
                 matched = this.markMatch(searchTerm, searchableLink.descriptionLowerCase, descriptionMask) || matched;
                 if (!matched) {
                     return;
@@ -222,11 +226,11 @@ namespace shortycut {
             }
 
             result.push({
-                type: 'search-result',
+                type: "search-result",
                 keyword: searchableLink.keyword,
                 keywordHtml: this.highlightMatch(searchableLink.keyword, keywordMask),
                 descriptionHtml: this.highlightMatch(searchableLink.description, descriptionMask),
-                shortcutType: searchableLink.link.isQuery ? 'query' : 'bookmark',
+                shortcutType: searchableLink.link.isQuery ? "query" : "bookmark",
                 shortcut: searchableLink.shortcut,
                 link: searchableLink.link,
                 hidesMoreChildren: false
@@ -257,12 +261,12 @@ namespace shortycut {
                 }
                 let section = sanitize(text.substring(start, end));
                 if (mask[start]) {
-                    section = `<span class='matched-substring'>${section}</span>`;
+                    section = `<span class="matched-substring">${section}</span>`;
                 }
                 result.push(section);
             }
 
-            return replaceAll(result.join(''), Segments.SEPARATOR_PLACEHOLDER, Segments.SEPARATOR_HTML, false);
+            return replaceAll(result.join(""), Segments.SEPARATOR_PLACEHOLDER, Segments.SEPARATOR_HTML, false);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -288,14 +292,14 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private get allLinks() {
-            const allLinks = Filter._allLinks ?? Filter.initializeLinks()
+            const allLinks = Filter._allLinks ?? Filter.initializeLinks();
             Filter._allLinks = allLinks;
             return allLinks;
         }
 
         private static initializeLinks(): Array<SearchableLink> {
 
-            const result = new Array<{ link: Link, links: Links }>();
+            const result = new Array<{ link: Link, links: Links; }>();
             shortcuts.values.forEach(shortcut =>
                 result.push(...shortcut.all.filter(item => this.includeOverriddenShortcuts || !item.link.overridden))
             );

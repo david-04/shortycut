@@ -1,9 +1,9 @@
 namespace shortycut {
 
-    export type ShortcutType = 'query' | 'bookmark' | 'both' | 'none';
+    export type ShortcutType = "query" | "bookmark" | "both" | "none";
 
     export type DynamicLinkFunction = (searchTerm: string) => string;
-    export type DynamicLink = { generator: DynamicLinkFunction, urlForFavicon: string };
+    export type DynamicLink = { generator: DynamicLinkFunction, urlForFavicon: string; };
 
     //------------------------------------------------------------------------------------------------------------------
     // Action to be taken if a keyword has multiple links
@@ -12,7 +12,7 @@ namespace shortycut {
     export class OnMultiLink {
 
         public static readonly values = new Array<OnMultiLink>();
-        public static readonly byName: { [index: string]: OnMultiLink } = {};
+        public static readonly byName: { [index: string]: OnMultiLink; } = {};
 
         private constructor(public readonly key: string) {
             OnMultiLink.values.push(this);
@@ -23,10 +23,10 @@ namespace shortycut {
             return OnMultiLink.byName[config.shortcutFormat.url.multiLinkIndicator.default] || OnMultiLink.SHOW_MENU;
         }
 
-        public static readonly REPLACE_PREVIOUS = new OnMultiLink('replacePrevious');
-        public static readonly OPEN_IN_NEW_TAB = new OnMultiLink('openInNewTab');
-        public static readonly SHOW_MENU = new OnMultiLink('showMenu');
-        public static readonly SEARCH_BUCKET = new OnMultiLink('searchBucket');
+        public static readonly REPLACE_PREVIOUS = new OnMultiLink("replacePrevious");
+        public static readonly OPEN_IN_NEW_TAB = new OnMultiLink("openInNewTab");
+        public static readonly SHOW_MENU = new OnMultiLink("showMenu");
+        public static readonly SEARCH_BUCKET = new OnMultiLink("searchBucket");
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ namespace shortycut {
         public readonly isQuery: boolean;
         private _filterSummary?: string;
         private _overridden = false;
-        private searchTerm = '';
+        private searchTerm = "";
 
         constructor(
             public readonly keyword: string,
@@ -46,27 +46,27 @@ namespace shortycut {
             public readonly segments: Segments,
             public readonly onMultiLink: OnMultiLink,
             public readonly isSearchable: boolean,
-            private urlOrDynamicLink: string | DynamicLink,
-            private _postFields?: string
+            private readonly urlOrDynamicLink: string | DynamicLink,
+            private readonly _postFields?: string
         ) {
-            this.isQuery = 'string' !== typeof this.urlOrDynamicLink
+            this.isQuery = "string" !== typeof this.urlOrDynamicLink
                 || 0 <= adjustCase(this.urlOrDynamicLink).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
-                || 0 <= adjustCase(this._postFields ?? '').indexOf(config.shortcutFormat.url.searchTermPlaceholder);
+                || 0 <= adjustCase(this._postFields ?? "").indexOf(config.shortcutFormat.url.searchTermPlaceholder);
         }
 
         public get url() {
             return replaceAll(
-                'string' === typeof this.urlOrDynamicLink
+                "string" === typeof this.urlOrDynamicLink
                     ? this.urlOrDynamicLink
                     : this.urlOrDynamicLink.generator(this.searchTerm),
                 config.shortcutFormat.url.searchTermPlaceholder,
-                encodeURIComponent(this.searchTerm || ''),
+                encodeURIComponent(this.searchTerm || ""),
                 config.shortcutFormat.keyword.caseSensitive
             );
         }
 
         public get urlForFavicon() {
-            return 'string' === typeof (this.urlOrDynamicLink)
+            return "string" === typeof (this.urlOrDynamicLink)
                 ? this.urlOrDynamicLink
                 : this.urlOrDynamicLink.urlForFavicon;
         }
@@ -81,7 +81,9 @@ namespace shortycut {
 
         public get filterSummary() {
             if (!this._filterSummary) {
-                this._filterSummary = `${this.keyword} ${this.segments.description}`.toLocaleLowerCase().replace(/\s/g, '');
+                this._filterSummary = `${this.keyword} ${this.segments.description}`
+                    .toLocaleLowerCase()
+                    .replace(/\s/g, "");
             }
             return this._filterSummary;
         }
@@ -93,9 +95,10 @@ namespace shortycut {
         public getHref(searchTerm: string) {
             if (this._postFields) {
                 const query = `${this.keyword} ${decodeURIComponent(searchTerm)}`.trim();
-                return window.location.href.replace(/[#?].*/g, '')
-                    + `?${QueryParameters.QUERY}=${query}`
-                    + `&${QueryParameters.INDEX}=${this.index}`;
+                const baseUrl = window.location.href.replace(/[#?].*/g, "");
+                const queryParameter = `${QueryParameters.QUERY}=${query}`;
+                const indexParameter = `${QueryParameters.INDEX}=${this.index}`;
+                return `${baseUrl}?${queryParameter}&${indexParameter}`;
             } else {
                 return this.url;
             }
@@ -110,12 +113,12 @@ namespace shortycut {
                     encodeURIComponent(this.searchTerm),
                     config.shortcutFormat.keyword.caseSensitive
                 )
-                    .split('&')
+                    .split("&")
                     .filter(parameter => parameter)
                     .map(parameter => {
-                        const index = parameter.indexOf('=');
+                        const index = parameter.indexOf("=");
                         if (index < 1) {
-                            throw new Exception('Shortcut definition error',
+                            throw new Exception("Shortcut definition error",
                                 `Post parameter ${sanitize(parameter)} is not in key=value format`);
                         }
                         try {
@@ -124,7 +127,7 @@ namespace shortycut {
                                 value: decodeURIComponent(parameter.substring(index + 1))
                             };
                         } catch (exception) {
-                            throw new Exception('Shortcut definition error',
+                            throw new Exception("Shortcut definition error",
                                 `Post parameter ${sanitize(parameter)} is not URL encoded`);
                         }
                     });
@@ -146,14 +149,14 @@ namespace shortycut {
         private _descriptionHtml?: string;
 
         constructor(link: Link) {
-            this.current.push(link)
+            this.current.push(link);
         }
 
         public addLink(link: Link) {
             if (this.current.length && link.onMultiLink === OnMultiLink.REPLACE_PREVIOUS) {
                 this.current.forEach(currentLink => currentLink.markAsOverridden());
                 this.overridden.push(...this.current);
-                this.current.length = 0
+                this.current.length = 0;
             }
             this.current.push(link);
         }
@@ -171,13 +174,14 @@ namespace shortycut {
         }
 
         public get filterSummary() {
-            const filterSummary = this._filterSummary ?? this.current.map(link => link.filterSummary).join(' ');
+            const filterSummary = this._filterSummary ?? this.current.map(link => link.filterSummary).join(" ");
             this._filterSummary = filterSummary;
             return filterSummary;
         }
 
         public replacePlaceholders(searchTerm: string) {
-            [this.overridden, this.current].forEach(array => array.forEach(link => link.replacePlaceholder(searchTerm)));
+            [this.overridden, this.current]
+                .forEach(array => array.forEach(link => link.replacePlaceholder(searchTerm)));
         }
 
         public get descriptionHtml() {
@@ -203,7 +207,8 @@ namespace shortycut {
                     if (!matches) {
                         break;
                     }
-                } while (++length);
+                    length++;
+                } while (length);
 
                 if (length < 0) {
                     return this.current[0].segments.descriptionHtml;
@@ -226,15 +231,15 @@ namespace shortycut {
         constructor(public readonly keyword: string, public readonly sections: string[]) { }
 
         public get description() {
-            return this.sections.join('');
+            return this.sections.join("");
         }
     }
 
     export class Segments {
 
-        public static readonly SEPARATOR_TEXT = ' » ';
-        public static readonly SEPARATOR_HTML = ' &raquo; ';
-        public static readonly SEPARATOR_PLACEHOLDER = '\n';
+        public static readonly SEPARATOR_TEXT = " » ";
+        public static readonly SEPARATOR_HTML = " &raquo; ";
+        public static readonly SEPARATOR_PLACEHOLDER = "\n";
 
         private _description?: string;
         private _descriptionPlaceholder?: string;
@@ -248,7 +253,7 @@ namespace shortycut {
 
         public get descriptionHtml() {
             const descriptionHtml = this._descriptionHtml ??
-                this.segments.map(segment => sanitize(segment.description)).join(Segments.SEPARATOR_HTML)
+                this.segments.map(segment => sanitize(segment.description)).join(Segments.SEPARATOR_HTML);
             this._descriptionHtml = descriptionHtml;
             return descriptionHtml;
         }
@@ -270,9 +275,9 @@ namespace shortycut {
 
     export class MatchingSegment {
 
-        public readonly fingerprint = '';
-        public readonly keyword = '';
-        public readonly descriptionHtml = '';
+        public readonly fingerprint = "";
+        public readonly keyword = "";
+        public readonly descriptionHtml = "";
         public readonly isPartial: boolean;
         public hidesMoreChildren = false;
 
@@ -288,8 +293,10 @@ namespace shortycut {
                 if (this.keyword.length <= length || 0 === segment.keyword.length) {
                     this.keyword += segment.keyword;
                     if (segment.description && index < segmentsToDisplay) {
-                        const description = this.getDescription(segment.sections, length - lengthOffset, lengthOffset, length);
-                        this.descriptionHtml += `${this.descriptionHtml ? Segments.SEPARATOR_HTML : ''}${description}`;
+                        const description = this.getDescription(
+                            segment.sections, length - lengthOffset, lengthOffset, length
+                        );
+                        this.descriptionHtml += `${this.descriptionHtml ? Segments.SEPARATOR_HTML : ""}${description}`;
                     }
                     this.fingerprint += MatchingSegment.getFingerprint(segment, index + 1 !== segments.length);
                     lengthOffset += segment.keyword.length;
@@ -301,30 +308,32 @@ namespace shortycut {
         }
 
         private static getFingerprint(segment: Segment, appendDescription: boolean) {
-            const openingDelimiter = config.shortcutFormat.keyword.openingDelimiter || '[';
-            const closingDelimiter = config.shortcutFormat.keyword.closingDelimiter || ']';
-            const suffix = appendDescription ? segment.description.trim().toLocaleLowerCase() : '';
+            const openingDelimiter = config.shortcutFormat.keyword.openingDelimiter || "[";
+            const closingDelimiter = config.shortcutFormat.keyword.closingDelimiter || "]";
+            const suffix = appendDescription ? segment.description.trim().toLocaleLowerCase() : "";
             return openingDelimiter + segment.keyword + closingDelimiter + suffix;
         }
 
         private countSegmentsToDisplay(segments: Segment[]) {
 
             let segmentsToDisplay = segments.length;
-            for (; 0 < segmentsToDisplay && !segments[segmentsToDisplay - 1].keyword; segmentsToDisplay--);
+            for (; 0 < segmentsToDisplay && !segments[segmentsToDisplay - 1].keyword; segmentsToDisplay--) {
+                // just calculate segmentsToDisplay
+            }
             return Math.max(0, segmentsToDisplay);
         }
 
         private getDescription(sections: string[], hotkeysMatched: number, lengthOffset: number, length: number) {
 
             if (!config.homepage.suggestions.showHotkeys) {
-                return sanitize(sections.join(''));
+                return sanitize(sections.join(""));
             } else if (1 === sections.length) {
                 return this.autoDetectHotkeys(sections[0], this.keyword.substring(lengthOffset), length - lengthOffset);
             } else {
                 let result = sanitize(sections[0]);
                 for (let index = 1; index < sections.length; index++) {
                     if (hotkeysMatched < index) {
-                        result += create('span.hotkey', sanitize(sections[index].charAt(0))).outerHTML;
+                        result += create("span.hotkey", sanitize(sections[index].charAt(0))).outerHTML;
                         result += sanitize(sections[index].substring(1));
                     } else {
                         result += sanitize(sections[index]);
@@ -336,8 +345,8 @@ namespace shortycut {
 
         private autoDetectHotkeys(description: string, keyword: string, hotkeysMatched: number) {
             return hotkeySelector.selectHotkeys(keyword, description, hotkeysMatched)
-                .map(item => item.isHotkey ? create('span.hotkey', item.text).outerHTML : sanitize(item.text))
-                .join('');
+                .map(item => item.isHotkey ? create("span.hotkey", item.text).outerHTML : sanitize(item.text))
+                .join("");
         }
     }
 
@@ -350,7 +359,7 @@ namespace shortycut {
         private _bookmarks?: Links;
         private _queries?: Links;
         private _searchable?: Links;
-        public readonly all = new Array<{ link: Link, links: Links }>();
+        public readonly all = new Array<{ link: Link, links: Links; }>();
 
         public get bookmarks() {
             return this._bookmarks;
@@ -366,11 +375,11 @@ namespace shortycut {
 
         public get type(): ShortcutType {
             if (this.bookmarks) {
-                return this.queries ? 'both' : 'bookmark';
+                return this.queries ? "both" : "bookmark";
             } else if (this.queries) {
-                return 'query';
+                return "query";
             } else {
-                return 'none';
+                return "none";
             }
         }
 

@@ -4,7 +4,7 @@ namespace shortycut {
     // Configuration
     //------------------------------------------------------------------------------------------------------------------
 
-    export let config = null as any as Config;
+    export let config = null as unknown as Config;
 
     //------------------------------------------------------------------------------------------------------------------
     // Shortcuts
@@ -12,20 +12,25 @@ namespace shortycut {
 
     export type Shortcuts = Hashtable<Shortcut>;
 
-    export let shortcuts = null as any as Shortcuts;
+    export let shortcuts = null as unknown as Shortcuts;
 
     export let defaultSearchEngine: Shortcut | null = null;
+
+    defaultSearchEngine ??= null;
 
     //------------------------------------------------------------------------------------------------------------------
     // Various
     //------------------------------------------------------------------------------------------------------------------
 
-    export let queryParameters = null as any as QueryParameters;
-    export let redirector = null as any as Redirector;
-    export let router = null as any as Router;
-    export let faviconManager = null as any as FaviconManager;
-    export let javaScriptLoader = null as any as JavaScriptLoader;
-    export let hotkeySelector = null as any as HotkeySelector;
+    export let queryParameters = null as unknown as QueryParameters;
+    export let redirector = null as unknown as Redirector;
+    export let router = null as unknown as Router;
+    export let faviconManager = null as unknown as FaviconManager;
+    export let javaScriptLoader = null as unknown as JavaScriptLoader;
+    export let hotkeySelector = null as unknown as HotkeySelector;
+
+    faviconManager ??= null as unknown as FaviconManager;
+    javaScriptLoader ??= null as unknown as JavaScriptLoader;
 
     //------------------------------------------------------------------------------------------------------------------
     // Pages
@@ -48,19 +53,18 @@ namespace shortycut {
             redirect: null as RedirectPage | null,
             setup: null as SetupInstructions | null,
             shortlist: null as Shortlist | null
-        }
+        };
 
         public hideAllExcept(page: Page | null) {
-            Object.keys(this.pages).forEach(key => {
-                const value = (this.pages as any)[key] as Page | null;
-                if (value && value !== page && 'object' === typeof value && 'function' === typeof value.hide) {
+            forEachProperty(this.pages, (_key, value) => {
+                if (value && value !== page && "object" === typeof value && "function" === typeof value.hide) {
                     value.hide();
                 }
             });
         }
 
         public get error() {
-            const error = this.pages.error ?? new ErrorPage()
+            const error = this.pages.error ?? new ErrorPage();
             this.pages.error = error;
             return error;
         }
@@ -114,7 +118,7 @@ namespace shortycut {
     // Data collected during the start-up phase
     //------------------------------------------------------------------------------------------------------------------
 
-    export const dynamicLinkProtocol = 'function';
+    export const dynamicLinkProtocol = "function";
 
     class StartupCache {
 

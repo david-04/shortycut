@@ -15,7 +15,7 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function replaceAll(source: string, search: string, replacement: string, caseSensitive: boolean) {
-        let result = '';
+        let result = "";
         if (!caseSensitive) {
             search = search.toLocaleLowerCase();
         }
@@ -51,7 +51,7 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function isUrl(text: string) {
-        for (const protocol of ['http://', 'https://', 'ftp://', 'file://']) {
+        for (const protocol of ["http://", "https://", "ftp://", "file://"]) {
             if (startsWith(text, protocol)) {
                 return true;
             }

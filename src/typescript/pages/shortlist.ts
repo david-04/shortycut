@@ -7,12 +7,12 @@ namespace shortycut {
     export class Shortlist implements Page {
 
         private readonly dom = {
-            shortlist: assertNotNull(document.getElementById('shortlist')),
+            shortlist: assertNotNull(document.getElementById("shortlist")),
             listItems: new Array<HTMLElement>()
         };
 
         private links = new Array<Link>();
-        private searchTerm = '';
+        private searchTerm = "";
         private focusIndex = 0;
 
         //--------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public populate(links: Link[], searchTerm: string) {
-            this.links = [null as any as Link, ...links];
+            this.links = [null as unknown as Link, ...links];
             this.searchTerm = searchTerm;
             this.dom.listItems = [
                 this.createHeader(),
@@ -41,13 +41,13 @@ namespace shortycut {
                     index + 1,
                     link.getHref(this.searchTerm),
                     link.segments.descriptionHtml,
-                    (event) => this.openSelected(event, index + 1),
-                    sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, '')),
+                    event => this.openSelected(event, index + 1),
+                    sanitize(link.url.replace(/^[a-z]+:\/\/+/i, "").replace(/[#?].*/, "")),
                     link.url
                 ))
             ];
 
-            this.dom.shortlist.innerHTML = '';
+            this.dom.shortlist.innerHTML = "";
             this.dom.listItems.forEach(href => this.dom.shortlist.appendChild(href));
             this.focusIndex = 0;
 
@@ -55,7 +55,7 @@ namespace shortycut {
         }
 
         private createHeader() {
-            return this.createLink(0, 'javascript:void(0)', 'Open all', this.openAll);
+            return this.createLink(0, "javascript:void(0)", "Open all", this.openAll);
         }
 
         private createLink(
@@ -67,19 +67,19 @@ namespace shortycut {
             url?: string
         ) {
 
-            const a = document.createElement('a');
+            const a = document.createElement("a");
             a.href = href;
             a.id = `shortlist${index}`;
-            const favicon = url && config.homepage.suggestions.showFavicons ? faviconManager.getFavicon(url) : '';
-            a.innerHTML = create('div.row', [
-                create('div.icon', createImage('resources/arrow.svg')),
-                create('div.text', [
-                    create('div.title', title),
-                    url && subtitle ? create('div.url', favicon, subtitle) : ''
+            const favicon = url && config.homepage.suggestions.showFavicons ? faviconManager.getFavicon(url) : "";
+            a.innerHTML = create("div.row", [
+                create("div.icon", createImage("resources/arrow.svg")),
+                create("div.text", [
+                    create("div.title", title),
+                    url && subtitle ? create("div.url", favicon, subtitle) : ""
                 ])
             ]).outerHTML;
 
-            a.addEventListener('click', onClick);
+            a.addEventListener("click", onClick);
             return a;
         }
 
@@ -89,13 +89,13 @@ namespace shortycut {
 
         public show() {
             this.addEventHandlers();
-            this.dom.shortlist.style.display = 'flex';
+            this.dom.shortlist.style.display = "flex";
             this.dom.listItems[this.focusIndex].focus();
         }
 
         public hide() {
             this.removeEventHandlers();
-            this.dom.shortlist.style.display = 'none';
+            this.dom.shortlist.style.display = "none";
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -103,11 +103,11 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private addEventHandlers() {
-            ['keyup', 'keydown'].forEach(event => document.addEventListener(event as 'keyup', this.onKey));
+            ["keyup", "keydown"].forEach(event => document.addEventListener(event as "keyup", this.onKey));
         }
 
         private removeEventHandlers() {
-            ['keyup', 'keydown'].forEach(event => document.removeEventListener(event as 'keyup', this.onKey));
+            ["keyup", "keydown"].forEach(event => document.removeEventListener(event as "keyup", this.onKey));
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -116,14 +116,14 @@ namespace shortycut {
 
         private onKey(event: KeyboardEvent) {
 
-            if ('keyup' === event.type) {
+            if ("keyup" === event.type) {
                 return false;
             }
 
-            const id = document.activeElement?.id || '';
-            const current = id.match(/^shortlist\d+$/) ? parseInt(id.replace(/shortlist/, '')) : -1;
+            const id = document.activeElement?.id || "";
+            const current = id.match(/^shortlist\d+$/) ? parseInt(id.replace(/shortlist/, "")) : -1;
 
-            if ('Enter' === event.key) {
+            if ("Enter" === event.key) {
                 if (0 === current) {
                     return this.openAll(event);
                 } else if (current < this.links.length) {
@@ -162,22 +162,26 @@ namespace shortycut {
         }
 
         private getTargetIndex(key: string, current: number) {
-
-            if ('ArrowDown' === key || 'Down' === key || 'Enter' === key || 'Tab' === key) {
+            if (this.isArrowDown(key) || "Enter" === key || "Tab" === key) {
                 return Math.min(Math.max(current + 1, 0), this.links.length - 1);
-            } else if ('ArrowUp' === key || 'Up' === key) {
-                if (current < 0) {
-                    return this.links.length - 1;
-                } else {
-                    return Math.max(Math.min(current - 1, this.links.length - 1), 0);
-                }
-            } else if ('Home' === key || 'PageUp' === key) {
+            } else if (this.isArrowUp(key)) {
+                return current < 0
+                    ? this.links.length - 1
+                    : Math.max(Math.min(current - 1, this.links.length - 1), 0);
+            } else if ("Home" === key || "PageUp" === key) {
                 return 0;
-            } else if ('End' === key || 'PageDown' === key) {
+            } else if ("End" === key || "PageDown" === key) {
                 return this.links.length - 1;
             }
-
             return current;
+        }
+
+        private isArrowDown(key: string) {
+            return "ArrowDown" === key || "Down" === key;
+        }
+
+        private isArrowUp(key: string) {
+            return "ArrowUp" === key || "Up" === key;
         }
     }
 }

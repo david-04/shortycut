@@ -7,7 +7,7 @@ namespace shortycut {
     export class JavaScriptFile {
 
         public readonly dependencies = new Array<JavaScriptFile>();
-        public status: 'waiting' | 'loading' | 'completed' = 'waiting';
+        public status: "waiting" | "loading" | "completed" = "waiting";
 
         public constructor(public readonly url: string, dependencies?: JavaScriptFile[]) {
             dependencies?.forEach(dependency => this.dependencies.push(dependency));
@@ -22,10 +22,10 @@ namespace shortycut {
 
         private onCompleteHandler?: () => void;
 
-        private get files() {
-            const key: any = 'shortycut.JavaScriptLoader.files';
-            window[key] = window[key] ?? new Hashtable<JavaScriptFile>();
-            return window[key] as any as Hashtable<JavaScriptFile>;
+        private get files(): Hashtable<JavaScriptFile> {
+            const result = window.shortycutJavaScriptLoaderFiles ?? new Hashtable<JavaScriptFile>();
+            window.shortycutJavaScriptLoaderFiles ??= result;
+            return result;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -46,14 +46,14 @@ namespace shortycut {
         private checkDependenciesAndLoadFiles() {
             const files = this.files.values;
             for (const file of files) {
-                if (file.status === 'waiting' && !file.dependencies.filter(dep => dep.status !== 'completed').length) {
+                if (file.status === "waiting" && !file.dependencies.filter(dep => dep.status !== "completed").length) {
                     this.startLoad(file);
                 }
             }
 
-            const waitingFiles = files.filter(file => file.status === 'waiting');
+            const waitingFiles = files.filter(file => file.status === "waiting");
             const hasWaitingFiles = !!waitingFiles.length;
-            const hasLoadingFiles = !!files.filter(file => file.status === 'loading').length;
+            const hasLoadingFiles = !!files.filter(file => file.status === "loading").length;
 
             if (!hasWaitingFiles && !hasLoadingFiles && this.onCompleteHandler) {
                 this.onCompleteHandler();
@@ -61,7 +61,7 @@ namespace shortycut {
             if (hasWaitingFiles && !hasLoadingFiles) {
                 startupCache.initializationErrors.push(new ScriptLoadingError(`
                     There's a cyclic dependency (&quot;deadlock&quot;) between the following JavaScript files:
-                    ${(waitingFiles).map(file => sanitize(file.url)).join(' and ')}
+                    ${(waitingFiles).map(file => sanitize(file.url)).join(" and ")}
                 `.trim()));
                 waitingFiles.forEach(file => this.startLoad(file));
             }
@@ -72,13 +72,13 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private startLoad(file: JavaScriptFile) {
-            file.status = 'loading';
-            const script = document.createElement('script');
-            script.addEventListener('load', () => this.onLoad(file));
-            script.addEventListener('error', () => this.onError(file));
-            script.type = 'text/javascript';
+            file.status = "loading";
+            const script = document.createElement("script");
+            script.addEventListener("load", () => this.onLoad(file));
+            script.addEventListener("error", () => this.onError(file));
+            script.type = "text/javascript";
             script.src = file.url.match(/^[a-z]+:\/\/.*/i) ? file.url : `data/${file.url}`;
-            document.getElementsByTagName('head')[0].appendChild(script);
+            document.getElementsByTagName("head")[0].appendChild(script);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -86,12 +86,12 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private onLoad(file: JavaScriptFile) {
-            file.status = 'completed';
+            file.status = "completed";
             this.checkDependenciesAndLoadFiles();
         }
 
         private onError(file: JavaScriptFile) {
-            file.status = 'completed';
+            file.status = "completed";
             startupCache.initializationErrors.push(new ScriptLoadingError(`Failed to load ${sanitize(file.url)}`));
             this.checkDependenciesAndLoadFiles();
         }

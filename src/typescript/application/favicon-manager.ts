@@ -1,5 +1,7 @@
 namespace shortycut {
 
+    const MAX_PARALLEL_FAVICON_JOBS = 10;
+
     //------------------------------------------------------------------------------------------------------------------
     // Enums to describe the load priorities
     //------------------------------------------------------------------------------------------------------------------
@@ -23,9 +25,13 @@ namespace shortycut {
     class FaviconLoadScope {
 
         public static readonly OFFLINE = new FaviconLoadScope(FaviconOriginType.CACHE_OFFLINE);
-        public static readonly ONLINE = new FaviconLoadScope(FaviconOriginType.CACHE_OFFLINE, FaviconOriginType.WEBSITE);
+        public static readonly ONLINE = new FaviconLoadScope(
+            FaviconOriginType.CACHE_OFFLINE, FaviconOriginType.WEBSITE
+        );
         public static readonly FETCH_SERVICE = new FaviconLoadScope(FaviconOriginType.FETCH_SERVICE);
-        public static readonly PRIORITY = new FaviconLoadScope(FaviconOriginType.CACHE_OFFLINE, FaviconOriginType.FETCH_SERVICE, FaviconOriginType.WEBSITE);
+        public static readonly PRIORITY = new FaviconLoadScope(
+            FaviconOriginType.CACHE_OFFLINE, FaviconOriginType.FETCH_SERVICE, FaviconOriginType.WEBSITE
+        );
 
         public readonly originTypes: Array<FaviconOriginType>;
 
@@ -42,7 +48,7 @@ namespace shortycut {
 
     class FaviconLoadJob {
 
-        private status: 'new' | 'loading' | 'loaded' | 'failed' = 'new';
+        private status: "new" | "loading" | "loaded" | "failed" = "new";
         private readonly observers = new Array<FaviconFile>();
 
         //--------------------------------------------------------------------------------------------------------------
@@ -56,9 +62,9 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public addObserver(file: FaviconFile) {
-            if ('loaded' === this.status) {
+            if ("loaded" === this.status) {
                 file.onResolved();
-            } else if ('failed' === this.status) {
+            } else if ("failed" === this.status) {
                 file.onRejected();
             } else {
                 this.observers.push(file);
@@ -70,11 +76,11 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public get isNew() {
-            return 'new' === this.status;
+            return "new" === this.status;
         }
 
         public get isLoading() {
-            return 'loading' === this.status;
+            return "loading" === this.status;
         }
 
         public get isFinished() {
@@ -82,11 +88,11 @@ namespace shortycut {
         }
 
         public get isLoaded() {
-            return 'loaded' === this.status;
+            return "loaded" === this.status;
         }
 
         public get hasFailed() {
-            return 'failed' === this.status;
+            return "failed" === this.status;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -95,13 +101,13 @@ namespace shortycut {
 
         public startLoad() {
 
-            if ('new' !== this.status) {
+            if ("new" !== this.status) {
                 return false;
             }
-            this.status = 'loading';
-            create('img', element => {
-                element.addEventListener('load', () => this.onLoadEnd(true));
-                element.addEventListener('error', () => this.onLoadEnd(false));
+            this.status = "loading";
+            create("img", element => {
+                element.addEventListener("load", () => this.onLoadEnd(true));
+                element.addEventListener("error", () => this.onLoadEnd(false));
                 (element as HTMLImageElement).src = this.url;
             });
 
@@ -114,7 +120,7 @@ namespace shortycut {
 
         private onLoadEnd(success: boolean) {
 
-            this.status = success ? 'loaded' : 'failed';
+            this.status = success ? "loaded" : "failed";
             this.observers.forEach(observer => success ? observer.onResolved() : observer.onRejected());
             this.observers[0]?.origin.domain.registry.startNextLoad();
         }
@@ -160,7 +166,7 @@ namespace shortycut {
 
     class FaviconOrigin {
 
-        private static readonly EXTENSIONS = ['ico', 'png', 'jpg', 'gif', 'svg', 'jpeg'];
+        private static readonly EXTENSIONS = ["ico", "png", "jpg", "gif", "svg", "jpeg"];
 
         private files = new Array<FaviconFile>();
         public resolvedFile?: FaviconFile;
@@ -177,10 +183,10 @@ namespace shortycut {
         ) {
 
             if (type.isFetchService) {
-                const urlWithoutPort = this.url.replace(/%s/g, this.domain.name.replace(/:\d+$/, ''));
+                const urlWithoutPort = this.url.replace(/%s/g, this.domain.name.replace(/:\d+$/, ""));
                 this.files = [new FaviconFile(this, urlWithoutPort, urlWithoutPort)];
             } else {
-                const basename = type.isWebsite ? 'favicon' : this.domain.name.replace(/:/g, '!');
+                const basename = type.isWebsite ? "favicon" : this.domain.name.replace(/:/g, "!");
                 this.files = FaviconOrigin.EXTENSIONS
                     .map(extension => `${basename}.${extension}`)
                     .map(filename => new FaviconFile(this, filename, this.url.replace(/%s/g, filename)));
@@ -254,7 +260,7 @@ namespace shortycut {
 
             this.files = this.files.filter(currentFile => currentFile.name !== file.name);
             if (!this.files.length) {
-                this.domain.registry.cache.set(this.domain.name, this.name, '');
+                this.domain.registry.cache.set(this.domain.name, this.name, "");
                 this.domain.onOriginRejected(this);
             }
         }
@@ -267,7 +273,7 @@ namespace shortycut {
     class FaviconDomain {
 
         public readonly origins = new Hashtable<FaviconOrigin>();
-        private subDomains = new Hashtable<FaviconDomain>();
+        private readonly subDomains = new Hashtable<FaviconDomain>();
         public parentDomain?: FaviconDomain;
         public displayName: string;
 
@@ -288,7 +294,7 @@ namespace shortycut {
 
             this.createOrigins();
             this.createParentDomain();
-            this.displayName = this.name.replace(/^www\./i, '');
+            this.displayName = this.name.replace(/^www\./i, "");
         }
 
         private createOrigins() {
@@ -300,10 +306,10 @@ namespace shortycut {
 
             config.favicons.localFolders.forEach(origin => {
                 if (!origin.match(/^[a-z]+:\/\//i)) {
-                    origin = window.location.href.replace(/\/[^/]+$/, '') + '/' + origin;
+                    origin = `${window.location.href.replace(/\/[^/]+$/, "")}/${origin}`;
                 }
-                origin = origin.replace(/\/$/, '');
-                const type = origin.match(/^file:/) ? FaviconOriginType.CACHE_OFFLINE : FaviconOriginType.CACHE_ONLINE
+                origin = origin.replace(/\/$/, "");
+                const type = origin.match(/^file:/) ? FaviconOriginType.CACHE_OFFLINE : FaviconOriginType.CACHE_ONLINE;
                 this.origins.put(origin, new FaviconOrigin(this, origin, type, `${origin}/%s`));
             });
 
@@ -314,16 +320,16 @@ namespace shortycut {
 
             if (this.registry.readCache) {
                 this.origins.keys
-                    .filter(origin => '' === this.registry.cache.get(this.name, origin))
+                    .filter(origin => "" === this.registry.cache.get(this.name, origin))
                     .forEach(origin => this.origins.delete(origin));
             }
         }
 
         private createParentDomain() {
 
-            const parentDomain = this.name.replace(/^[^.]+\./, '');
+            const parentDomain = this.name.replace(/^[^.]+\./, "");
             if (parentDomain !== this.name) {
-                this.parentDomain = this.registry.addDomain(parentDomain, this.protocols, false)
+                this.parentDomain = this.registry.addDomain(parentDomain, this.protocols, false);
                 this.parentDomain.subDomains.put(this.name, this);
             }
         }
@@ -333,23 +339,27 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public startNextLoad(scope: FaviconLoadScope): boolean {
-
             if (this.isLoading) {
                 return false;
             }
-
             const types = scope.originTypes.filter(type => this.isPrimary || !type.isWebsite);
             for (const type of types) {
                 for (const origin of this.origins.values.filter(currentOrigin => currentOrigin.type === type)) {
-                    for (const parameters of [[false, false], [true, false], [true, true]]) {
-                        if (origin.startNextLoad(parameters[0], parameters[1])) {
-                            return true;
-                        }
+                    if (this.startNextLoadPrioritized(origin)) {
+                        return true;
                     }
                 }
             }
-
             return !!this.parentDomain?.startNextLoad(scope);
+        }
+
+        private startNextLoadPrioritized(origin: FaviconOrigin) {
+            for (const parameters of [[false, false], [true, false], [true, true]]) {
+                if (origin.startNextLoad(parameters[0], parameters[1])) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -360,7 +370,7 @@ namespace shortycut {
 
             if (!this.resolvedOrigin) {
                 this.resolvedOrigin = origin;
-                this.notifyObservers(origin.resolvedFile?.url)
+                this.notifyObservers(origin.resolvedFile?.url);
                 this.subDomains.values.forEach(domain => domain.onParentDomainResolved(this));
             }
             this.registry.updateFaviconToolsPage();
@@ -405,8 +415,8 @@ namespace shortycut {
 
         public getFavicon(): HTMLDivElement {
 
-            const img = create('img') as HTMLImageElement;
-            let domain: FaviconDomain = this;
+            const img = create("img") as HTMLImageElement;
+            let domain: FaviconDomain = this as FaviconDomain;
             while (!domain.resolvedOrigin && domain.parentDomain) {
                 domain = domain.parentDomain;
             }
@@ -416,8 +426,8 @@ namespace shortycut {
             } else {
                 this.observers.push(img);
             }
-            return create('div.favicon', img, element => {
-                element.dataset['domain'] = this.name;
+            return create("div.favicon", img, element => {
+                element.dataset["domain"] = this.name;
             }) as HTMLDivElement;
         }
     }
@@ -487,7 +497,7 @@ namespace shortycut {
                 return;
             }
 
-            let remainingJobs = Math.max(0, 10 - this.currentJobCount);
+            let remainingJobs = Math.max(0, MAX_PARALLEL_FAVICON_JOBS - this.currentJobCount);
             for (const scope of [FaviconLoadScope.OFFLINE, FaviconLoadScope.ONLINE, FaviconLoadScope.FETCH_SERVICE]) {
                 const domains = this.domains.values.filter(domain => domain.isPrimary && !domain.isResolved);
                 for (const domain of domains) {
@@ -532,8 +542,8 @@ namespace shortycut {
 
     export class FaviconManager {
 
-        private domains = new Hashtable<Array<string>>();
-        private cache = new FaviconCache();
+        private readonly domains = new Hashtable<Array<string>>();
+        private readonly cache = new FaviconCache();
         private registry: FaviconRegistry;
 
         //--------------------------------------------------------------------------------------------------------------
@@ -545,10 +555,10 @@ namespace shortycut {
             shortcuts.values.forEach(shortcut => {
                 shortcut.all.map(item => item.link).map(link => link.urlForFavicon).forEach(url => {
                     const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
-                    if ('file' !== protocol) {
+                    if ("file" !== protocol) {
                         const protocols = this.domains.computeIfAbsent(domain, () => new Array<string>());
                         if (!protocols.filter(currentProtocol => currentProtocol === protocol).length) {
-                            if ('https' === protocol) {
+                            if ("https" === protocol) {
                                 protocols.unshift(protocol);
                             } else {
                                 protocols.push(protocol);
@@ -563,8 +573,10 @@ namespace shortycut {
 
         public static extractProtocolAndDomain(url: string) {
             return {
-                protocol: assertNotNull(url.match(/^([a-z]+:\/\/)?/i))[0].replace(/:.*/, '').toLocaleLowerCase() || 'http',
-                domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, '').replace(/\/.*/, '').toLowerCase()
+                protocol: assertNotNull(url.match(/^([a-z]+:\/\/)?/i))[0]
+                    .replace(/:.*/, "")
+                    .toLocaleLowerCase() || "http",
+                domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, "").replace(/\/.*/, "").toLowerCase()
             };
         }
 
@@ -601,9 +613,9 @@ namespace shortycut {
 
             const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
 
-            if ('file' === protocol || !this.registry.domains.get(domain)) {
-                const div = create('div.favicon', createImage('resources/local.svg')) as HTMLDivElement;
-                div.dataset['domain'] = domain;
+            if ("file" === protocol || !this.registry.domains.get(domain)) {
+                const div = create("div.favicon", createImage("resources/local.svg")) as HTMLDivElement;
+                div.dataset["domain"] = domain;
                 return div;
             } else {
                 return this.registry.getFavicon(domain);
@@ -633,7 +645,7 @@ namespace shortycut {
                     domain = domain.parentDomain;
                 }
                 if (!domain.resolvedOrigin?.resolvedFile?.job.url || domain.resolvedOrigin?.type.isFetchService) {
-                    domains.push(domain.displayName)
+                    domains.push(domain.displayName);
                 }
             });
 
@@ -650,21 +662,21 @@ namespace shortycut {
                     domain = domain.parentDomain;
                 }
                 if (domain.resolvedOrigin?.resolvedFile?.job.url && domain.resolvedOrigin.type.isWebsite) {
-                    const name = domain.displayName.replace(/:/g, '!');
-                    const extension = domain.resolvedOrigin?.resolvedFile.name.replace(/^.*\./, '') ?? 'ico';
-                    files.put(`${name}.${extension}`, domain.resolvedOrigin.resolvedFile.job.url)
+                    const name = domain.displayName.replace(/:/g, "!");
+                    const extension = domain.resolvedOrigin?.resolvedFile.name.replace(/^.*\./, "") ?? "ico";
+                    files.put(`${name}.${extension}`, domain.resolvedOrigin.resolvedFile.job.url);
                 }
             });
 
             return files.entries
-                .map(entry => { return { filename: entry.key, url: entry.value } })
+                .map(entry => { return { filename: entry.key, url: entry.value }; })
                 .sort((a, b) => this.compare(a.filename, b.filename));
         }
 
         public getOfflineDomains() {
 
             const files = new Hashtable<string>();
-            const prefix = window.location.href.replace(/\/[^/]+$/, '') + '/';
+            const prefix = window.location.href.replace(/\/[^/]+$/, "") + "/";
 
             this.registry.domains.values.filter(domain => domain.isPrimary && domain.isResolved).forEach(domain => {
                 while (!domain.resolvedOrigin && domain.parentDomain) {
@@ -677,7 +689,7 @@ namespace shortycut {
             });
 
             return files.entries
-                .map(entry => { return { path: entry.key, url: entry.value } })
+                .map(entry => { return { path: entry.key, url: entry.value }; })
                 .sort((item1, item2) => this.compare(item1.path, item2.path));
         }
 
@@ -686,7 +698,7 @@ namespace shortycut {
             if (s1 < s2) {
                 return -1;
             } else {
-                return s1 == s2 ? 0 : 1;
+                return s1 === s2 ? 0 : 1;
             }
         }
     }

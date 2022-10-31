@@ -7,10 +7,10 @@ namespace shortycut {
     export class Menu {
 
         private readonly dom = {
-            menu: document.querySelector('#menu') as HTMLElement,
-            burgerIcon: document.querySelector('#menu .burger-icon') as HTMLElement,
-            closeIcon: document.querySelector('#menu .close-icon') as HTMLElement,
-            items: document.querySelector('#menu .items') as HTMLElement
+            menu: document.querySelector("#menu") as HTMLElement,
+            burgerIcon: document.querySelector("#menu .burger-icon") as HTMLElement,
+            closeIcon: document.querySelector("#menu .close-icon") as HTMLElement,
+            items: document.querySelector("#menu .items") as HTMLElement
         };
 
         private onClose?: (() => void);
@@ -41,19 +41,19 @@ namespace shortycut {
 
         private populateItems() {
 
-            this.dom.items.innerHTML = '';
+            this.dom.items.innerHTML = "";
 
             const menuItems: Array<[string, ((event: MouseEvent) => boolean) | (() => boolean)]> = [
                 [`ShortyCut ${getVersionNumber()}`, this.onShortyCut],
-                ['Documentation', this.onDocumentation],
-                ['Link tools', this.onLinkTools],
-                ['Browser integration', this.onBrowserIntegration],
-                ['Favicons', this.onFavicons]
+                ["Documentation", this.onDocumentation],
+                ["Link tools", this.onLinkTools],
+                ["Browser integration", this.onBrowserIntegration],
+                ["Favicons", this.onFavicons]
             ];
 
             menuItems.forEach(array =>
                 this.dom.items.appendChild(
-                    create('a', array[0], element => element.addEventListener('click', array[1]))
+                    create("a", array[0], element => element.addEventListener("click", array[1]))
                 )
             );
         }
@@ -63,17 +63,17 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private addEventListeners() {
-            this.dom.closeIcon.addEventListener('click', this.onClickCloseIcon);
-            this.dom.burgerIcon.addEventListener('click', this.onClickBurgerIcon);
-            document.body.addEventListener('click', this.onClickBody);
-            document.body.addEventListener('keydown', this.onKeyDown);
+            this.dom.closeIcon.addEventListener("click", this.onClickCloseIcon);
+            this.dom.burgerIcon.addEventListener("click", this.onClickBurgerIcon);
+            document.body.addEventListener("click", this.onClickBody);
+            document.body.addEventListener("keydown", this.onKeyDown);
         }
 
         private removeEventListeners() {
-            this.dom.closeIcon.removeEventListener('click', this.onClickCloseIcon);
-            this.dom.burgerIcon.removeEventListener('click', this.onClickBurgerIcon);
-            document.body.removeEventListener('click', this.onClickBody);
-            document.body.removeEventListener('keydown', this.onKeyDown);
+            this.dom.closeIcon.removeEventListener("click", this.onClickCloseIcon);
+            this.dom.burgerIcon.removeEventListener("click", this.onClickBurgerIcon);
+            document.body.removeEventListener("click", this.onClickBody);
+            document.body.removeEventListener("keydown", this.onKeyDown);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -81,33 +81,33 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public showBurgerIcon() {
-            if (this.dom.menu.style.display === 'none') {
+            if (this.dom.menu.style.display === "none") {
                 this.addEventListeners();
             }
-            this.dom.burgerIcon.style.display = 'block';
-            this.dom.closeIcon.style.display = 'none';
-            this.dom.items.style.display = 'none';
-            this.dom.menu.style.display = 'block';
+            this.dom.burgerIcon.style.display = "block";
+            this.dom.closeIcon.style.display = "none";
+            this.dom.items.style.display = "none";
+            this.dom.menu.style.display = "block";
         }
 
         public showCloseIcon(onClose: (() => void)) {
             this.onClose = onClose;
-            if (this.dom.menu.style.display === 'none') {
+            if (this.dom.menu.style.display === "none") {
                 this.addEventListeners();
             }
-            this.dom.burgerIcon.style.display = 'none';
-            this.dom.closeIcon.style.display = 'block';
-            this.dom.items.style.display = 'none';
-            this.dom.menu.style.display = 'block';
+            this.dom.burgerIcon.style.display = "none";
+            this.dom.closeIcon.style.display = "block";
+            this.dom.items.style.display = "none";
+            this.dom.menu.style.display = "block";
         }
 
         public hide() {
             this.removeEventListeners();
-            this.dom.menu.style.display = 'none';
+            this.dom.menu.style.display = "none";
         }
 
         public closeMenu() {
-            this.dom.items.style.display = 'none';
+            this.dom.items.style.display = "none";
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public onClickBurgerIcon(event: MouseEvent) {
-            this.dom.items.style.display = 'none' === this.dom.items.style.display ? 'block' : 'none';
+            this.dom.items.style.display = "none" === this.dom.items.style.display ? "block" : "none";
             return this.cancelEvent(event);
         }
 
@@ -133,7 +133,7 @@ namespace shortycut {
 
         public onShortyCut(event: MouseEvent) {
             this.closeMenu();
-            const url = 'https://github.com/david-04/shortycut';
+            const url = "https://github.com/david-04/shortycut";
             if (queryParameters.facets.newTabs) {
                 window.open(url);
             } else {
@@ -144,7 +144,7 @@ namespace shortycut {
 
         public onDocumentation(event: MouseEvent) {
             this.closeMenu();
-            const url = getWindowLocationPath() + 'resources/docs/index.html';
+            const url = getWindowLocationPath() + "resources/docs/index.html";
             if (queryParameters.facets.newTabs) {
                 window.open(url);
             } else {
@@ -178,8 +178,8 @@ namespace shortycut {
         }
 
         private onKeyDown(event: KeyboardEvent) {
-            if (('Escape' === event.key || 'Esc' === event.key)) {
-                if (this.dom.items.style.display !== 'none') {
+            if (("Escape" === event.key || "Esc" === event.key)) {
+                if (this.dom.items.style.display !== "none") {
                     this.closeMenu();
                     event.preventDefault();
                     return false;

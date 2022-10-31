@@ -1,3 +1,4 @@
+
 namespace shortycut {
 
     //------------------------------------------------------------------------------------------------------------------
@@ -8,7 +9,7 @@ namespace shortycut {
         if (a < b) {
             return -1;
         } else {
-            return a === b ? 0 : 1
+            return a === b ? 0 : 1;
         }
     }
 
@@ -25,7 +26,7 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function getVersionNumber() {
-        return '##VERSION_NUMBER##'.replace(/^##.*/, '');
+        return "##VERSION_NUMBER##".replace(/^##.*/, "");
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -38,8 +39,8 @@ namespace shortycut {
         } catch (exception) {
             // ignored
         }
-        const valueMatches = 'success' === (window as any)['shortycutBrowserTest'];
-        delete (window as any)['shortycutBrowserTest'];
+        const valueMatches = "success" === window.shortycutBrowserTest;
+        delete window.shortycutBrowserTest;
         return valueMatches;
     }
 
@@ -48,9 +49,9 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function isDemoMode() {
-        const demoKeywords = ['tm', 'tz', 'tp', 'tt', 'tr', 'e', 'news'];
+        const demoKeywords = ["tm", "tz", "tp", "tt", "tr", "e", "news"];
         const matchedKeywords = demoKeywords.filter(keyword => shortcuts.get(keyword));
-        return shortcuts.size == demoKeywords.length && matchedKeywords.length === demoKeywords.length;
+        return shortcuts.size === demoKeywords.length && matchedKeywords.length === demoKeywords.length;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -59,9 +60,9 @@ namespace shortycut {
 
     export function assertNotNull<T>(value: T): Exclude<T, null | undefined> {
         if (undefined === value) {
-            throw new Error('Value is undefined');
+            throw new Error("Value is undefined");
         } else if (null === value) {
-            throw new Error('Value is null');
+            throw new Error("Value is null");
         } else {
             return value as Exclude<T, null | undefined>;
         }
@@ -72,11 +73,11 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function getWindowLocationPath() {
-        const url = window.location.href.replace(/[#?].*/, '');
-        const index = url.lastIndexOf('/');
+        const url = window.location.href.replace(/[#?].*/, "");
+        const index = url.lastIndexOf("/");
         const lastPathSegment = url.substring(index + 1);
         if (lastPathSegment) {
-            if (0 <= lastPathSegment.indexOf('.')) {
+            if (0 <= lastPathSegment.indexOf(".")) {
                 return url.substring(0, index + 1);
             } else {
                 return `${url}/`;
@@ -84,5 +85,21 @@ namespace shortycut {
         } else {
             return url;
         }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Iterate over all property and pass the key-value pair to a callback
+    //------------------------------------------------------------------------------------------------------------------
+
+    export function forEachProperty<T>(object: { [index: string]: T; }, callback: (key: string, value: T) => void) {
+        Object.keys(object).forEach(key => callback(key, getProperty(object, key) as T));
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Retrieve a property value from an object
+    //------------------------------------------------------------------------------------------------------------------
+
+    export function getProperty<T>(object: { [index: string]: T; }, key: string) {
+        return object && "object" === typeof object ? object[key] : undefined;
     }
 }

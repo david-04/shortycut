@@ -41,9 +41,9 @@ namespace shortycut {
         } else {
             console.error(exception);
             const message = `${exception}`;
-            pages.error.populate('Internal error', [
-                create('p', 'An internal error occurred:'),
-                create('p', message)
+            pages.error.populate("Internal error", [
+                create("p", "An internal error occurred:"),
+                create("p", message)
             ]);
         }
         pages.hideAllExcept(pages.error);
@@ -63,19 +63,19 @@ namespace shortycut {
         }
 
         public toHtml() {
-            return create('div.description', this.htmlElements);
+            return create("div.description", this.htmlElements);
         }
     }
 
     export class ScriptLoadingError extends InitializationError {
         constructor(html: string) {
-            super(create('div:html', html))
+            super(create("div:html", html));
         }
     }
 
     export class ParserError extends InitializationError {
         constructor(public readonly description: string, public readonly line: string) {
-            super(create('div', description, ':'), create('div', create('tt', line)))
+            super(create("div", description, ":"), create("div", create("tt", line)));
         }
     }
 

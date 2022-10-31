@@ -31,14 +31,15 @@ namespace shortycut {
 
     export function toUrl(dynamicLinkFunction: DynamicLinkFunction) {
 
-        if ('function' !== typeof dynamicLinkFunction) {
+        if ("function" !== typeof dynamicLinkFunction) {
             startupCache.initializationErrors.push(new InitializationError(
-                create('div', 'The parameter passed to shortycut.toUrl() is not a function:'),
-                create('div', create('tt', `${dynamicLinkFunction}`)))
+                create("div", "The parameter passed to shortycut.toUrl() is not a function:"),
+                create("div", create("tt", `${dynamicLinkFunction}`)))
             );
         }
 
-        const key = `${dynamicLinkProtocol}://${startupCache.dynamicLinks.size}-${dynamicLinkIndex++}`;
+        const key = `${dynamicLinkProtocol}://${startupCache.dynamicLinks.size}-${dynamicLinkIndex}`;
+        dynamicLinkIndex++;
         startupCache.dynamicLinks.put(key, {
             generator: dynamicLinkFunction,
             urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
@@ -50,7 +51,7 @@ namespace shortycut {
 
         let invalidUrl: string | undefined = undefined;
 
-        for (const searchTerm of [undefined, null, '', '1']) {
+        for (const searchTerm of [undefined, null, "", "1"]) {
             const result = getDynamicLinkUrl(dynamicLinkFunction, searchTerm);
             if (result.url) {
                 return result.url;
@@ -60,12 +61,12 @@ namespace shortycut {
 
         if (invalidUrl) {
             startupCache.initializationErrors.push(new InitializationError(
-                create('div', 'The dynamic link function returned an invalid URL.'),
-                create('div', create('tt', invalidUrl)))
+                create("div", "The dynamic link function returned an invalid URL."),
+                create("div", create("tt", invalidUrl)))
             );
         }
 
-        return 'file:///';
+        return "file:///";
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -74,13 +75,14 @@ namespace shortycut {
 
     function getDynamicLinkUrl(dynamicLinkFunction: DynamicLinkFunction, searchTerm?: string | null) {
         try {
-            const url = dynamicLinkFunction(searchTerm as any)?.trim();
+            const url = dynamicLinkFunction(searchTerm ?? "")?.trim();
             if (url) {
                 if (isUrl(url)) {
                     return { url };
                 } else {
-                    const name = (dynamicLinkFunction as any)?.name || 'function';
-                    const parameter = undefined === searchTerm || null === searchTerm ? `${searchTerm}` : `'${searchTerm}'`;
+                    const name = (dynamicLinkFunction as { name?: string; })?.name || "function";
+                    const quotes = undefined === searchTerm || null === searchTerm ? "" : "'";
+                    const parameter = `${quotes}${searchTerm}${quotes}`;
                     return { invalidUrl: `${name}(${parameter}) => ${url}` };
                 }
             }

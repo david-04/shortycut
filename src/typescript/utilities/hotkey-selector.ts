@@ -1,12 +1,14 @@
 namespace shortycut {
 
-    type HotkeyCandidates = Array<{ index: number, isPreferred: boolean }>;
+    type HotkeyCandidates = Array<{ index: number, isPreferred: boolean; }>;
 
     //------------------------------------------------------------------------------------------------------------------
     // Automatically select letters from the description to be highlighted as hotkeys
     //------------------------------------------------------------------------------------------------------------------
 
     export class HotkeySelector {
+
+        private static readonly MAX_ASCII_CODE = 127;
 
         //--------------------------------------------------------------------------------------------------------------
         // Split the description into alternating segments of descriptions and hotkeys
@@ -87,7 +89,7 @@ namespace shortycut {
 
         private isSeparator(char: string) {
             const code = char.charCodeAt(0);
-            return 0 <= code && code <= 127 && char.match(/[^a-z]/i);
+            return 0 <= code && code <= HotkeySelector.MAX_ASCII_CODE && char.match(/[^a-z]/i);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -117,7 +119,8 @@ namespace shortycut {
         private switchToNextCombination(currentCombination: number[], candidates: HotkeyCandidates[]) {
 
             for (let index = currentCombination.length - 1; 0 <= index; index--) {
-                if (++currentCombination[index] < candidates[index].length) {
+                currentCombination[index]++;
+                if (currentCombination[index] < candidates[index].length) {
                     return true;
                 } else if (0 === index) {
                     return false;
@@ -179,10 +182,13 @@ namespace shortycut {
 
         private splitDescription(description: string, hotkeyPositions: number[]) {
 
-            const result = new Array<{ text: string, isHotkey: boolean }>();
+            const result = new Array<{ text: string, isHotkey: boolean; }>();
             result.push({ text: description.substring(0, hotkeyPositions[0]), isHotkey: false });
             for (let index = 0; index < hotkeyPositions.length; index++) {
-                result.push({ text: description.substring(hotkeyPositions[index], hotkeyPositions[index] + 1), isHotkey: true });
+                result.push({
+                    text: description.substring(hotkeyPositions[index], hotkeyPositions[index] + 1),
+                    isHotkey: true
+                });
                 const nextIndex = index + 1 < hotkeyPositions.length ? hotkeyPositions[index + 1] : description.length;
                 result.push({ text: description.substring(hotkeyPositions[index] + 1, nextIndex), isHotkey: false });
             }

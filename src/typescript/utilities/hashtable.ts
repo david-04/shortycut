@@ -2,7 +2,8 @@ namespace shortycut {
 
     type CallbackKey<R> = (key: string) => R;
     type CallbackKeyValue<T, R> = ((key: string, value: T) => R) | CallbackKey<T>;
-    type CallbackKeyValueHashtable<T, R> = ((key: string, value: T, hashtable: Hashtable<T>) => R) | CallbackKeyValue<T, R>;
+    type CallbackKeyValueHashtable<T, R> =
+        ((key: string, value: T, hashtable: Hashtable<T>) => R) | CallbackKeyValue<T, R>;
     type CallbackKeyHashtable<T, R> = ((key: string, hashtable: Hashtable<T>) => R) | CallbackKey<R>;
     type CallbackValue<T, R> = (value: T) => R;
 
@@ -12,7 +13,7 @@ namespace shortycut {
 
     export class Hashtable<T> {
 
-        private data: { [index: string]: T } = {};
+        private data: { [index: string]: T; } = {};
 
         //--------------------------------------------------------------------------------------------------------------
         // Add and retrieve items
@@ -31,7 +32,7 @@ namespace shortycut {
         }
 
         public computeIfAbsent(key: string, supplier: (((key: string) => T) | (() => T))): T {
-            const value = this.data[key] ?? supplier(key)
+            const value = this.data[key] ?? supplier(key);
             this.data[key] = value;
             return value;
         }

@@ -7,9 +7,9 @@ namespace shortycut {
     export class RedirectPage implements Page {
 
         private readonly dom = {
-            redirect: document.querySelector('#redirect') as HTMLElement,
-            title: document.querySelector('#redirect .title') as HTMLElement,
-            url: document.querySelector('#redirect .url') as HTMLElement,
+            redirect: document.querySelector("#redirect") as HTMLElement,
+            title: document.querySelector("#redirect .title") as HTMLElement,
+            url: document.querySelector("#redirect .url") as HTMLElement,
         };
 
         //--------------------------------------------------------------------------------------------------------------
@@ -31,11 +31,11 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public show() {
-            document.body.append(create('div:html', '&nbsp;'));
+            document.body.append(create("div:html", "&nbsp;"));
         }
 
         public hide() {
-            this.dom.redirect.style.display = 'none';
+            this.dom.redirect.style.display = "none";
         }
     }
 }

@@ -12,7 +12,7 @@ namespace shortycut {
         private showRedirectPage = true;
 
         //--------------------------------------------------------------------------------------------------------------
-        // Analyse the query and redirect as required
+        // Analyze the query and redirect as required
         //--------------------------------------------------------------------------------------------------------------
 
         public processQuery() {
@@ -22,24 +22,17 @@ namespace shortycut {
             const isHomepageKeyword = config.homepage.keywords.some(keyword => keyword === queryParameters.keyword);
 
             if (setup) {
-                document.title = 'ShortyCut';
+                document.title = "ShortyCut";
                 this.showSetupPage(setup);
             } else if (shortcut) {
                 this.redirectShortcut(shortcut);
             } else if (isUrl(queryParameters.fullQuery)) {
                 this.openUrl(queryParameters.fullQuery, RedirectMode.ERASE_HISTORY);
-            } else if (!queryParameters.keyword || !defaultSearchEngine || !config.defaultSearchEngine.useInAddressBar || isHomepageKeyword) {
-                this.alwaysOpenNewTabs = queryParameters.facets.newTabs;
-                this.showRedirectPage = false;
-                document.title = 'ShortyCut';
-                router.goto(pages.home.populate(
-                    isHomepageKeyword
-                        ? queryParameters.fullQuery.replace(/^\s*[^\s]+/, '').trim()
-                        : queryParameters.fullQuery
-                ));
-                if (queryParameters.facets.noFocus) {
-                    pages.home.removeFocus();
-                }
+            } else if (!queryParameters.keyword
+                || !defaultSearchEngine
+                || !config.defaultSearchEngine.useInAddressBar
+                || isHomepageKeyword) {
+                this.openHomepage(isHomepageKeyword);
             } else {
                 defaultSearchEngine.replacePlaceholders(queryParameters.fullQuery);
                 const links = defaultSearchEngine.queries?.current || defaultSearchEngine.bookmarks?.current;
@@ -49,6 +42,20 @@ namespace shortycut {
                     queryParameters.fullQuery,
                     RedirectMode.ERASE_HISTORY
                 );
+            }
+        }
+
+        private openHomepage(isHomepageKeyword: boolean) {
+            this.alwaysOpenNewTabs = queryParameters.facets.newTabs;
+            this.showRedirectPage = false;
+            document.title = "ShortyCut";
+            router.goto(pages.home.populate(
+                isHomepageKeyword
+                    ? queryParameters.fullQuery.replace(/^\s*[^\s]+/, "").trim()
+                    : queryParameters.fullQuery
+            ));
+            if (queryParameters.facets.noFocus) {
+                pages.home.removeFocus();
             }
         }
 
@@ -76,7 +83,7 @@ namespace shortycut {
                     RedirectMode.ERASE_HISTORY
                 );
             } else {
-                throw new Exception('Internal error', 'Found no links to use for redirection');
+                throw new Exception("Internal error", "Found no links to use for redirection");
             }
         }
 
@@ -127,7 +134,7 @@ namespace shortycut {
 
             if (RedirectMode.PRESERVE_HISTORY === mode && !this.alwaysOpenNewTabs) {
                 window.location.href = url;
-            } else if (RedirectMode.ERASE_HISTORY == mode && !this.alwaysOpenNewTabs) {
+            } else if (RedirectMode.ERASE_HISTORY === mode && !this.alwaysOpenNewTabs) {
                 window.location.replace(url);
             } else {
                 window.open(url);
@@ -139,14 +146,14 @@ namespace shortycut {
 
         private submitForm(link: Link) {
 
-            const form = document.createElement('form');
+            const form = document.createElement("form");
             form.action = link.url;
-            form.method = 'post';
-            form.style.display = 'none';
+            form.method = "post";
+            form.style.display = "none";
 
             for (const field of (link.postFields || [])) {
-                const input = document.createElement('input');
-                input.type = 'text';
+                const input = document.createElement("input");
+                input.type = "text";
                 input.name = field.key;
                 input.value = field.value;
                 form.appendChild(input);

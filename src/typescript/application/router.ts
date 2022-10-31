@@ -14,8 +14,8 @@ namespace shortycut {
             this.goHome = this.goHome.bind(this);
             this.onHashChange = this.onHashChange.bind(this);
             this.onKeyDown = this.onKeyDown.bind(this);
-            window.addEventListener('hashchange', this.onHashChange);
-            document.addEventListener('keydown', this.onKeyDown);
+            window.addEventListener("hashchange", this.onHashChange);
+            document.addEventListener("keydown", this.onKeyDown);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ namespace shortycut {
         }
 
         private getCurrentHistoryIndex() {
-            const index = parseInt(window.location.hash.replace('#', ''));
+            const index = parseInt(window.location.hash.replace("#", ""));
             return Math.min(Math.max(isNaN(index) ? 0 : index, 0), this.history.length - 1);
         }
 
@@ -75,7 +75,7 @@ namespace shortycut {
                     if (page === pages.home) {
                         this.menu.showBurgerIcon();
                     } else {
-                        this.menu.showCloseIcon(this.goBackOrHome)
+                        this.menu.showCloseIcon(this.goBackOrHome);
                     }
                 } else {
                     this.menu.hide();
@@ -84,7 +84,7 @@ namespace shortycut {
         }
 
         private onKeyDown(event: KeyboardEvent) {
-            if (('Escape' === event.key || 'Esc' === event.key)) {
+            if (("Escape" === event.key || "Esc" === event.key)) {
                 if (this.history[this.history.length - 1] !== pages.home) {
                     this.goBackOrHome();
                     event.preventDefault();

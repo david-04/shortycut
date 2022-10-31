@@ -2,10 +2,10 @@ namespace shortycut {
 
     export class QueryParameters {
 
-        public static readonly QUERY = 'q';
-        public static readonly INDEX = 'i';
-        public static readonly SETUP = 'setup';
-        public static readonly FACETS = 'facets';
+        public static readonly QUERY = "q";
+        public static readonly INDEX = "i";
+        public static readonly SETUP = "setup";
+        public static readonly FACETS = "facets";
 
         public readonly queryParameters: Hashtable<string>;
         public readonly fullQuery: string;
@@ -16,7 +16,7 @@ namespace shortycut {
         public readonly facets = {
             newTabs: false,
             noFocus: false
-        }
+        };
 
         //--------------------------------------------------------------------------------------------------------------
         // Initialize the redirector and extract the query parameters
@@ -26,30 +26,30 @@ namespace shortycut {
 
             this.queryParameters = this.getQueryParameters();
 
-            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, '').replace(/\+/g, ' ');
-            this.keyword = adjustCase(this.fullQuery).replace(/\s.*/, '');
-            this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, '');
-            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, '').match(/^\d+$/)
-                ? parseInt(this.queryParameters.getOrDefault(QueryParameters.INDEX, ''))
+            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, "").replace(/\+/g, " ");
+            this.keyword = adjustCase(this.fullQuery).replace(/\s.*/, "");
+            this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, "");
+            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, "").match(/^\d+$/)
+                ? parseInt(this.queryParameters.getOrDefault(QueryParameters.INDEX, ""))
                 : undefined;
             this.setup = this.queryParameters.get(QueryParameters.SETUP);
             this.queryParameters
-                .getOrDefault(QueryParameters.FACETS, '')
-                .split(',')
+                .getOrDefault(QueryParameters.FACETS, "")
+                .split(",")
                 .map(facet => facet.trim().toLowerCase())
                 .filter(facet => facet)
                 .forEach(facet => this.applyFacet(facet));
         }
 
         private applyFacet(facet: string) {
-            if ('new-tabs' === facet) {
+            if ("new-tabs" === facet) {
                 this.facets.newTabs = true;
-            } else if ('no-focus' === facet) {
+            } else if ("no-focus" === facet) {
                 this.facets.noFocus = true;
             } else {
                 startupCache.initializationErrors.push(
                     new InitializationError(
-                        create('div', 'Facet ', create('tt', facet), ' (in this page\'s address) is not supported')
+                        create("div", "Facet ", create("tt", facet), " (in this page's address) is not supported")
                     )
                 );
             }
@@ -60,20 +60,19 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private getQueryParameters() {
-
             const result = new Hashtable<string>();
-
-            if (window.location.search) {
-                for (const parameter of window.location.search.trim().replace(/^\?/, '').trim().split('&')) {
-                    const index = parameter.indexOf('=');
-                    if (0 < index) {
-                        const key = this.urlDecode(parameter.substring(0, index));
-                        if (key) {
-                            result.put(key, this.urlDecode(parameter.substring(index + 1)));
-                        }
-                    } else {
-                        result.put(this.urlDecode(parameter), '');
+            if (!window.location.search) {
+                return result;
+            }
+            for (const parameter of window.location.search.trim().replace(/^\?/, "").trim().split("&")) {
+                const index = parameter.indexOf("=");
+                if (0 < index) {
+                    const key = this.urlDecode(parameter.substring(0, index));
+                    if (key) {
+                        result.put(key, this.urlDecode(parameter.substring(index + 1)));
                     }
+                } else {
+                    result.put(this.urlDecode(parameter), "");
                 }
             }
 
@@ -84,9 +83,9 @@ namespace shortycut {
             try {
                 return decodeURIComponent(value).trim();
             } catch (error) {
-                throw new Exception('URL syntax error',
-                    create('p', 'A query parameter passed in the URL is not url-encoded:'),
-                    create('p', value)
+                throw new Exception("URL syntax error",
+                    create("p", "A query parameter passed in the URL is not url-encoded:"),
+                    create("p", value)
                 );
             }
         }

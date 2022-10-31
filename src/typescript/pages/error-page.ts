@@ -6,11 +6,11 @@ namespace shortycut {
 
     export class ErrorPage implements Page {
 
-        private dom = {
-            error: document.querySelector('#error') as HTMLElement,
-            title: document.querySelector('#error .title') as HTMLElement,
-            message: document.querySelector('#error .message') as HTMLElement
-        }
+        private readonly dom = {
+            error: document.querySelector("#error") as HTMLElement,
+            title: document.querySelector("#error .title") as HTMLElement,
+            message: document.querySelector("#error .message") as HTMLElement
+        };
 
         //--------------------------------------------------------------------------------------------------------------
         // Populate the page
@@ -23,18 +23,18 @@ namespace shortycut {
             if (titleOrException instanceof Exception) {
                 this.dom.title.innerHTML = titleOrException.title;
                 message = titleOrException.content;
-            } else if ('string' === typeof titleOrException) {
+            } else if ("string" === typeof titleOrException) {
                 this.dom.title.innerHTML = titleOrException;
             }
 
             message.forEach(item => {
                 (Array.isArray(item) ? item : [item]).forEach(element => {
-                    if ('object' === typeof element) {
+                    if ("object" === typeof element) {
                         this.dom.message.appendChild(element);
                     } else {
                         this.dom.message.innerHTML += element;
                     }
-                })
+                });
             });
 
             return this;
@@ -49,11 +49,11 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public show(): void {
-            this.dom.error.style.display = 'flex';
+            this.dom.error.style.display = "flex";
         }
 
         public hide() {
-            this.dom.error.style.display = 'none';
+            this.dom.error.style.display = "none";
         }
     }
 }

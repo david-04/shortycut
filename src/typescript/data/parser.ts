@@ -7,11 +7,11 @@ namespace shortycut {
     class ParserContext {
 
         // input data
-        public line = '';
+        public line = "";
 
         // extracted components
-        public description = '';
-        public urlOrDynamicLink: string | DynamicLink = '';
+        public description = "";
+        public urlOrDynamicLink: string | DynamicLink = "";
         public isStandardProtocol = false;
         public onMultiLink: OnMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
         public postFields?: string;
@@ -26,7 +26,9 @@ namespace shortycut {
 
     export class ShortcutParser {
 
-        private KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', dynamicLinkProtocol].map(p => `${p}://`);
+        private readonly KNOWN_PROTOCOLS = ["file", "ftp", "http", "https", dynamicLinkProtocol].map(p => `${p}://`);
+
+        private static readonly PROTOCOL_SEPARATOR = "://";
 
         //--------------------------------------------------------------------------------------------------------------
         // Parse all shortcut definitions
@@ -42,29 +44,35 @@ namespace shortycut {
                     try {
                         this.parseLineAndStoreShortcut(context, shortcuts);
                     } catch (exception) {
-                        if (exception instanceof ParserError) {
-                            startupCache.initializationErrors.push(exception);
-                        } else {
-                            throw exception;
-                        }
+                        this.handleParserError(exception);
                     }
                 }
             }
 
-            if ('defaultsearchengine' === config.defaultSearchEngine.keyword) {
+            if ("defaultsearchengine" === config.defaultSearchEngine.keyword) {
                 shortcuts.delete(config.defaultSearchEngine.keyword);
             }
 
             if (!defaultSearchEngine) {
                 defaultSearchEngine = new Shortcut(
-                    'config.defaultSearchEngine.keyword',
+                    "config.defaultSearchEngine.keyword",
                     [],
                     OnMultiLink.SHOW_MENU,
-                    'https://duckduckgo.com/?q='
-                    + config.shortcutFormat.url.searchTermPlaceholder
-                    + '&kah=us-en%2Chk-tzh&kav=1&kam=google-maps&kak=-1&kax=-1&kaq=-1&kap=-1&kao=-1&kau=-1',
+                    [
+                        "https://duckduckgo.com/?q=",
+                        config.shortcutFormat.url.searchTermPlaceholder,
+                        "&kah=us-en%2Chk-tzh&kav=1&kam=google-maps&kak=-1&kax=-1&kaq=-1&kap=-1&kao=-1&kau=-1"
+                    ].join(""),
                     undefined
                 );
+            }
+        }
+
+        private handleParserError(exception: unknown) {
+            if (exception instanceof ParserError) {
+                startupCache.initializationErrors.push(exception);
+            } else {
+                throw exception;
             }
         }
 
@@ -108,7 +116,7 @@ namespace shortycut {
             );
 
             if (!hasKeywords) {
-                throw new ParserError('Failed to retrieve the keyword', context.line)
+                throw new ParserError("Failed to retrieve the keyword", context.line);
             }
 
             return shortcuts;
@@ -120,7 +128,7 @@ namespace shortycut {
 
         private splitDescriptionAndUrl(context: ParserContext) {
 
-            let { url, isStandardProtocol } = this.getUrl(context.line);
+            const { url, isStandardProtocol } = this.getUrl(context.line);
             context.isStandardProtocol = isStandardProtocol;
             context.urlOrDynamicLink = url;
             context.description = context.line.substring(0, context.line.length - url.length);
@@ -129,7 +137,7 @@ namespace shortycut {
                 context.urlOrDynamicLink = startupCache.dynamicLinks.get(context.urlOrDynamicLink);
                 if (!context.urlOrDynamicLink) {
                     throw new ParserError(
-                        'The dynamic link created via shortycut.toUrl() must be at the end of the line',
+                        "The dynamic link created via shortycut.toUrl() must be at the end of the line",
                         context.line
                     );
                 }
@@ -154,9 +162,9 @@ namespace shortycut {
             const index = this.KNOWN_PROTOCOLS
                 .map(protocol => lineLowerCase.indexOf(protocol))
                 .filter(matchIndex => 0 <= matchIndex)
-                .reduce((a, b) => a < b ? a : b, line.length)
+                .reduce((a, b) => a < b ? a : b, line.length);
             if (index < line.length) {
-                return { isStandardProtocol: true, url: line.substring(index) }
+                return { isStandardProtocol: true, url: line.substring(index) };
             } else {
                 return undefined;
             }
@@ -169,18 +177,13 @@ namespace shortycut {
         private getNonStandardProtocolUrl(line: string, lineLowerCase: string) {
             let offset = 0;
             while (offset < line.length) {
-                const index = line.indexOf('://', offset);
+                const index = line.indexOf(ShortcutParser.PROTOCOL_SEPARATOR, offset);
                 if (0 < index) {
-                    if ('a' <= lineLowerCase.charAt(index - 1) && lineLowerCase.charAt(index - 1) <= 'z') {
-                        let start = index - 1;
-                        while (0 < start
-                            && 'a' <= lineLowerCase.charAt(start - 1)
-                            && lineLowerCase.charAt(start - 1) <= 'z') {
-                            start--;
-                        }
+                    if ("a" <= lineLowerCase.charAt(index - 1) && lineLowerCase.charAt(index - 1) <= "z") {
+                        const start = this.getProtocolStartOffset(index, lineLowerCase);
                         return { isStandardProtocol: false, url: line.substring(start) };
                     } else {
-                        offset = index + 3;
+                        offset = index + ShortcutParser.PROTOCOL_SEPARATOR.length;
                     }
                 } else {
                     offset = line.length;
@@ -188,8 +191,18 @@ namespace shortycut {
             }
 
             throw new ParserError(
-                'Unable to retrieve the link (make sure it starts with a protocol like https://)', line
+                "Unable to retrieve the link (make sure it starts with a protocol like https://)", line
             );
+        }
+
+        private getProtocolStartOffset(index: number, lineLowerCase: string) {
+            let start = index - 1;
+            while (0 < start
+                && "a" <= lineLowerCase.charAt(start - 1)
+                && lineLowerCase.charAt(start - 1) <= "z") {
+                start--;
+            }
+            return start;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -198,19 +211,22 @@ namespace shortycut {
 
         private parseOnMultiLink(context: ParserContext) {
 
-            const multiLinkIndicator = config.shortcutFormat.url.multiLinkIndicator;
+            const multiLinkIndicator =
+                config.shortcutFormat.url.multiLinkIndicator as object as { [index: string]: string | undefined; };
 
-            for (let pass = 0; pass < 2; pass++) {
+            for (let pass = 0; pass <= 1; pass++) {
                 for (const onMultiLink of OnMultiLink.values) {
-                    const symbol = (multiLinkIndicator as any)[onMultiLink.key] as string;
+                    const symbol = getProperty(multiLinkIndicator, onMultiLink.key) ?? "~!@#$%^&*()_+";
                     if (!pass && context.isStandardProtocol
-                        && 'string' === typeof context.urlOrDynamicLink
+                        && "string" === typeof context.urlOrDynamicLink
                         && startsWith(context.urlOrDynamicLink, symbol)) {
                         context.onMultiLink = onMultiLink;
                         context.urlOrDynamicLink = context.urlOrDynamicLink.substring(symbol.length).trim();
                         return;
                     } else if (pass && endsWith(context.description, symbol)) {
-                        context.description = context.description.substring(0, context.description.length - symbol.length).trim();
+                        context.description = context.description.substring(
+                            0, context.description.length - symbol.length
+                        ).trim();
                         context.onMultiLink = onMultiLink;
                         return;
                     }
@@ -228,7 +244,7 @@ namespace shortycut {
 
             context.postFields = undefined;
 
-            if ('string' === typeof context.urlOrDynamicLink) {
+            if ("string" === typeof context.urlOrDynamicLink) {
                 const separator = config.shortcutFormat.url.postIndicator;
                 const index = separator ? adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
                 if (separator && 0 <= index) {
@@ -244,7 +260,7 @@ namespace shortycut {
 
         private parseKeywordsAndDescription(context: ParserContext) {
 
-            context.description = context.description.replace(/\s+/, ' ');
+            context.description = context.description.replace(/\s+/, " ");
 
             if (startsWith(context.description, config.shortcutFormat.keyword.openingDelimiter)) {
                 return this.parseSegments(context, context.description);
@@ -316,7 +332,7 @@ namespace shortycut {
         // Combine each keyword of each segment with each keyword in each other segment
         //--------------------------------------------------------------------------------------------------------------
 
-        private formKeywords(context: ParserContext, segments: Array<{ keywords: string[], description: string }>) {
+        private formKeywords(context: ParserContext, segments: Array<{ keywords: string[], description: string; }>) {
 
             const result = new Hashtable<Array<Segment>>();
             const keyword = new Array<string>();
@@ -330,10 +346,10 @@ namespace shortycut {
 
                 const array = new Array<Segment>();
                 for (let index = 0; index < segments.length; index++) {
-                    keyword[index] = segments[index].keywords[context.combination[index]] ?? '';
+                    keyword[index] = segments[index].keywords[context.combination[index]] ?? "";
                     array.push(this.createSegment(keyword[index], segments[index].description));
                 }
-                result.put(keyword.join(''), array);
+                result.put(keyword.join(""), array);
 
                 hasMoreCombinations = false;
                 for (let index = segments.length - 1; 0 <= index; index--) {
@@ -351,7 +367,7 @@ namespace shortycut {
         }
 
         //--------------------------------------------------------------------------------------------------------------
-        // Splits hotkeys from non-hotkeys (e.g. _Git_Hub is converted into ['', 'G', 'it', 'H', 'ub']
+        // Splits hotkeys from non-hotkeys (e.g. _Git_Hub is converted into ["", "G", "it", "H", "ub"]
         //--------------------------------------------------------------------------------------------------------------
 
         private createSegment(keyword: string, description: string) {
@@ -360,9 +376,9 @@ namespace shortycut {
 
             if (marker) {
 
-                const sections = replaceAll(description, `${marker}${marker}`, '\n', true)
+                const sections = replaceAll(description, `${marker}${marker}`, "\n", true)
                     .split(marker)
-                    .map(item => replaceAll(item, '\n', `${marker}${marker}`, true));
+                    .map(item => replaceAll(item, "\n", `${marker}${marker}`, true));
 
                 let repeat = false;
                 for (let index = 1; index < sections.length; index = index + (repeat ? 0 : 1)) {
@@ -376,7 +392,7 @@ namespace shortycut {
                         repeat = false;
                     }
                 }
-                return new Segment(keyword, keyword.length + 1 === sections.length ? sections : [sections.join('')]);
+                return new Segment(keyword, keyword.length + 1 === sections.length ? sections : [sections.join("")]);
             }
 
             return new Segment(keyword, [description]);

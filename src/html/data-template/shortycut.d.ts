@@ -27,7 +27,7 @@ declare namespace shortycut {
         replacePrevious?: string;
         openInNewTab?: string;
         showMenu?: string;
-        default?: 'replacePreviousDefinition' | 'openInNewTab' | 'showMenu';
+        default?: "replacePreviousDefinition" | "openInNewTab" | "showMenu";
     }
     interface HomepageConfig {
         keywords?: Array<string>;
