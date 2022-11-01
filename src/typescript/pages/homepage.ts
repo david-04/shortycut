@@ -491,8 +491,9 @@ namespace shortycut {
         // Accept a suggestion via return key
         //--------------------------------------------------------------------------------------------------------------
 
-        private applySuggestion(selectedIndex: number, mode: RedirectMode, viaRightArrow: boolean) {
-
+        private applySuggestion(
+            selectedIndex: number, mode: RedirectMode, viaRightArrow: boolean, searchTerm?: string
+        ) {
             const suggestion = this.suggestions[selectedIndex];
             const shortcut = suggestion.shortcut;
 
@@ -503,7 +504,7 @@ namespace shortycut {
             } else if (shortcut.bookmarks) {
                 this.redirectToLinks(shortcut.getFinalizedBookmarks(), viaRightArrow, mode);
             } else if (shortcut.queries) {
-                const searchTerm = this.promptForSearchTerm();
+                searchTerm = searchTerm?.trim() || this.promptForSearchTerm();
                 if (searchTerm) {
                     this.redirectToLinks(shortcut.getFinalizedQueries(searchTerm), viaRightArrow, mode);
                 }
@@ -569,7 +570,7 @@ namespace shortycut {
             links?: Links
         ) {
             if (postKeywordInput && (shortcut.searchable || !shortcut.queries) && this.suggestions.length) {
-                this.applySuggestion(0, mode, false);
+                this.applySuggestion(0, mode, false, postKeywordInput);
             } else {
                 if (!shortcut?.bookmarks && shortcut?.queries) {
                     searchTerm ||= this.promptForSearchTerm();
@@ -596,7 +597,7 @@ namespace shortycut {
                 redirector.redirect(defaultSearchEngine.getFinalizedLinks(input), mode);
             } else if (this.suggestions.length) {
                 this.selectedIndex = 0;
-                this.applySuggestion(this.selectedIndex, mode, false);
+                this.applySuggestion(this.selectedIndex, mode, false, searchTerm);
             }
         }
 
