@@ -2,8 +2,38 @@ namespace shortycut {
 
     export type ShortcutType = "query" | "bookmark" | "both" | "none";
 
-    export type DynamicLinkFunction = (searchTerm: string) => string;
+    export type DynamicLinkResult = string
+        | ReadonlyArray<string>
+        | ReadonlyArray<{ description: string, url: string; }>;
+
+    export type DynamicLinkFunction = (searchTerm: string) => DynamicLinkResult;
     export type DynamicLink = { generator: DynamicLinkFunction, urlForFavicon: string; };
+
+    export interface FinalizedPostField {
+        key: string;
+        value: string;
+    }
+
+    export type FinalizedPostFields = ReadonlyArray<FinalizedPostField>;
+
+    export interface FinalizedUrlBase {
+        url: string,
+        postFields?: FinalizedPostFields;
+    }
+
+    export interface FinalizedUrl extends FinalizedUrlBase {
+        permalink: string,
+    }
+
+    export interface FinalizedLink {
+        htmlDescription: string;
+        urls: ReadonlyArray<FinalizedUrl>;
+    }
+
+    export interface FinalizedLinks {
+        onMultiLink: OnMultiLink;
+        links: readonly FinalizedLink[];
+    }
 
     //------------------------------------------------------------------------------------------------------------------
     // Action to be taken if a keyword has multiple links
@@ -38,7 +68,10 @@ namespace shortycut {
         public readonly isQuery: boolean;
         private _filterSummary?: string;
         private _overridden = false;
-        private searchTerm = "";
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Initialization
+        //--------------------------------------------------------------------------------------------------------------
 
         constructor(
             public readonly keyword: string,
@@ -46,27 +79,88 @@ namespace shortycut {
             public readonly segments: Segments,
             public readonly onMultiLink: OnMultiLink,
             public readonly isSearchable: boolean,
-            private readonly urlOrDynamicLink: string | DynamicLink,
-            private readonly _postFields?: string
+            private readonly urlOrDynamicLink: string | DynamicLink
         ) {
             this.isQuery = "string" !== typeof this.urlOrDynamicLink
-                || 0 <= adjustCase(this.urlOrDynamicLink).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
-                || 0 <= adjustCase(this._postFields ?? "").indexOf(config.shortcutFormat.url.searchTermPlaceholder);
+                || 0 <= adjustCase(this.urlOrDynamicLink).indexOf(config.shortcutFormat.url.searchTermPlaceholder);
         }
 
-        public get url() {
-            return replaceAll(
-                "string" === typeof this.urlOrDynamicLink
-                    ? this.urlOrDynamicLink
-                    : this.urlOrDynamicLink.generator(this.searchTerm),
-                config.shortcutFormat.url.searchTermPlaceholder,
-                encodeURIComponent(this.searchTerm || ""),
-                config.shortcutFormat.keyword.caseSensitive
-            );
+        //--------------------------------------------------------------------------------------------------------------
+        // Convert this link into finalized links/URLs (with the search term replaced)
+        //--------------------------------------------------------------------------------------------------------------
+
+        public toFinalizedLinks(searchTerm: string) {
+            if ("string" === typeof this.urlOrDynamicLink) {
+                return this.constructFinalizedLinks([this.urlOrDynamicLink], searchTerm);
+            } else {
+                const urlOrUrls = this.urlOrDynamicLink.generator(searchTerm);
+                if ("string" === typeof urlOrUrls) {
+                    return this.constructFinalizedLinks([urlOrUrls], searchTerm);
+                } else {
+                    return this.constructFinalizedLinks(urlOrUrls, searchTerm);
+                }
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Convert the given URLs/links into one or more finalized links
+        //--------------------------------------------------------------------------------------------------------------
+
+        private constructFinalizedLinks(
+            urls: ReadonlyArray<string | { description: string, url: string; }>,
+            searchTerm: string
+        ) {
+            if (0 === urls.filter(link => "string" !== typeof link && link.description?.trim()).length) {
+                return [
+                    this.constructFinalizedLink(
+                        "", urls.map(link => "string" === typeof link ? link : link.url), searchTerm
+                    )
+                ];
+            } else {
+                return urls.map(link => "string" === typeof link ? { description: "", url: link } : link)
+                    .map(link => this.constructFinalizedLink(link.description, [link.url], searchTerm));
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Convert the given URLs into one finalized link
+        //--------------------------------------------------------------------------------------------------------------
+
+        private constructFinalizedLink(
+            description: string, urls: readonly string[], searchTerm: string
+        ): FinalizedLink {
+            const segment = new Segments([...this.segments.segments, new Segment("", [description])]);
+            return {
+                htmlDescription: (description ? segment : this.segments).descriptionHtml,
+                urls: urls.map(url => this.constructFinalizedUrl(url, searchTerm))
+            };
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Convert a single URL into a finalized URL
+        //--------------------------------------------------------------------------------------------------------------
+
+        private constructFinalizedUrl(link: string, searchTerm: string) {
+            const parsedLink = Link.splitUrlAndPostFields(link);
+            const url = Link.insertSearchTerm(parsedLink.url, searchTerm);
+            const postFields = Link.constructFinalizedPostFields(parsedLink.postFields, searchTerm);
+            const permalink = postFields ? Link.constructFinalizedPermalink(url, postFields) : url;
+            return { url, postFields, permalink };
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Create a permalink (the regular URL for GET requests and a ShortyCut self-link for POST requests)
+        //--------------------------------------------------------------------------------------------------------------
+
+        public static constructFinalizedPermalink(finalizedUrl: string, finalizedPostFields?: FinalizedPostFields) {
+            const baseUrl = window.location.href.replace(/[#?].*/g, "");
+            const json: FinalizedUrlBase = { url: finalizedUrl, postFields: finalizedPostFields };
+            const redirect = encodeURIComponent(JSON.stringify(json));
+            return `${baseUrl}?${QueryParameters.REDIRECT}=${redirect}`;
         }
 
         public get urlForFavicon() {
-            return "string" === typeof (this.urlOrDynamicLink)
+            return "string" === typeof this.urlOrDynamicLink
                 ? this.urlOrDynamicLink
                 : this.urlOrDynamicLink.urlForFavicon;
         }
@@ -88,51 +182,53 @@ namespace shortycut {
             return this._filterSummary;
         }
 
-        public replacePlaceholder(searchTerm: string) {
-            this.searchTerm = searchTerm;
+        private static insertSearchTerm(text: string, searchTerm: string) {
+            return replaceAll(
+                text,
+                config.shortcutFormat.url.searchTermPlaceholder,
+                encodeURIComponent(searchTerm),
+                config.shortcutFormat.keyword.caseSensitive
+            );
         }
 
-        public getHref(searchTerm: string) {
-            if (this._postFields) {
-                const query = `${this.keyword} ${decodeURIComponent(searchTerm)}`.trim();
-                const baseUrl = window.location.href.replace(/[#?].*/g, "");
-                const queryParameter = `${QueryParameters.QUERY}=${query}`;
-                const indexParameter = `${QueryParameters.INDEX}=${this.index}`;
-                return `${baseUrl}?${queryParameter}&${indexParameter}`;
+        public static splitUrlAndPostFields(url: string) {
+            const separator = config.shortcutFormat.url.postIndicator;
+            const index = separator ? adjustCase(url).indexOf(separator) : -1;
+            if (separator && 0 <= index) {
+                return { url: url.substring(0, index), postFields: url.substring(index + separator.length) };
             } else {
-                return this.url;
+                return { url };
             }
         }
 
-        public get postFields() {
+        //--------------------------------------------------------------------------------------------------------------
+        // Construct a finalized post fields as key/value pairs with the search term already replaced
+        //--------------------------------------------------------------------------------------------------------------
 
-            if (this._postFields) {
-                return replaceAll(
-                    this._postFields,
-                    config.shortcutFormat.url.searchTermPlaceholder,
-                    encodeURIComponent(this.searchTerm),
-                    config.shortcutFormat.keyword.caseSensitive
-                )
-                    .split("&")
-                    .filter(parameter => parameter)
-                    .map(parameter => {
-                        const index = parameter.indexOf("=");
-                        if (index < 1) {
-                            throw new Exception("Shortcut definition error",
-                                `Post parameter ${sanitize(parameter)} is not in key=value format`);
-                        }
-                        try {
-                            return {
-                                key: decodeURIComponent(parameter.substring(0, index)),
-                                value: decodeURIComponent(parameter.substring(index + 1))
-                            };
-                        } catch (exception) {
-                            throw new Exception("Shortcut definition error",
-                                `Post parameter ${sanitize(parameter)} is not URL encoded`);
-                        }
-                    });
-            } else {
-                return undefined;
+        private static constructFinalizedPostFields(postFields: string | undefined, searchTerm: string) {
+            return postFields?.split("&").filter(field => field)
+                .map(field => this.constructFinalizedPostField(field, searchTerm));
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Construct a single post field as key/value pair with the search term already replaced
+        //--------------------------------------------------------------------------------------------------------------
+
+        private static constructFinalizedPostField(parameter: string, searchTerm: string) {
+            const index = parameter.indexOf("=");
+            if (index < 1) {
+                throw new Exception(
+                    "Shortcut definition error", `Post parameter ${sanitize(parameter)} is not in key=value format`
+                );
+            }
+            try {
+                const key = decodeURIComponent(this.insertSearchTerm(parameter.substring(0, index), searchTerm));
+                const value = decodeURIComponent(this.insertSearchTerm(parameter.substring(index + 1), searchTerm));
+                return { key, value };
+            } catch (exception) {
+                throw new Exception(
+                    "Shortcut definition error", `Post parameter ${sanitize(parameter)} is not URL encoded`
+                );
             }
         }
     }
@@ -162,7 +258,7 @@ namespace shortycut {
         }
 
         public get onMultiLink() {
-            return this.current[this.current.length - 1].onMultiLink;
+            return this.current[this.current.length - 1].onMultiLink ?? OnMultiLink.getDefault();
         }
 
         public get isQuery() {
@@ -177,11 +273,6 @@ namespace shortycut {
             const filterSummary = this._filterSummary ?? this.current.map(link => link.filterSummary).join(" ");
             this._filterSummary = filterSummary;
             return filterSummary;
-        }
-
-        public replacePlaceholders(searchTerm: string) {
-            [this.overridden, this.current]
-                .forEach(array => array.forEach(link => link.replacePlaceholder(searchTerm)));
         }
 
         public get descriptionHtml() {
@@ -218,6 +309,19 @@ namespace shortycut {
                         .join(Segments.SEPARATOR_HTML);
                 }
             }
+        }
+
+        public toFinalizedLinks(searchTerm: string): FinalizedLinks {
+            const links = new Array<FinalizedLink>();
+            let onMultiLink = this.onMultiLink;
+            for (const link of this.current) {
+                const newLinks = link.toFinalizedLinks(searchTerm);
+                newLinks.forEach(link => links.push(link));
+                if (1 < newLinks.length) {
+                    onMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
+                }
+            }
+            return { onMultiLink, links };
         }
     }
 
@@ -383,22 +487,28 @@ namespace shortycut {
             }
         }
 
+        //--------------------------------------------------------------------------------------------------------------
+        // Initialization
+        //--------------------------------------------------------------------------------------------------------------
+
         constructor(
             public readonly keyword: string,
             segments: Segment[],
             onMultiLink: OnMultiLink,
-            urlOrDynamicLink: string | DynamicLink,
-            postParameters?: string
+            urlOrDynamicLink: string | DynamicLink
         ) {
-            this.addLink(keyword, segments, onMultiLink, urlOrDynamicLink, postParameters);
+            this.addLink(keyword, segments, onMultiLink, urlOrDynamicLink);
         }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Append a new link to the collection
+        //--------------------------------------------------------------------------------------------------------------
 
         public addLink(
             keyword: string,
             segments: Segment[],
             onMultiLink: OnMultiLink,
-            urlOrDynamicLink: string | DynamicLink,
-            postParameters?: string
+            urlOrDynamicLink: string | DynamicLink
         ) {
             const link = new Link(
                 keyword,
@@ -406,8 +516,7 @@ namespace shortycut {
                 new Segments(segments),
                 OnMultiLink.SEARCH_BUCKET === onMultiLink ? OnMultiLink.getDefault() : onMultiLink,
                 OnMultiLink.SEARCH_BUCKET === onMultiLink,
-                urlOrDynamicLink,
-                postParameters
+                urlOrDynamicLink
             );
             if (link.isSearchable) {
                 this._searchable = this.createOrAdd(link, this._searchable);
@@ -417,6 +526,10 @@ namespace shortycut {
                 this._bookmarks = this.createOrAdd(link, this._bookmarks);
             }
         }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Append a link to the container (or create a new one if none is provided)
+        //--------------------------------------------------------------------------------------------------------------
 
         private createOrAdd(link: Link, links?: Links) {
             if (links) {
@@ -428,8 +541,39 @@ namespace shortycut {
             return links;
         }
 
-        public replacePlaceholders(searchTerm: string) {
-            this._queries?.replacePlaceholders(searchTerm);
+        //--------------------------------------------------------------------------------------------------------------
+        // Retrieve finalized links for all current bookmarks
+        //--------------------------------------------------------------------------------------------------------------
+
+        public getFinalizedBookmarks() {
+            return this.createFinalizedLinks(this.bookmarks);
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Retrieve finalized links (with the search term inserted) for all current queries
+        //--------------------------------------------------------------------------------------------------------------
+
+        public getFinalizedQueries(searchTerm: string) {
+            return this.createFinalizedLinks(this.queries, searchTerm);
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Retrieve the
+        //--------------------------------------------------------------------------------------------------------------
+
+        public getFinalizedLinks(searchTerm?: string) {
+            return this.createFinalizedLinks(
+                this.bookmarks && (!searchTerm?.trim() || !this.queries) ? this.bookmarks : this.queries, searchTerm
+            );
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Convert the given links into finalized links
+        //--------------------------------------------------------------------------------------------------------------
+
+        private createFinalizedLinks(links?: Links | undefined, searchTerm?: string): FinalizedLinks {
+            return links?.toFinalizedLinks(searchTerm?.trim() ?? "")
+                ?? { onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB, links: [] };
         }
 
         public getSegmentMatches(length: number) {

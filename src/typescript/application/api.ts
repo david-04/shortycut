@@ -75,7 +75,9 @@ namespace shortycut {
 
     function getDynamicLinkUrl(dynamicLinkFunction: DynamicLinkFunction, searchTerm?: string | null) {
         try {
-            const url = dynamicLinkFunction(searchTerm ?? "")?.trim();
+            const generatedLinks = dynamicLinkFunction(searchTerm ?? "");
+            const firstGeneratedLink = "string" === typeof generatedLinks ? generatedLinks : generatedLinks[0];
+            const url = "string" === typeof firstGeneratedLink ? firstGeneratedLink : firstGeneratedLink.url;
             if (url) {
                 if (isUrl(url)) {
                     return { url };

@@ -11,8 +11,7 @@ namespace shortycut {
             listItems: new Array<HTMLElement>()
         };
 
-        private links = new Array<Link>();
-        private searchTerm = "";
+        private links = new Array<FinalizedLink>;
         private focusIndex = 0;
 
         //--------------------------------------------------------------------------------------------------------------
@@ -32,25 +31,22 @@ namespace shortycut {
         // Populate the shortlist
         //--------------------------------------------------------------------------------------------------------------
 
-        public populate(links: Link[], searchTerm: string) {
-            this.links = [null as unknown as Link, ...links];
-            this.searchTerm = searchTerm;
+        public populate(links: FinalizedLinks) {
+            this.links = [null as unknown as FinalizedLink, ...links.links];
             this.dom.listItems = [
                 this.createHeader(),
                 ...this.links.slice(1).map((link, index) => this.createLink(
                     index + 1,
-                    link.getHref(this.searchTerm),
-                    link.segments.descriptionHtml,
+                    link.urls[0].permalink,
+                    link.htmlDescription,
                     event => this.openSelected(event, index + 1),
-                    sanitize(link.url.replace(/^[a-z]+:\/\/+/i, "").replace(/[#?].*/, "")),
-                    link.url
+                    sanitize(link.urls[0]?.url.replace(/^[a-z]+:\/\/+/i, "").replace(/[#?].*/, "") ?? ""),
+                    link.urls[0]?.url
                 ))
             ];
-
             this.dom.shortlist.innerHTML = "";
             this.dom.listItems.forEach(href => this.dom.shortlist.appendChild(href));
             this.focusIndex = 0;
-
             return this;
         }
 
@@ -66,7 +62,6 @@ namespace shortycut {
             subtitle?: string,
             url?: string
         ) {
-
             const a = document.createElement("a");
             a.href = href;
             a.id = `shortlist${index}`;
@@ -78,7 +73,6 @@ namespace shortycut {
                     url && subtitle ? create("div.url", favicon, subtitle) : ""
                 ])
             ]).outerHTML;
-
             a.addEventListener("click", onClick);
             return a;
         }
@@ -141,9 +135,7 @@ namespace shortycut {
 
         private openSelected(event: KeyboardEvent | MouseEvent, current: number) {
             redirector.redirect(
-                [this.links[current]],
-                OnMultiLink.OPEN_IN_NEW_TAB,
-                this.searchTerm,
+                { links: [this.links[current]], onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB },
                 queryParameters.facets.newTabs ? RedirectMode.NEW_TAB : RedirectMode.PRESERVE_HISTORY
             );
             event.preventDefault();
@@ -152,9 +144,7 @@ namespace shortycut {
 
         private openAll(event: KeyboardEvent | MouseEvent) {
             redirector.redirect(
-                this.links.slice(1),
-                OnMultiLink.OPEN_IN_NEW_TAB,
-                this.searchTerm,
+                { links: this.links.slice(1), onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB },
                 RedirectMode.PRESERVE_HISTORY
             );
             event.preventDefault();

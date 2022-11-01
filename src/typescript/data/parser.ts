@@ -14,7 +14,6 @@ namespace shortycut {
         public urlOrDynamicLink: string | DynamicLink = "";
         public isStandardProtocol = false;
         public onMultiLink: OnMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
-        public postFields?: string;
 
         // re-usable components (garbage collection performance tuning)
         public combination = new Array<number>();
@@ -62,8 +61,7 @@ namespace shortycut {
                         "https://duckduckgo.com/?q=",
                         config.shortcutFormat.url.searchTermPlaceholder,
                         "&kah=us-en%2Chk-tzh&kav=1&kam=google-maps&kak=-1&kax=-1&kaq=-1&kap=-1&kao=-1&kau=-1"
-                    ].join(""),
-                    undefined
+                    ].join("")
                 );
             }
         }
@@ -84,7 +82,6 @@ namespace shortycut {
 
             this.splitDescriptionAndUrl(context);
             this.parseOnMultiLink(context);
-            this.parsePostFields(context);
             const keywords = this.formKeywords(context, this.parseKeywordsAndDescription(context));
             let hasKeywords = false;
 
@@ -96,16 +93,14 @@ namespace shortycut {
                         keyword,
                         sections,
                         context.onMultiLink,
-                        context.urlOrDynamicLink,
-                        context.postFields
+                        context.urlOrDynamicLink
                     );
                 } else {
                     shortcuts.put(keyword, new Shortcut(
                         keyword,
                         sections,
                         context.onMultiLink,
-                        context.urlOrDynamicLink,
-                        context.postFields
+                        context.urlOrDynamicLink
                     ));
                 }
                 if (keyword === config.defaultSearchEngine.keyword) {
@@ -234,24 +229,6 @@ namespace shortycut {
             }
 
             context.onMultiLink = OnMultiLink.getDefault();
-        }
-
-        //--------------------------------------------------------------------------------------------------------------
-        // Extract the post parameters
-        //--------------------------------------------------------------------------------------------------------------
-
-        private parsePostFields(context: ParserContext) {
-
-            context.postFields = undefined;
-
-            if ("string" === typeof context.urlOrDynamicLink) {
-                const separator = config.shortcutFormat.url.postIndicator;
-                const index = separator ? adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
-                if (separator && 0 <= index) {
-                    context.postFields = context.urlOrDynamicLink.substring(index + separator.length);
-                    context.urlOrDynamicLink = context.urlOrDynamicLink.substring(0, index);
-                }
-            }
         }
 
         //--------------------------------------------------------------------------------------------------------------

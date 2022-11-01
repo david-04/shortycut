@@ -16,9 +16,9 @@ namespace shortycut {
         // Populate the page
         //--------------------------------------------------------------------------------------------------------------
 
-        public populate(link: Link) {
-            this.dom.title.innerHTML = link.segments.descriptionHtml;
-            this.dom.url.innerHTML = sanitize(link.url);
+        public populate(htmlDescription: string, url: string) {
+            this.dom.title.innerHTML = htmlDescription;
+            this.dom.url.innerHTML = sanitize(url);
             return this;
         }
 

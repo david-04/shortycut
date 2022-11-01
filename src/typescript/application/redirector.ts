@@ -18,14 +18,16 @@ namespace shortycut {
         public processQuery() {
 
             const shortcut = shortcuts.get(queryParameters.keyword) || undefined;
-            const setup = queryParameters.setup;
+            const { setup, redirect } = queryParameters;
             const isHomepageKeyword = config.homepage.keywords.some(keyword => keyword === queryParameters.keyword);
 
             if (setup) {
                 document.title = "ShortyCut";
                 this.showSetupPage(setup);
+            } else if (redirect) {
+                this.processAuxiliaryRedirect(redirect);
             } else if (shortcut) {
-                this.redirectShortcut(shortcut);
+                this.processShortcut(shortcut);
             } else if (isUrl(queryParameters.fullQuery)) {
                 this.openUrl(queryParameters.fullQuery, RedirectMode.ERASE_HISTORY);
             } else if (!queryParameters.keyword
@@ -34,54 +36,51 @@ namespace shortycut {
                 || isHomepageKeyword) {
                 this.openHomepage(isHomepageKeyword);
             } else {
-                defaultSearchEngine.replacePlaceholders(queryParameters.fullQuery);
-                const links = defaultSearchEngine.queries?.current || defaultSearchEngine.bookmarks?.current;
-                this.redirect(
-                    assertNotNull(links),
-                    OnMultiLink.OPEN_IN_NEW_TAB,
-                    queryParameters.fullQuery,
-                    RedirectMode.ERASE_HISTORY
-                );
+                const links = defaultSearchEngine.getFinalizedLinks(queryParameters.fullQuery);
+                this.redirect({ ...links, onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB }, RedirectMode.ERASE_HISTORY);
             }
         }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Redirect to the URL provided in the query parameter
+        //--------------------------------------------------------------------------------------------------------------
+
+        private processAuxiliaryRedirect(redirect: FinalizedUrlBase) {
+            const { url, postFields } = redirect;
+            const permalink = Link.constructFinalizedPermalink(url, postFields);
+            const finalizedLinks = {
+                onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB,
+                links: [{ htmlDescription: "", urls: [{ url, postFields, permalink }] }]
+            };
+            this.redirect(finalizedLinks, RedirectMode.ERASE_HISTORY);
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Display the homepage
+        //--------------------------------------------------------------------------------------------------------------
 
         private openHomepage(isHomepageKeyword: boolean) {
             this.alwaysOpenNewTabs = queryParameters.facets.newTabs;
             this.showRedirectPage = false;
             document.title = "ShortyCut";
-            router.goto(pages.home.populate(
-                isHomepageKeyword
-                    ? queryParameters.fullQuery.replace(/^\s*[^\s]+/, "").trim()
-                    : queryParameters.fullQuery
-            ));
+            const query = isHomepageKeyword
+                ? queryParameters.fullQuery.replace(/^\s*[^\s]+/, "").trim()
+                : queryParameters.fullQuery;
+            router.goto(pages.home.populate(query));
             if (queryParameters.facets.noFocus) {
                 pages.home.removeFocus();
             }
         }
 
-        private redirectShortcut(shortcut: Shortcut) {
-            shortcut.replacePlaceholders(queryParameters.searchTerm);
-            if (queryParameters.index && shortcut.all[queryParameters.index]) {
-                this.redirect(
-                    [shortcut.all[queryParameters.index].link],
-                    OnMultiLink.OPEN_IN_NEW_TAB,
-                    queryParameters.searchTerm,
-                    RedirectMode.ERASE_HISTORY
-                );
-            } else if (shortcut.queries && (queryParameters.searchTerm || !shortcut.bookmarks)) {
-                this.redirect(
-                    shortcut.queries.current,
-                    shortcut.queries.onMultiLink,
-                    queryParameters.searchTerm,
-                    RedirectMode.ERASE_HISTORY
-                );
+        //--------------------------------------------------------------------------------------------------------------
+        // Process a shortcut by opening the links or rendering the shortlist
+        //--------------------------------------------------------------------------------------------------------------
+
+        private processShortcut(shortcut: Shortcut) {
+            if (shortcut.queries && (queryParameters.searchTerm || !shortcut.bookmarks)) {
+                this.redirect(shortcut.getFinalizedQueries(queryParameters.searchTerm), RedirectMode.ERASE_HISTORY);
             } else if (shortcut.bookmarks) {
-                this.redirect(
-                    shortcut.bookmarks.current,
-                    shortcut.bookmarks.onMultiLink,
-                    queryParameters.searchTerm,
-                    RedirectMode.ERASE_HISTORY
-                );
+                this.redirect(shortcut.getFinalizedBookmarks(), RedirectMode.ERASE_HISTORY);
             } else {
                 throw new Exception("Internal error", "Found no links to use for redirection");
             }
@@ -91,42 +90,53 @@ namespace shortycut {
         // Open the selected link(s) or display the shortlist
         //--------------------------------------------------------------------------------------------------------------
 
-        public redirect(links: Link[], onMultiLink: OnMultiLink, searchTerm: string, mode: RedirectMode) {
-
-            links.forEach(link => link.replacePlaceholder(searchTerm));
-
-            if (1 === links.length) {
-                this.openLink(links[0], searchTerm, mode);
-            } else if (onMultiLink === OnMultiLink.SHOW_MENU) {
+        public redirect(finalizedLinks: FinalizedLinks, mode: RedirectMode) {
+            const urls = this.flattenUrls(finalizedLinks);
+            const htmlDescription = finalizedLinks.links[0]?.htmlDescription ?? "";
+            if (1 === urls.length) {
+                this.openLink(htmlDescription, urls[0], mode);
+            } else if (1 < urls.length && finalizedLinks.onMultiLink === OnMultiLink.SHOW_MENU) {
                 this.showRedirectPage = false;
-                setTimeout(() => router.goto(pages.shortlist.populate(links, searchTerm)), 0);
-            } else if (this.alwaysOpenNewTabs) {
-                links.forEach(link => window.open(link.url));
-                router.goBackToAndResetHomepage();
+                setTimeout(() => router.goto(pages.shortlist.populate(finalizedLinks)), 0);
             } else {
-                links.slice(1).forEach(link => window.open(link.url));
-                this.openLink(links[0], searchTerm, mode);
+                if (this.alwaysOpenNewTabs) {
+                    urls.forEach(link => window.open(link.permalink));
+                    router.goBackToAndResetHomepage();
+                } else {
+                    urls.slice(1).forEach(link => window.open(link.permalink));
+                    this.openLink(htmlDescription, urls[0], mode);
+                }
             }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Flatten nested URLs
+        //--------------------------------------------------------------------------------------------------------------
+
+        private flattenUrls(finalizedLinks: FinalizedLinks) {
+            const finalizedUrls = new Array<FinalizedUrl>();
+            finalizedLinks.links.forEach(link => link.urls.forEach(url => finalizedUrls.push(url)));
+            return finalizedUrls;
         }
 
         //--------------------------------------------------------------------------------------------------------------
         // Open a link in the current tab
         //--------------------------------------------------------------------------------------------------------------
 
-        private openLink(link: Link, searchTerm: string, mode: RedirectMode) {
+        private openLink(htmlDescription: string, url: FinalizedUrl, mode: RedirectMode) {
 
             if (this.showRedirectPage) {
-                router.goto(pages.redirect.populate(link));
+                router.goto(pages.redirect.populate(htmlDescription, url.url));
             }
 
-            if (link.postFields) {
+            if (url.postFields) {
                 if (RedirectMode.NEW_TAB === mode || this.alwaysOpenNewTabs) {
-                    this.openUrl(link.getHref(searchTerm), mode);
+                    this.openUrl(url.permalink, mode);
                 } else {
-                    this.submitForm(link);
+                    this.submitForm(url);
                 }
             } else {
-                this.openUrl(link.url, mode);
+                this.openUrl(url.url, mode);
             }
         }
 
@@ -144,7 +154,7 @@ namespace shortycut {
             }
         }
 
-        private submitForm(link: Link) {
+        private submitForm(link: FinalizedUrl) {
 
             const form = document.createElement("form");
             form.action = link.url;

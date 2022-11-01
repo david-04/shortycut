@@ -3,7 +3,7 @@ namespace shortycut {
     export class QueryParameters {
 
         public static readonly QUERY = "q";
-        public static readonly INDEX = "i";
+        public static readonly REDIRECT = "r";
         public static readonly SETUP = "setup";
         public static readonly FACETS = "facets";
 
@@ -11,7 +11,7 @@ namespace shortycut {
         public readonly fullQuery: string;
         public readonly keyword: string;
         public readonly searchTerm: string;
-        public readonly index?: number;
+        public readonly redirect?: FinalizedUrlBase;
         public readonly setup?: string;
         public readonly facets = {
             newTabs: false,
@@ -29,9 +29,8 @@ namespace shortycut {
             this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, "").replace(/\+/g, " ");
             this.keyword = adjustCase(this.fullQuery).replace(/\s.*/, "");
             this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, "");
-            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, "").match(/^\d+$/)
-                ? parseInt(this.queryParameters.getOrDefault(QueryParameters.INDEX, ""))
-                : undefined;
+            const redirect = this.queryParameters.get(QueryParameters.REDIRECT);
+            this.redirect = redirect ? JSON.parse(redirect) : undefined;
             this.setup = this.queryParameters.get(QueryParameters.SETUP);
             this.queryParameters
                 .getOrDefault(QueryParameters.FACETS, "")

@@ -1,4 +1,4 @@
-function dynamicLink(searchTerm) {
+function dynamicLinkSingle(searchTerm) {
     var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');
     if (searchTerm.match(/^[0-9]+$/)) {
         return url + 'Dynamic: Numbers only';
@@ -7,6 +7,19 @@ function dynamicLink(searchTerm) {
     } else {
         return url + 'Dynamic: Mixed content';
     }
+}
+
+function dynamicLinkTabs(searchTerm) {
+    var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');
+    return [1, 2].map(index => `${url}Tab ${index} - ${encodeURIComponent(searchTerm)}`);
+}
+
+function dynamicLinkMenu(searchTerm) {
+    var url = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');
+    return [1, 2].map(index => ({
+        description: `${url}Tab ${index} for "${searchTerm}"`,
+        url: `${url}Tab ${index} - ${encodeURIComponent(searchTerm)}`
+    }));
 }
 
 function mkDocsIssues(searchTerm) {
@@ -21,7 +34,9 @@ var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
 
 var shortcuts = [
 
-    '[d] Dynamic                                                        ' + shortycut.toUrl(dynamicLink),
+    '[d] Dynamic [s] Single                                             ' + shortycut.toUrl(dynamicLinkSingle),
+    '[d] Dynamic [t] Tabs                                               ' + shortycut.toUrl(dynamicLinkTabs),
+    '[d] Dynamic [m] Menu                                               ' + shortycut.toUrl(dynamicLinkMenu),
     '[mkdi] MkDocs issues                                                   http:// MkDocs Issues listing',
     '[mkdi] MkDocs issues                                               ' + mkDocsIssuesUrl,
 

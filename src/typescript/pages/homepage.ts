@@ -501,29 +501,18 @@ namespace shortycut {
             } else if (suggestion.type === "search-result") {
                 this.applySearchResult(suggestion, viaRightArrow, mode);
             } else if (shortcut.bookmarks) {
-                this.redirectToBookmark(shortcut.bookmarks, viaRightArrow, mode);
+                this.redirectToLinks(shortcut.getFinalizedBookmarks(), viaRightArrow, mode);
             } else if (shortcut.queries) {
-                this.redirectToQuery(shortcut.queries, viaRightArrow, mode);
+                const searchTerm = this.promptForSearchTerm();
+                if (searchTerm) {
+                    this.redirectToLinks(shortcut.getFinalizedQueries(searchTerm), viaRightArrow, mode);
+                }
             }
         }
 
-        private redirectToQuery(queries: Links, viaRightArrow: boolean, mode: RedirectMode) {
-            const searchTerm = this.promptForSearchTerm();
-            if (searchTerm) {
-                redirector.redirect(
-                    queries.current,
-                    viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : assertNotNull(queries).onMultiLink,
-                    searchTerm,
-                    mode);
-            }
-        }
-
-        private redirectToBookmark(bookmarks: Links, viaRightArrow: boolean, mode: RedirectMode) {
+        private redirectToLinks(links: FinalizedLinks, viaRightArrow: boolean, mode: RedirectMode) {
             redirector.redirect(
-                bookmarks.current,
-                viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : bookmarks.onMultiLink,
-                "",
-                mode
+                viaRightArrow ? { ...links, onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB } : links, mode
             );
         }
 
@@ -531,18 +520,22 @@ namespace shortycut {
             if (suggestion.link?.isQuery) {
                 const searchTerm = this.promptForSearchTerm();
                 if (searchTerm) {
-                    redirector.redirect(
-                        [suggestion.link],
-                        viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink,
-                        searchTerm,
+                    this.redirectToLinks(
+                        {
+                            links: suggestion.link.toFinalizedLinks(searchTerm),
+                            onMultiLink: suggestion.link.onMultiLink ?? OnMultiLink.getDefault()
+                        },
+                        viaRightArrow,
                         mode
                     );
                 }
             } else if (suggestion.link) {
-                redirector.redirect(
-                    [suggestion.link],
-                    viaRightArrow ? OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink,
-                    "",
+                this.redirectToLinks(
+                    {
+                        links: suggestion.link.toFinalizedLinks(""),
+                        onMultiLink: suggestion.link.onMultiLink ?? OnMultiLink.getDefault()
+                    },
+                    viaRightArrow,
                     mode
                 );
             }
@@ -595,18 +588,12 @@ namespace shortycut {
                     const query = encodeURIComponent(`${keyword} ${searchTerm}`.trim());
                     redirector.openUrl(`${url}?${QueryParameters.QUERY}=${query}`, mode);
                 } else {
-                    redirector.redirect(links.current, links.onMultiLink, searchTerm, mode);
+                    redirector.redirect(links.toFinalizedLinks(searchTerm), mode);
                 }
             } else if (isUrl(input)) {
                 redirector.openUrl(input, mode);
             } else if (defaultSearchEngine?.queries && config.defaultSearchEngine.useOnHomepage) {
-                defaultSearchEngine.replacePlaceholders(input);
-                redirector.redirect(
-                    defaultSearchEngine.queries.current,
-                    defaultSearchEngine.queries.onMultiLink,
-                    input,
-                    mode
-                );
+                redirector.redirect(defaultSearchEngine.getFinalizedLinks(input), mode);
             } else if (this.suggestions.length) {
                 this.selectedIndex = 0;
                 this.applySuggestion(this.selectedIndex, mode, false);
