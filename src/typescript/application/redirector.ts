@@ -95,7 +95,7 @@ namespace shortycut {
             const htmlDescription = finalizedLinks.links[0]?.htmlDescription ?? "";
             if (1 === urls.length) {
                 this.openLink(htmlDescription, urls[0], mode);
-            } else if (1 < urls.length && finalizedLinks.onMultiLink === OnMultiLink.SHOW_MENU) {
+            } else if (1 < finalizedLinks.links.length && finalizedLinks.onMultiLink === OnMultiLink.SHOW_MENU) {
                 this.showRedirectPage = false;
                 setTimeout(() => router.goto(pages.shortlist.populate(finalizedLinks)), 0);
             } else {

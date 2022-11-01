@@ -317,9 +317,12 @@ namespace shortycut {
             for (const link of this.current) {
                 const newLinks = link.toFinalizedLinks(searchTerm);
                 newLinks.forEach(link => links.push(link));
-                if (1 < newLinks.length) {
-                    onMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
+                if (1 < newLinks.length && 1 === this.current.length) {
+                    onMultiLink = OnMultiLink.SHOW_MENU;
                 }
+            }
+            if (1 < links.length && onMultiLink !== OnMultiLink.SHOW_MENU) {
+                onMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
             }
             return { onMultiLink, links };
         }

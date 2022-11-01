@@ -496,7 +496,6 @@ namespace shortycut {
         ) {
             const suggestion = this.suggestions[selectedIndex];
             const shortcut = suggestion.shortcut;
-
             if (suggestion.type === "segment" || (viaRightArrow && suggestion.hidesMoreChildren)) {
                 this.applyFilter(viaRightArrow && suggestion.hidesMoreChildren);
             } else if (suggestion.type === "search-result") {
@@ -555,15 +554,14 @@ namespace shortycut {
             const keyword = adjustCase(input.replace(/\s.*/, ""));
             const shortcut = shortcuts.get(keyword);
             const postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
-            const searchTerm: string | undefined = input.replace(/^[^\s]*\s*/, "");
+            const searchTerm: string | undefined = postKeywordInput.trim();
             const links = shortcut?.queries && searchTerm ? shortcut?.queries : shortcut?.bookmarks;
-            this.getSearchTermAndRedirect(mode, input, keyword, shortcut, postKeywordInput, searchTerm, links);
+            this.getSearchTermAndRedirect(mode, input, shortcut, postKeywordInput, searchTerm, links);
         }
 
         private getSearchTermAndRedirect(
             mode: RedirectMode,
             input: string,
-            keyword: string,
             shortcut: Shortcut,
             postKeywordInput: string,
             searchTerm: string | undefined,
@@ -578,19 +576,13 @@ namespace shortycut {
                         return;
                     }
                 }
-                this.performRedirect(input, keyword, searchTerm ?? "", mode, links);
+                this.performRedirect(input, searchTerm ?? "", mode, links);
             }
         }
 
-        private performRedirect(input: string, keyword: string, searchTerm: string, mode: RedirectMode, links?: Links) {
+        private performRedirect(input: string, searchTerm: string, mode: RedirectMode, links?: Links) {
             if (links) {
-                if (1 < links.current.length && RedirectMode.NEW_TAB === mode) {
-                    const url = window.location.href.replace(/[?#].*/, "");
-                    const query = encodeURIComponent(`${keyword} ${searchTerm}`.trim());
-                    redirector.openUrl(`${url}?${QueryParameters.QUERY}=${query}`, mode);
-                } else {
-                    redirector.redirect(links.toFinalizedLinks(searchTerm), mode);
-                }
+                redirector.redirect(links.toFinalizedLinks(searchTerm.trim()), mode);
             } else if (isUrl(input)) {
                 redirector.openUrl(input, mode);
             } else if (defaultSearchEngine?.queries && config.defaultSearchEngine.useOnHomepage) {
