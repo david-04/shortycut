@@ -551,23 +551,19 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public constructor() {
-
             shortcuts.values.forEach(shortcut => {
-                shortcut.all.map(item => item.link).map(link => link.urlForFavicon).forEach(url => {
-                    const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
-                    if ("file" !== protocol) {
-                        const protocols = this.domains.computeIfAbsent(domain, () => new Array<string>());
-                        if (!protocols.filter(currentProtocol => currentProtocol === protocol).length) {
-                            if ("https" === protocol) {
-                                protocols.unshift(protocol);
-                            } else {
-                                protocols.push(protocol);
+                shortcut.all.map(item => item.link).map(link => link.faviconUrls).forEach(urls => {
+                    urls.forEach(url => {
+                        const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
+                        if ("file" !== protocol) {
+                            const protocols = this.domains.computeIfAbsent(domain, () => new Array<string>());
+                            if (!protocols.filter(currentProtocol => currentProtocol === protocol).length) {
+                                "https" === protocol ? protocols.unshift(protocol) : protocols.push(protocol);
                             }
                         }
-                    }
+                    });
                 });
             });
-
             this.registry = new FaviconRegistry(this.cache, true, false, this.domains);
         }
 
@@ -609,16 +605,13 @@ namespace shortycut {
         // Obtain a single favicon
         //--------------------------------------------------------------------------------------------------------------
 
-        public getFavicon(url: string): HTMLDivElement {
-
-            const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
-
-            if ("file" === protocol || !this.registry.domains.get(domain)) {
-                const div = create("div.favicon", createImage("resources/local.svg")) as HTMLDivElement;
-                div.dataset["domain"] = domain;
-                return div;
+        public getFavicon(url: string | undefined): HTMLDivElement {
+            const createDiv = (url: string) => create("div.favicon", createImage(url)) as HTMLDivElement;
+            if (url?.trim()) {
+                const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
+                return "file" === protocol ? createDiv("resources/local.svg") : this.registry.getFavicon(domain);
             } else {
-                return this.registry.getFavicon(domain);
+                return createDiv("resources/unknown.svg");
             }
         }
 
@@ -627,7 +620,6 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public getPendingDomains() {
-
             return this.registry.domains.values
                 .filter(domain => domain.isPrimary && !domain.isResolved && !domain.isRejected)
                 .map(domain => domain.displayName)
@@ -635,7 +627,6 @@ namespace shortycut {
         }
 
         public getMissingDomains() {
-
             const domains = this.registry.domains.values
                 .filter(domain => domain.isPrimary && domain.isRejected)
                 .map(domain => domain.displayName);

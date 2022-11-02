@@ -102,7 +102,7 @@ shortycut.addShortcuts([
 ]);
 ```
 
-With these shortcuts in place, there's only keyword to remember.
+With these shortcuts in place, there's only one keyword to remember.
 Depending on the search term (if any), it opens the right page straight away.
 
 ## ![](img/arrow.svg) Favicons

@@ -1,29 +1,54 @@
 const TARGET_URL = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, '/data-test/target.html?');
 
-function dynamicLinkSingle(searchTerm) {
+function url(description) {
+    return `${TARGET_URL}${encodeURIComponent(description.trim()).replace(/%25s/g, "%s")}`;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Link generators
+//----------------------------------------------------------------------------------------------------------------------
+
+function dynamicQuerySingle(searchTerm) {
     if (searchTerm.match(/^\d+$/)) {
-        return TARGET_URL + "Dynamic: Numbers only";
+        return url(`Dynamic query - Single - Numbers only - %s`);
     } else if (searchTerm.match(/^[a-z]+$/i)) {
-        return TARGET_URL + "Dynamic: Letters only";
+        return url("Dynamic query - Single - Letters only - %s");
     } else {
-        return TARGET_URL + "Dynamic: Mixed content";
+        return url("Dynamic query - Single - Mixed content - %s");
     }
 }
 
-function dynamicLinkTabs(searchTerm) {
-    return [1, 1 + 1].map(index => `${TARGET_URL}Dynamic [${index}] ${encodeURIComponent(searchTerm)}`);
+function dynamicQueryTabs(_searchTerm) {
+    return [1, 1 + 1].map(index => url(`Dynamic query - Tabs[${index}] - %s`));
 }
 
-function dynamicLinkMenu(searchTerm) {
-    return [1, 1 + 1].map(index => ({
-        description: `Dynamic [${index}] "${searchTerm}"`,
-        url: `${TARGET_URL}Dynamic [${index}] ${encodeURIComponent(searchTerm)}`
-    }));
+function dynamicQueryMenu(_searchTerm) {
+    return [1, 1 + 1].map(index => ({description: `Query ${index}`, url: url(`Dynamic query - Menu[${index}] - %s`)}));
+}
+
+function dynamicBookmarkSingle() {
+    return url(`Dynamic bookmark - Single - rand=${Math.round(100 * Math.random())}`); // NOSONAR
+}
+
+function dynamicBookmarkTabs() {
+    return [1, 1 + 1].map(index => url(`Dynamic bookmark - Tabs[${index}]`));
+}
+
+function dynamicBookmarkMenu() {
+    return [1, 1 + 1].map(index => ({description: `Bookmark ${index}`, url: url(`Dynamic bookmark - Menu[${index}]`)}));
+}
+
+function dynamicBookmarkBroken() {
+    return [];
 }
 
 function mkDocsIssues(searchTerm) {
     return "https://github.com/mkdocs/mkdocs/issues/" + (searchTerm.match(/^\d+$/) ? "%s" : "q=%s");
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Shortcuts
+//----------------------------------------------------------------------------------------------------------------------
 
 const shortcuts = `
 
@@ -31,20 +56,26 @@ const shortcuts = `
     // Dynamic shortcuts
     //------------------------------------------------------------------------------------------------------------------
 
-    [d] Dynamic [s] Single                                         ${shortycut.toUrl(dynamicLinkSingle)}
-    [d] Dynamic [t] Tabs                                           ${shortycut.toUrl(dynamicLinkTabs)}
-    [d] Dynamic [m] Menu                                           ${shortycut.toUrl(dynamicLinkMenu)}
+    [d] Dynamic [q] Query [s] Single                                ${shortycut.toQueryUrl(dynamicQuerySingle)}
+    [d] Dynamic [q] Query [t] Tabs                                  ${shortycut.toQueryUrl(dynamicQueryTabs)}
+    [d] Dynamic [q] Query [m] Menu                                  ${shortycut.toQueryUrl(dynamicQueryMenu)}
 
-    [d] Dynamic [1] 1 [] Dynamic                                    ?${shortycut.toUrl(dynamicLinkTabs)}
-    [d] Dynamic [1] 1 [] Static                                     ?http:// Static %s
-    [d] Dynamic [2] 2 [] Dynamic                                    ^${shortycut.toUrl(dynamicLinkTabs)}
-    [d] Dynamic [2] 2 [] Static                                     ^http:// Static %s
-    [d] Dynamic [3] 3 [] Dynamic                                    ?${shortycut.toUrl(dynamicLinkMenu)}
-    [d] Dynamic [3] 3 [] Static                                     ?http:// Static %s
-    [d] Dynamic [4] 4 [] Dynamic                                    ^${shortycut.toUrl(dynamicLinkMenu)}
-    [d] Dynamic [4] 4 [] Static                                     ^http:// Static %s
+    [d] Dynamic [q] Query [1] 1 [] Dynamic                         ?${shortycut.toQueryUrl(dynamicQueryTabs)}
+    [d] Dynamic [q] Query [1] 1 [] Static                          ?http:// Static %s
+    [d] Dynamic [q] Query [2] 2 [] Dynamic                         ^${shortycut.toQueryUrl(dynamicQueryTabs)}
+    [d] Dynamic [q] Query [2] 2 [] Static                          ^http:// Static %s
+    [d] Dynamic [q] Query [3] 3 [] Dynamic                         ?${shortycut.toQueryUrl(dynamicQueryMenu)}
+    [d] Dynamic [q] Query [3] 3 [] Static                          ?http:// Static %s
+    [d] Dynamic [q] Query [4] 4 [] Dynamic                         ^${shortycut.toQueryUrl(dynamicQueryMenu)}
+    [d] Dynamic [q] Query [4] 4 [] Static                          ^http:// Static %s
 
-    [mkdi] MkDocs issues                                           ${shortycut.toUrl(mkDocsIssues)}
+    [d] Dynamic [b] Bookmark [s] Single                             ${shortycut.toBookmarkUrl(dynamicBookmarkSingle)}
+    [d] Dynamic [b] Bookmark [t] Tabs                               ${shortycut.toBookmarkUrl(dynamicBookmarkTabs)}
+    [d] Dynamic [b] Bookmark [m] Menu                               ${shortycut.toBookmarkUrl(dynamicBookmarkMenu)}
+
+    [d] Dynamic [b] Bookmark [b] Broken                             ${shortycut.toBookmarkUrl(dynamicBookmarkBroken)}
+
+    [mkdi] MkDocs issues                                            ${shortycut.toUrl(mkDocsIssues)}
     [mkdi] MkDocs issues                                            http:// MkDocs Issues listing
 
     //------------------------------------------------------------------------------------------------------------------
@@ -122,7 +153,15 @@ const shortcuts = `
     [a] AWS [p] Prod [] queue-2-deadletter                         #http:// AWS Prod Queue 2 Dead Letter
 `;
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------------------------------------------------
+
 shortycut.addShortcuts(shortcuts.replace(/http:\/\/\s+/gi, TARGET_URL));
+
+//----------------------------------------------------------------------------------------------------------------------
+// Load additional files
+//----------------------------------------------------------------------------------------------------------------------
 
 shortycut.loadJavaScript('../data-test/shortcuts-01.js').andThen('../data-test/shortcuts-02.js');
 shortycut.loadJavaScript('../data-test/shortcuts-01.js').andThen('../data-test/shortcuts-03.js');

@@ -1,5 +1,11 @@
 # ![](img/arrow.svg) Release notes
 
+## Version 1.4.0-DEV | 2022-11-01
+
+- SonarLint
+- fixed typings for config (search buckets were missing)
+- dynamic multi-link queries
+
 ## Version 1.3.1 | 2022-09-23
 
 - Tweaked the homepage's suggestion filter (avoiding unnecessary full-text searches)

@@ -27,7 +27,8 @@ declare namespace shortycut {
         replacePrevious?: string;
         openInNewTab?: string;
         showMenu?: string;
-        default?: "replacePreviousDefinition" | "openInNewTab" | "showMenu";
+        searchBucket?: string;
+        default?: "replacePreviousDefinition" | "openInNewTab" | "showMenu" | "searchBucket";
     }
     interface HomepageConfig {
         keywords?: Array<string>;
@@ -51,7 +52,9 @@ declare namespace shortycut {
     }
     export function configure(newConfig: Config): void;
     export function addShortcuts(...shortcuts: (string | string[])[]): void;
-    export function toUrl(dynamicLinkFunction: (searchTerm: string) => string): string;
+    export function toUrl(dynamicLinkFunction: (searchTerm: string) => string): string
+        | ReadonlyArray<string>
+        | ReadonlyArray<{ description: string, url: string; }>;
     interface JavaScriptDependencyBuilder {
         andThen(...files: string[]): JavaScriptDependencyBuilder;
     }

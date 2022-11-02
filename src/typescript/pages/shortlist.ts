@@ -56,14 +56,14 @@ namespace shortycut {
 
         private createLink(
             index: number,
-            href: string,
+            permalink: string,
             title: string,
             onClick: (event: MouseEvent) => void,
             subtitle?: string,
             url?: string
         ) {
             const a = document.createElement("a");
-            a.href = href;
+            a.href = permalink;
             a.id = `shortlist${index}`;
             const favicon = url && config.homepage.suggestions.showFavicons ? faviconManager.getFavicon(url) : "";
             a.innerHTML = create("div.row", [

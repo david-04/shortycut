@@ -13,7 +13,6 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function addShortcuts(...shortcuts: (string | string[])[]) {
-
         for (const shortcut of shortcuts) {
             if (Array.isArray(shortcut)) {
                 shortcut.forEach(item => startupCache.shortcuts.push(item));
@@ -24,75 +23,97 @@ namespace shortycut {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Create a virtual URL that points to a function which dynamically generates the actual link at runtime
+    // Create a virtual URL for a function that dynamically converts a search term into one or more links
     //------------------------------------------------------------------------------------------------------------------
 
-    let dynamicLinkIndex = 0;
+    export function toUrl(fn: DynamicQueryFunction) {
+        return registerDynamicLink("toUrl", fn);
+    }
 
-    export function toUrl(dynamicLinkFunction: DynamicLinkFunction) {
+    //------------------------------------------------------------------------------------------------------------------
+    // Create a virtual URL for a function that dynamically converts a search term into one or more links
+    //------------------------------------------------------------------------------------------------------------------
 
-        if ("function" !== typeof dynamicLinkFunction) {
-            startupCache.initializationErrors.push(new InitializationError(
-                create("div", "The parameter passed to shortycut.toUrl() is not a function:"),
-                create("div", create("tt", `${dynamicLinkFunction}`)))
+    export function toQueryUrl(fn: DynamicQueryFunction) {
+        return registerDynamicLink("toQueryUrl", fn);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Create a virtual URL for a function that dynamically generates one or more (non-query) links
+    //------------------------------------------------------------------------------------------------------------------
+
+    export function toBookmarkUrl(fn: DynamicBookmarkFunction) {
+        return registerDynamicLink("toBookmarkUrl", fn);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Add a dynamic link to the registry and return a virtual URL to reference it
+    //------------------------------------------------------------------------------------------------------------------
+
+    function registerDynamicLink(entryPoint: "toUrl" | "toQueryUrl" | "toBookmarkUrl", fn: DynamicLinkFunction) {
+        if ("function" !== typeof fn) {
+            startupCache.initializationErrors.push(
+                new InitializationError(
+                    create("div", `The parameter passed to shortycut.${entryPoint}() is not a function:`),
+                    create("div", create("tt", `${fn}`))
+                )
             );
+            fn = () => [];
         }
 
-        const key = `${dynamicLinkProtocol}://${startupCache.dynamicLinks.size}-${dynamicLinkIndex}`;
-        dynamicLinkIndex++;
+        const key = `${dynamicLinkProtocol}://${entryPoint}.${startupCache.dynamicLinks.size + 1}`;
         startupCache.dynamicLinks.put(key, {
-            generator: dynamicLinkFunction,
-            urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
+            generator: fn,
+            isQuery: "toBookmarkUrl" !== entryPoint,
+            faviconUrls: getUrlsForFavicon(fn)
         });
         return key;
     }
 
-    function getUrlForFavicon(dynamicLinkFunction: DynamicLinkFunction) {
+    //------------------------------------------------------------------------------------------------------------------
+    // Retrieve all URLs relevant for favicons
+    //------------------------------------------------------------------------------------------------------------------
 
-        let invalidUrl: string | undefined = undefined;
+    function getUrlsForFavicon(dynamicLinkFunction: DynamicQueryFunction) {
+
+        const valid = new Array<string>();
+        const invalid = new Array<string>();
 
         for (const searchTerm of [undefined, null, "", "1"]) {
-            const result = getDynamicLinkUrl(dynamicLinkFunction, searchTerm);
-            if (result.url) {
-                return result.url;
-            }
-            invalidUrl = invalidUrl || result.invalidUrl;
+            try {
+                const result = analyzeUrls(dynamicLinkFunction(searchTerm as unknown as string));
+                result.valid.forEach(url => valid.push(url));
+                result.invalid.forEach(url => invalid.push(url));
+            } catch (_ignored) { }
         }
 
-        if (invalidUrl) {
-            startupCache.initializationErrors.push(new InitializationError(
-                create("div", "The dynamic link function returned an invalid URL."),
-                create("div", create("tt", invalidUrl)))
+        if (invalid.length) {
+            const invalidLinksLike = 1 === invalid.length ? "an invalid URL" : "invalid URLs like";
+
+            startupCache.initializationErrors.push(
+                new InitializationError(
+                    create("div", `The dynamic link function returned ${invalidLinksLike}`),
+                    create("div", create("tt", invalid[0]))
+                )
             );
         }
 
-        return "file:///";
+        return valid;
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Try to get the dynamic link for the given search term - and ignore exceptions
+    // Extract all URLs from a dynamic link and categorize them into valid and invalid URLs
     //------------------------------------------------------------------------------------------------------------------
 
-    function getDynamicLinkUrl(dynamicLinkFunction: DynamicLinkFunction, searchTerm?: string | null) {
-        try {
-            const generatedLinks = dynamicLinkFunction(searchTerm ?? "");
-            const firstGeneratedLink = "string" === typeof generatedLinks ? generatedLinks : generatedLinks[0];
-            const url = "string" === typeof firstGeneratedLink ? firstGeneratedLink : firstGeneratedLink.url;
-            if (url) {
-                if (isUrl(url)) {
-                    return { url };
-                } else {
-                    const name = (dynamicLinkFunction as { name?: string; })?.name || "function";
-                    const quotes = undefined === searchTerm || null === searchTerm ? "" : "'";
-                    const parameter = `${quotes}${searchTerm}${quotes}`;
-                    return { invalidUrl: `${name}(${parameter}) => ${url}` };
-                }
-            }
-        } catch (exception) {
-            // try the next search term
-        }
-        return {};
+    function analyzeUrls(result: DynamicLinkResult) {
+        const valid = new Array<string>();
+        const invalid = new Array<string>();
+        ("string" === typeof result ? [result] : result)
+            .map(link => "string" === typeof link ? link : link.url)
+            .forEach(url => (url && isUrl(url) ? valid : invalid).push(url));
+        return { valid, invalid };
     }
+
 
     //------------------------------------------------------------------------------------------------------------------
     // Load JavaScript files

@@ -6,8 +6,15 @@ namespace shortycut {
         | ReadonlyArray<string>
         | ReadonlyArray<{ description: string, url: string; }>;
 
-    export type DynamicLinkFunction = (searchTerm: string) => DynamicLinkResult;
-    export type DynamicLink = { generator: DynamicLinkFunction, urlForFavicon: string; };
+    export type DynamicQueryFunction = (searchTerm: string) => DynamicLinkResult;
+    export type DynamicBookmarkFunction = () => DynamicLinkResult;
+    export type DynamicLinkFunction = DynamicQueryFunction | DynamicBookmarkFunction;
+
+    export interface DynamicLink {
+        generator: DynamicQueryFunction;
+        faviconUrls: string[];
+        isQuery: boolean;
+    }
 
     export interface FinalizedPostField {
         key: string;
@@ -81,8 +88,9 @@ namespace shortycut {
             public readonly isSearchable: boolean,
             private readonly urlOrDynamicLink: string | DynamicLink
         ) {
-            this.isQuery = "string" !== typeof this.urlOrDynamicLink
-                || 0 <= adjustCase(this.urlOrDynamicLink).indexOf(config.shortcutFormat.url.searchTermPlaceholder);
+            this.isQuery = "string" === typeof this.urlOrDynamicLink
+                ? 0 <= adjustCase(this.urlOrDynamicLink).indexOf(config.shortcutFormat.url.searchTermPlaceholder)
+                : this.urlOrDynamicLink.isQuery;
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -159,10 +167,10 @@ namespace shortycut {
             return `${baseUrl}?${QueryParameters.REDIRECT}=${redirect}`;
         }
 
-        public get urlForFavicon() {
+        public get faviconUrls() {
             return "string" === typeof this.urlOrDynamicLink
-                ? this.urlOrDynamicLink
-                : this.urlOrDynamicLink.urlForFavicon;
+                ? [this.urlOrDynamicLink]
+                : this.urlOrDynamicLink.faviconUrls;
         }
 
         public get overridden() {

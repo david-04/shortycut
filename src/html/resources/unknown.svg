@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="unknown.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="242.43661"
+     inkscape:cy="137.38075"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1857"
+     inkscape:window-height="1057"
+     inkscape:window-x="55"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-197)">
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:#ff0000;stroke-width:4.24900028;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;stroke-dashoffset:0"
+       id="rect4485-9"
+       width="95.751366"
+       height="95.751366"
+       x="2.1245"
+       y="199.12413"
+       ry="15.869294" />
+    <g
+       aria-label="?"
+       transform="matrix(1.4765841,0,0,1.4765841,-85.304395,260.3319)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       id="flowRoot4487-1">
+      <path
+         d="m 102.12956,-17.884913 q 0,6.484375 -5.234377,9.5052086 -3.932292,2.2395834 -4.270833,4.5312502 -0.07813,0.5989584 -0.130209,1.1979167 -0.182291,0.5468751 -0.9375,0.5468751 -2.630208,0 -3.776042,0.3125 -0.234375,0.078125 -0.364583,0.078125 -0.9375,0 -0.9375,-2.5520835 0,-2.2135417 2.552083,-5.4687502 2.578125,-3.2812499 2.578125,-5.4947919 0,-3.359375 -3.567708,-3.359375 -2.265625,0 -5.885417,1.770833 -1.119792,0 -1.119792,-6.640625 0,-0.729167 0.07813,-1.09375 0.364584,-1.744792 4.348959,-2.708334 2.890625,-0.703125 5.572917,-0.703125 4.713542,0 7.8125,2.630209 3.281257,2.786458 3.281257,7.447917 z M 95.072266,4.5109212 q 0,2.0052085 -1.40625,3.4635419 -1.380208,1.4583334 -3.385417,1.4583334 -2.005208,0 -3.411458,-1.4583334 -1.380208,-1.4583334 -1.380208,-3.4635419 0,-2.0052084 1.380208,-3.4114585 1.40625,-1.43229171 3.411458,-1.43229171 2.005209,0 3.385417,1.43229171 1.40625,1.4062501 1.40625,3.4114585 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:53.33333588px;font-family:'Berlin Sans FB Demi';-inkscape-font-specification:'Berlin Sans FB Demi Bold';fill:#ffffff;fill-opacity:1"
+         id="path4519"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

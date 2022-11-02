@@ -390,7 +390,7 @@ namespace shortycut {
                             ? create("div.keyword:html", suggestion.keywordHtml)
                             : "",
                         config.homepage.suggestions.showFavicons
-                            ? faviconManager.getFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
+                            ? faviconManager.getFavicon(suggestion.shortcut.all[0].link.faviconUrls[0])
                             : "",
                         create("div.description:html", this.getDescription(suggestion))
                     ], rowContent => rowContent.addEventListener("click", (event: MouseEvent) => {
@@ -609,7 +609,8 @@ namespace shortycut {
 
             if (homepageIsVisible) {
                 faviconManager.setCurrentlyDisplayedLinks(
-                    this.suggestions.map(suggestion => suggestion.shortcut.all[0].link.urlForFavicon)
+                    this.suggestions.map(suggestion => suggestion.shortcut.all[0].link.faviconUrls[0])
+                        .filter(url => url)
                 );
                 if (config.favicons.preloadOnStart) {
                     faviconManager.startPreload();
