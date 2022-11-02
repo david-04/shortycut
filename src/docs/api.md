@@ -13,8 +13,7 @@ shortycut.addShortcuts(`
 `);
 ```
 
-A few older browsers (like Internet Explorer) don't support the multi-line syntax.
-When using such a browser, the shortcuts need to be passed as an array of strings instead:
+A few older browsers (like Internet Explorer) don't support the multi-line syntax. When using such a browser, the shortcuts need to be passed as an array of strings instead:
 
 
 ```javascript
@@ -40,16 +39,11 @@ shortycut.configure({
 });
 ```
 
-The supported options are described in "[Configuration](configuration.md)".
-It is not necessary to pass all of them and the function can be called multiple times.
-When modifying the same settings, subsequent calls override previous ones.
+The supported options are described in "[Configuration](configuration.md)". It is not necessary to pass all of them and the function can be called multiple times. When modifying the same settings, subsequent calls override previous ones.
 
 ## ![](img/arrow.svg) loadJavaScript()
 
-Load additional JavaScript files.
-This function can be called repeatedly and accepts multiple files.
-All files - including separate calls to `loadJavaScript()` - are loaded in parallel, i.e. the order is unpredictable.
-This can be changed by using `andThen()` to model dependencies:
+Load additional JavaScript files. This function can be called repeatedly and accepts multiple files. All files - including separate calls to `loadJavaScript()` - are loaded in parallel, i.e. the order is unpredictable. This can be changed by using `andThen()` to model dependencies:
 
 ```
 shortycut.loadJavaScript('shared-shortcuts.js', 'tools.js')
@@ -57,14 +51,11 @@ shortycut.loadJavaScript('shared-shortcuts.js', 'tools.js')
                 .andThen('shortcuts-01.js', 'shortcuts-02.js');
 ```
 
-Files are loaded from (or relative to) ShortyCut's `data` folder,
-unless a complete URL (including a protocol like `https://` or `file://`) is passed.
-See "[Loading separate files](loading-separate-files.md)" for further details.
+Files are loaded from (or relative to) ShortyCut's `data` folder, unless a complete URL (including a protocol like `https://` or `file://`) is passed. See "[Loading separate files](loading-separate-files.md)" for further details.
 
 ## ![](img/arrow.svg) toUrl()
 
-Register a function that generates dynamic links based on the current search term.
-The call to `toUrl()` returns a virtual link that can be used like any other URL when defining shortcuts:
+Register a function that generates dynamic links based on the current search term. The call to `toUrl()` returns a virtual link that can be used like any other URL when defining shortcuts:
 
 ```javascript
 function mkDocsIssues(searchTerm) {
@@ -80,5 +71,4 @@ var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
 shortycut.addShortcuts('[mkdi] MkDocs Issues ' + mkDocsIssuesUrl`);
 ```
 
-When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.
-See "[Dynamic links](dynamic-links.md)" for details.
+When the keyword is used, ShortyCut calls the respective function to obtain the applicable link. See "[Dynamic links](dynamic-links.md)" for details.
