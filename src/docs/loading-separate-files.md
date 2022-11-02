@@ -78,7 +78,7 @@ Loading files in parallel is quicker than doing it sequentially. But their actua
 ```javascript
 shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js')
                 .andThen('shortcuts-03.js', 'shortcuts-04.js')
-                .andThen('shortcuts-05.js'                   );
+                .andThen('shortcuts-05.js');
 ```
 
 This example starts by loading `shortcuts-01.js` and `shortcuts-02.js` in parallel. When both files have been fully loaded, `shortcuts-03.js` and `shortcuts-04.js` are loaded in parallel. When those files have both been loaded as well, ShortyCut starts to load`shortcuts-05.js`.

@@ -1,6 +1,8 @@
 # ![](img/arrow.svg) API
 
-ShortyCut provides functions that can be used to interact with it through JavaScript code.
+ShortyCut provides functions that can be used to interact with it through JavaScript code. It also ships with typings for TypeScript. 
+
+The typings were previously contained in the `data-template` folder but have now been moved to the `resources` folder. Please delete `shortycut.d.ts` from your `data` folder and instead point your `tsconfig.json` to the `resources` folder. This will ensure that every update also re-applies the latest typings.
 
 ## ![](img/arrow.svg) addShortcuts()
 
@@ -53,9 +55,9 @@ shortycut.loadJavaScript('shared-shortcuts.js', 'tools.js')
 
 Files are loaded from (or relative to) ShortyCut's `data` folder, unless a complete URL (including a protocol like `https://` or `file://`) is passed. See "[Loading separate files](loading-separate-files.md)" for further details.
 
-## ![](img/arrow.svg) toUrl()
+## ![](img/arrow.svg) toBookmarkUrl()
 
-Register a function that generates dynamic links based on the current search term. The call to `toUrl()` returns a virtual link that can be used like any other URL when defining shortcuts:
+Register a function that generates dynamic links (without requiring a search term). The call to `toBookmarkUrl()` returns a virtual link (as a `string`) that can be used like any other URL when defining shortcuts:
 
 ```javascript
 function mkDocsIssues(searchTerm) {
@@ -65,10 +67,30 @@ function mkDocsIssues(searchTerm) {
         return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
     }
 }
-
 var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
-
 shortycut.addShortcuts('[mkdi] MkDocs Issues ' + mkDocsIssuesUrl`);
 ```
 
-When the keyword is used, ShortyCut calls the respective function to obtain the applicable link. See "[Dynamic links](dynamic-links.md)" for details.
+When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.
+
+Dynamic bookmark functions can also return multiple links to show as a list or to open in new tabs. See "[Dynamic links](dynamic-links.md#dynamic-bookmarks)" for details.
+
+## ![](img/arrow.svg) toQueryUrl()
+
+Register a function that generates dynamic links based on the current search term. The call to `toQueryUrl()` returns a virtual link (as a `string`) that can be used like any other URL when defining shortcuts:
+
+```javascript
+function mkDocsIssues(searchTerm) {
+    if (searchTerm.trim().match(/^[0-9]+$/)) {
+        return 'https://github.com/mkdocs/mkdocs/issues/%s';
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+    }
+}
+var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
+shortycut.addShortcuts('[mkdi] MkDocs Issues ' + mkDocsIssuesUrl`);
+```
+
+When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.
+
+Dynamic query functions can also return multiple links to show as a list or to open in new tabs. See "[Dynamic links](dynamic-links.md#dynamic-queries)" for details.

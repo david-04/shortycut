@@ -4,7 +4,6 @@ ShortyCut is a JavaScript application to quickly navigate to websites using keyw
 
 ```javascript
 shortycut.addShortcuts(`
-
     [e]    Search eBay      https://www.ebay.com.au/sch/i.html?nkw=%s
     [ta]   The Age          https://www.theage.com.au/melbourne-news
     [tc]   TechCrunch       https://techcrunch.com

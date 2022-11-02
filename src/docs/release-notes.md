@@ -1,9 +1,10 @@
 # ![](img/arrow.svg) Release notes
 
-## Version 1.4.0-DEV | 2022-11-01
+## Version 1.4.0-DEV | 2022-11-02
 
-- fixed typings for config (search buckets were missing)
-- dynamic multi-link queries
+- Introduced [dynamic bookmarks](dynamic-links.md#dynamic-bookmarks)
+- Enabled dynamic link functions to [return multiple links](dynamic-links.md#dynamic-multi-links)
+- Updated the TypeScript typings
 - Performed technical maintenance (applied stricter linting)
 
 ## Version 1.3.1 | 2022-09-23

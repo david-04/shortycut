@@ -2,7 +2,6 @@
 
 ```text
 MIT License
-
 Copyright (c) 2020-2022 David Hofmann
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
