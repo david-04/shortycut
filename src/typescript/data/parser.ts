@@ -11,7 +11,7 @@ namespace shortycut {
 
         // extracted components
         public description = "";
-        public urlOrDynamicLink: string | DynamicLink = "";
+        public urlOrDynamicShortcut: string | DynamicShortcut = "";
         public isStandardProtocol = false;
         public onMultiLink: OnMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
 
@@ -93,14 +93,14 @@ namespace shortycut {
                         keyword,
                         sections,
                         context.onMultiLink,
-                        context.urlOrDynamicLink
+                        context.urlOrDynamicShortcut
                     );
                 } else {
                     shortcuts.put(keyword, new Shortcut(
                         keyword,
                         sections,
                         context.onMultiLink,
-                        context.urlOrDynamicLink
+                        context.urlOrDynamicShortcut
                     ));
                 }
                 if (keyword === config.defaultSearchEngine.keyword) {
@@ -125,12 +125,12 @@ namespace shortycut {
 
             const { url, isStandardProtocol } = this.getUrl(context.line);
             context.isStandardProtocol = isStandardProtocol;
-            context.urlOrDynamicLink = url;
+            context.urlOrDynamicShortcut = url;
             context.description = context.line.substring(0, context.line.length - url.length);
 
-            if (0 === context.urlOrDynamicLink.indexOf(dynamicLinkProtocol)) {
-                context.urlOrDynamicLink = startupCache.dynamicLinks.get(context.urlOrDynamicLink);
-                if (!context.urlOrDynamicLink) {
+            if (0 === context.urlOrDynamicShortcut.indexOf(dynamicLinkProtocol)) {
+                context.urlOrDynamicShortcut = startupCache.dynamicLinks.get(context.urlOrDynamicShortcut);
+                if (!context.urlOrDynamicShortcut) {
                     throw new ParserError(
                         "The dynamic link created via shortycut.toUrl() must be at the end of the line",
                         context.line
@@ -213,10 +213,10 @@ namespace shortycut {
                 for (const onMultiLink of OnMultiLink.values) {
                     const symbol = getProperty(multiLinkIndicator, onMultiLink.key) ?? "~!@#$%^&*()_+";
                     if (!pass && context.isStandardProtocol
-                        && "string" === typeof context.urlOrDynamicLink
-                        && startsWith(context.urlOrDynamicLink, symbol)) {
+                        && "string" === typeof context.urlOrDynamicShortcut
+                        && startsWith(context.urlOrDynamicShortcut, symbol)) {
                         context.onMultiLink = onMultiLink;
-                        context.urlOrDynamicLink = context.urlOrDynamicLink.substring(symbol.length).trim();
+                        context.urlOrDynamicShortcut = context.urlOrDynamicShortcut.substring(symbol.length).trim();
                         return;
                     } else if (pass && endsWith(context.description, symbol)) {
                         context.description = context.description.substring(

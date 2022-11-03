@@ -127,9 +127,9 @@ namespace shortycut {
         public readonly shortcuts = new Array<string>();
         public readonly initializationErrors = new Array<InitializationError>();
 
-        private _dynamicLinks?: Hashtable<DynamicLink>;
+        private _dynamicLinks?: Hashtable<DynamicShortcut>;
         public get dynamicLinks() {
-            const dynamicLinks = this._dynamicLinks ?? new Hashtable<DynamicLink>();
+            const dynamicLinks = this._dynamicLinks ?? new Hashtable<DynamicShortcut>();
             this._dynamicLinks = dynamicLinks;
             return dynamicLinks;
         }

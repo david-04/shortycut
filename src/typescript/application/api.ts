@@ -12,12 +12,12 @@ namespace shortycut {
     // Store shortcut definitions to be parsed later
     //------------------------------------------------------------------------------------------------------------------
 
-    export function addShortcuts(...shortcuts: (string | string[])[]) {
+    export function addShortcuts(...shortcuts: readonly (string | readonly string[])[]) {
         for (const shortcut of shortcuts) {
-            if (Array.isArray(shortcut)) {
-                shortcut.forEach(item => startupCache.shortcuts.push(item));
-            } else {
+            if ("string" === typeof shortcut) {
                 startupCache.shortcuts.push(shortcut);
+            } else {
+                shortcut.forEach(item => startupCache.shortcuts.push(item));
             }
         }
     }
@@ -105,7 +105,7 @@ namespace shortycut {
     // Extract all URLs from a dynamic link and categorize them into valid and invalid URLs
     //------------------------------------------------------------------------------------------------------------------
 
-    function analyzeUrls(result: DynamicLinkResult) {
+    function analyzeUrls(result: GeneratedLinks) {
         const valid = new Array<string>();
         const invalid = new Array<string>();
         ("string" === typeof result ? [result] : result)
@@ -123,12 +123,12 @@ namespace shortycut {
 
         public constructor(public readonly dependencies: JavaScriptFile[]) { }
 
-        public andThen(...files: string[]) {
+        public andThen(...files: readonly string[]) {
             return new JavaScriptDependencyBuilder(files.map(file => javaScriptLoader.add(file, this.dependencies)));
         }
     }
 
-    export function loadJavaScript(...files: string[]) {
+    export function loadJavaScript(...files: readonly string[]) {
         return new JavaScriptDependencyBuilder([]).andThen(...files);
     }
 }
