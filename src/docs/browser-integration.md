@@ -18,7 +18,7 @@ The keyword assigned to the ShortyCut bookmark (e.g. `sc`) needs to be entered b
 
 ![](img/keyword-query-address-bar.png)
 
-Having to enter ShortyCut's own keyword (`sc`) first, allows it to be used on a case-by-case basis, while preserving the address bar's default behavior for everything else. See "[Keyword query](keyword-query.md)" for details.
+This approach preserves the address bar's default behavior and only invokes ShortyCut on a case-by-case basis. See "[Keyword query](keyword-query.md)" for details.
 
 ## ![](img/arrow.svg) Web server
 

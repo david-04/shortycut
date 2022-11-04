@@ -58,7 +58,7 @@ The next section of the page displays websites that don't have a standard favico
 
 ![](img/favicons-missing.png)
 
-When downloading icons from elsewhere, the base filename (without extension) must be exactly as displayed in the list. For example, the icon for `dict.leo.org` could be saved as `dict.leo.org.ico`. The file extensions can be `ico`, `jpg`, `png` or `svg`.
+When downloading icons from elsewhere, the base filename (without extension) must be exactly as displayed in the list. For example, the icon for `dict.leo.org` could be saved as `dict.leo.org.ico`. The file extensions can be `ico`, `jpg`, `png`, or `svg`.
 
 ## ![](img/arrow.svg) Downloaded favicons
 

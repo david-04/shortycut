@@ -23,7 +23,7 @@ shortycut
   +-- index.html
 ```
 
-It requires the environment variable `JAVA_HOME` or `PATH` to point to the folder where Java is installed. One of them should be set automatically when installing Java. On all other operating systems, the web server needs to be started manually via command line:
+It requires the environment variable `JAVA_HOME` or `PATH` to point to the folder where Java is installed. One of them should be set automatically when installing Java. On all other operating systems, the web server needs to be started manually via the command line:
 
 ```text
 javaw -jar web-server.jar
@@ -64,7 +64,7 @@ Using ShortyCut as the default search engine will replace the address bar's defa
 
 ## ![](img/arrow.svg) Using encrypted connections
 
-Some browsers only detect and accept search engines which are accessed via encrypted `https`. When using such a browser in combination with the built-in web server, open ShortyCut via this link:
+Some browsers only detect and accept search engines that are accessed via encrypted `https`. When using such a browser in combination with the built-in web server, open ShortyCut via this link:
 
 [https://localhost:4172/](https://localhost:4172/)
 

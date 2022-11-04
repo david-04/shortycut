@@ -36,7 +36,7 @@ shortycut.loadJavaScript(
 );
 ```
 
-Spreading shortcuts across multiple files also allows to easily hide and restore some of them by adding or removing the respective files from the `loadJavaScript` command.
+Shortcuts isolated in individual files can easily be hidden and restored by adding or removing the respective files from the `loadJavaScript` command.
 
 ## ![](img/arrow.svg) Relative and absolute paths
 
@@ -60,7 +60,7 @@ shortycut.loadJavaScript(
 );
 ```
 
-Loading files via the network can slow down ShortyCut, because it waits until all files have been fully loaded before redirecting or showing the homepage.
+Loading files via the network can slow down ShortyCut. It needs to wait until all files have been fully loaded before redirecting or showing the homepage.
 
 ## ![](img/arrow.svg) Loading files in a specific order
 
@@ -71,7 +71,7 @@ shortycut.loadJavaScript('shortcuts-01.js');
 shortycut.loadJavaScript('shortcuts-02.js', 'shortcuts-03.js');
 ```
 
-In this example, all three files are loaded simultaneously. However, some might load quicker and overtake others along the way. This could lead to `shortcuts-03.js` to effectively come before `shortcuts-01.js`.
+In this example, all three files are loaded simultaneously. However, some might load quicker and overtake others along the way. This could lead to `shortcuts-03.js` effectively being executed before `shortcuts-01.js`.
 
 Loading files in parallel is quicker than doing it sequentially. But their actual order is unpredictable and can be different each time. In many cases, that's not a problem, but it can become one when a file overrides keywords or uses JavaScript variables and functions that are defined in another file. In those cases, `andThen` can be used to describe dependencies between the files:
 
@@ -90,4 +90,4 @@ shortycut.loadJavaScript('shortcuts-01.js', 'shortcuts-02.js');
 shortycut.loadJavaScript('shortcuts-01.js').thenLoad( 'shortcuts-03.js');
 ```
 
-In this example, `shortcuts-01.js` and `shortcuts-02.js` are loaded in parallel. `shortcuts-03.js` is loaded after `shortcuts-01.js` (but independent of `shortcuts-02.js`). Passing the same file to `loadJavaScript` again does not cause a reload. That is, the second line does not actually load `shortcuts-01.js`, because it has already been loaded in the first line.
+In this example, `shortcuts-01.js` and `shortcuts-02.js` are loaded in parallel. `shortcuts-03.js` is loaded after `shortcuts-01.js` (but independent of `shortcuts-02.js`). Passing the same file to `loadJavaScript` again does not cause a reload. That is, the second line does not load `shortcuts-01.js` because it has already been loaded in the first line.

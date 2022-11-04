@@ -4,7 +4,7 @@ This integration method only works with browsers that natively support keywords 
 
 ![](img/keyword-query-address-bar.png)
 
-The dedicated keyword for ShortyCut allows it to be used on a case-by-case basis when needed, while preserving the address bar's default behavior for everything else.
+A dedicated keyword for ShortyCut allows it to be used on a case-by-case basis when needed. At the same time, the address bar's default behavior is preserved for all other use cases.
 
 ## ![](img/arrow.svg) Firefox
 

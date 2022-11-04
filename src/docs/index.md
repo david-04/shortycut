@@ -13,15 +13,15 @@ shortycut.addShortcuts(`
 `);
 ```
 
-Links are opened by entering the corresponding keyword (for example `ta` or `tr`). Using ShortyCut's homepage is the easiest way to do this, because it works in all browsers and provides suggestions while typing:
+Links are opened by entering the corresponding keyword (for example `ta` or `tr`). Using ShortyCut's homepage is the easiest way to do this. It works in all browsers and provides suggestions while typing:
 
 ![](img/favicons-suggestions.png)
 
-ShortyCut can also be set up as the browser's default search engine, so that keywords can be entered directly in the address bar:
+ShortyCut can also be set up as the browser's default search engine. This way, keywords can be entered directly in the address bar:
 
 ![](img/web-server-address-bar.png)
 
-ShortyCut makes keywords available in all browsers, including those that don't natively support it. It enhances their capabilities with additional features like keywords with multiple links, support for `POST` pages and the ability to dynamically generate shortcuts via JavaScript.
+ShortyCut makes keywords available in all browsers, including those that don't natively support it. It enhances their capabilities with additional features like keywords with multiple links, support for `POST` pages, and the ability to dynamically generate shortcuts via JavaScript.
 
 ## ![](img/arrow.svg) Resources
 

@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) Dynamic links
 
-ShortyCut allows to dynamically open different pages based on the current search term. This is an advanced technique that requires JavaScript code to be written. It helps to reduce the overall number of keywords by reusing pre-existing ones for similar queries.
+ShortyCut can dynamically open different pages based on the current search term. This is an advanced technique that requires JavaScript code to be written. It helps to reduce the overall number of keywords by reusing pre-existing ones for similar queries.
 
 ## ![](img/arrow.svg) Use case
 
@@ -13,7 +13,7 @@ Sometimes there are different ways how information can be accessed and searched.
 - Open one specific issue<br>
   <https://github.com/mkdocs/mkdocs/issues/2163>
 
-Creating separate keywords allows to quickly navigate to the most suitable page on a case-by-case basis:
+With separate keywords, the most suitable page can be quickly opened on a case-by-case basis:
 
 ```javascript
 shortycut.addShortcuts(`

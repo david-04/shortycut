@@ -53,7 +53,7 @@ shortycut.loadJavaScript('shared-shortcuts.js', 'tools.js')
                 .andThen('shortcuts-01.js', 'shortcuts-02.js');
 ```
 
-Files are loaded from (or relative to) ShortyCut's `data` folder, unless a complete URL (including a protocol like `https://` or `file://`) is passed. See "[Loading separate files](loading-separate-files.md)" for further details.
+Files are loaded from (or relative to) ShortyCut's `data` folder unless a complete URL (including a protocol like `https://` or `file://`) is passed. See "[Loading separate files](loading-separate-files.md)" for further details.
 
 ## ![](img/arrow.svg) toBookmarkUrl()
 

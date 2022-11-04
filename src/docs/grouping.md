@@ -20,7 +20,7 @@ Grouping can be used to reduce the number of suggestions on ShortyCut's homepage
 
 This example uses a naming convention that's quite easy to remember. Keywords always start with `gh` for GitHub, followed by the project (e.g. `sc` for ShortyCut). An optional page (e.g. `i` for issues) can be appended at the end.
 
-Using this naming convention quickly leads to a lot of keywords starting with `gh`, which can mess up the suggestions on ShortyCut's homepage. Typing `g`, for example, would flood the list with GitHub suggestion, obstructing the view and hiding other (potentially more relevant) shortcuts:
+Using this naming convention quickly leads to a lot of keywords starting with `gh`, which can mess up the suggestions on ShortyCut's homepage. Typing `g`, for example, would flood the list with GitHub suggestions, obstructing the view and hiding other (potentially more relevant) shortcuts:
 
 ![](img/grouping-01.png)
 
@@ -53,7 +53,7 @@ When grouping is enabled, the keywords can be segmented and intertwined with the
 [gh] GitHub [mkd] MkDocs    [pr] pull requests   https://github.com/.../pulls
 ```
 
-The square brackets (`[` and `]`) are usually optional, but they must be used for all shortcuts that use grouping. On the other hand, grouping itself is optional can be applied selectively to only those shortcuts that benefit from it.
+The square brackets (`[` and `]`) are usually optional, but they must be used for all shortcuts that use grouping. On the other hand, grouping itself is optional and can be applied selectively to only those shortcuts that benefit from it.
 
 On ShortyCut's homepage, grouped shortcuts unfold level by level. For example, after typing `g`, all GitHub links are hidden behind a single suggestion:
 

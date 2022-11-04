@@ -31,7 +31,7 @@ Once a keyword has been assigned, it can be entered in the browser's address bar
 
 With keywords it's easy to catch up on the latest offers without a single click:
 
-* Press `Ctrl` + `L` (to focus on address bar) or `Ctrl` + `T` (to open a new tab)
+* Press `Ctrl` + `L` (to focus on the address bar) or `Ctrl` + `T` (to open a new tab)
 * Enter the keyword `sunnies`
 * Press `Enter`
 
@@ -39,13 +39,13 @@ This will open the bookmarked page and restores all filters. There's no need to 
 
 ## ![](img/arrow.svg) Keyword searches
 
-Keyword bookmarks are great for quickly restoring filters and directly accessing nested pages. But they're also kind of a one-trick pony and always produce the same page view. A more versatile form are keyword searches. They work with websites that allow searching for things like products, news, or images. Like filters and settings, the search term is usually included in the page's address:
+Keyword bookmarks are great for quickly restoring filters and directly accessing nested pages. But they're also a one-trick pony. They always produce the same page view. Keyword searches are more versatile. They work with websites that allow searching for things like products, news, or images. Similar to filters and settings, the search term is usually included in the page's address:
 
 ```text
 https://www.ebay.com.au/sch/i.html?_nkw=sunglasses&_from=R40&LH_PrefLoc=1
 ```
 
-Once such a page has been bookmarked, it can be turned into a keyword search by replacing the original search term `sunglasses` with `%s` (which is as a special placeholder recognized by the browser):
+Once such a page has been bookmarked, it can be turned into a keyword search by replacing the original search term `sunglasses` with `%s` (which is a special placeholder recognized by the browser):
 
 ![](img/ebay-properties.png)
 
@@ -59,6 +59,6 @@ This will open eBay, restore all bookmarked filters, and search for hats.
 
 Keywords are incredibly handy. They bypass long-winded navigation steps, restore filter settings, and open the right page straight away. As a native browser feature, they do have some limitations, though.
 
-In Chromium-based browsers, for example, the usability is not great. To assign keywords, bookmarks need to be added as search engines. This is done in the settings and less convenient than working with regular bookmarks. Search engines can't be organized in folders either. All keywords end up in one long list, making it hard to maintain them.
+In Chromium-based browsers, for example, the usability is not great. To assign keywords, bookmarks need to be added as search engines. This is done in the settings and it's far less convenient than working with regular bookmarks. Search engines can't be organized in folders either. All keywords end up in one long list, making it hard to maintain them.
 
-Some browsers, don't support keywords at all. And those that do, usually lack the ability to synchronize them with other browsers. Keywords need to be maintained separately when using different browsers simultaneously.
+Some browsers, don't support keywords at all. And those that do, cannot usually synchronize them with other browsers. Keywords need to be maintained separately when using different browsers simultaneously.

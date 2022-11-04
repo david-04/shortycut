@@ -65,7 +65,7 @@ This property defines the delimiter that introduces comments within shortcut def
 
 ## ![](img/arrow.svg) shortcutFormat.keyword.caseSensitive
 
-This property enables or disables case-sensitivity for keywords. The default value is `false`, meaning that keywords are not case-sensitive. A `news` shortcut could be opened by entering variations like `News` or `NEWS`. On the other hand, if the property is set to `true`, keywords must be entered exactly as they are defined in `shortcuts.js`.
+This property enables or disables case sensitivity for keywords. The default value is `false`, meaning that keywords are not case-sensitive. A new shortcut could be opened by entering variations like `News` or `NEWS`. On the other hand, if the property is set to `true`, keywords must be entered exactly as they are defined in `shortcuts.js`.
 
 ## ![](img/arrow.svg) shortcutFormat.keyword.openingDelimiter and shortcutFormat.keyword.closingDelimiter
 
@@ -109,11 +109,11 @@ This property defines the character that can be put in front of a link to mark i
 
 ## ![](img/arrow.svg) shortcutFormat.url.multiLinkIndicator.default
 
-This property defines the default behavior for keywords with multiple links. It can be set to `replacePrevious`, `openInNewTab` or `showMenu` (which is the default value). See "[Multi-link shortcuts](multi-link-shortcuts.md)" for details.
+This property defines the default behavior for keywords with multiple links. It can be set to `replacePrevious`, `openInNewTab`, or `showMenu` (which is the default value). See "[Multi-link shortcuts](multi-link-shortcuts.md)" for details.
 
 ## ![](img/arrow.svg) homepage.keywords
 
-This property defines keywords that can be entered in the browser's address bar to open ShortyCut's homepage. The default values are `?`, `help`, `home`, `homepage`, `sc` and`shortycut`. When entering one of these keywords, the homepage is opened (instead of invoking the default [search engine](default-search-engine.md)).
+This property defines keywords that can be entered in the browser's address bar to open ShortyCut's homepage. The default values are `?`, `help`, `home`, `homepage`, `sc`, and `shortycut`. When entering one of these keywords, the homepage is opened (instead of invoking the default [search engine](default-search-engine.md)).
 
 ## ![](img/arrow.svg) homepage.suggestions.showKeywords
 

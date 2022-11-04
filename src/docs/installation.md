@@ -21,7 +21,7 @@ After renaming the folder, open `index.html` in your browser (e.g. by double-cli
 
 After installing ShortyCut, you need to add your own links and keywords. This is done by editing `shortcuts.js` in the `data` folder. See "[Shortcut syntax](shortcut-syntax.md)" for details.
 
-In order to use the keywords, you also need to make them available in your browser. The easiest way is to pin ShortyCut's homepage, but other methods are available, too. See "[Browser integration](browser-integration.md)" for details.
+To use the keywords, you also need to make them available in your browser. The easiest way is to pin ShortyCut's homepage, but other methods are available as well. See "[Browser integration](browser-integration.md)" for details.
 
 ShortyCut can be customized by editing `settings.js` in the `data` folder. This includes enabling and disabling features as well as tweaking the way shortcuts are defined. See "[Configuration](configuration.md)" for details.
 

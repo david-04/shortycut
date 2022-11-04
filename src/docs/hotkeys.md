@@ -25,7 +25,7 @@ In this example, the underscore (`_`) can be used to mark the correct hotkeys:
 [tc] _Tech_Crunch    https://techcrunch.com
 ```
 
-It's important that the hotkeys are aligned with the keyword. ShortyCut disregards markers if the letters don't match. On the other hand, there's no need to mark hotkeys if the automatic highlighting would pick the right ones anyway. ShortyCut uses the designed hotkeys where possible, and resorts to automatic highlighting in all other cases:
+The hotkeys must be aligned with the keyword. ShortyCut disregards markers if the letters don't match. On the other hand, there's no need to mark hotkeys if the automatic highlighting would pick the right ones anyway. ShortyCut uses the designed hotkeys where possible, and resorts to automatic highlighting in all other cases:
 
 ![](img/hotkeys-manual.png)
 

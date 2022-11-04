@@ -1,11 +1,11 @@
 # ![](img/arrow.svg) Release notes
 
-## Version 1.4.0-DEV | 2022-11-02
+## Version 1.4.0 | 2022-11-04
 
 - Introduced [dynamic bookmarks](dynamic-links.md#dynamic-bookmarks)
-- Enabled dynamic link functions to [return multiple links](dynamic-links.md#dynamic-multi-links)
-- Updated the TypeScript typings
-- Performed technical maintenance (applied stricter linting)
+- Added the ability to dynamically [generate a variable number of links](dynamic-links.md#dynamic-multi-links)
+- Updated and documented the TypeScript typings
+- Performed technical maintenance (stricter linting and refactoring)
 
 ## Version 1.3.1 | 2022-09-23
 
