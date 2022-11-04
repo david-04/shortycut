@@ -141,62 +141,39 @@
             <div class="section">
               
                 <h1 id="post-links"><img alt="" src="img/arrow.svg" /> POST links</h1>
-<p>Some pages transmit data via the <code>POST</code> method,
-which prevents filters and settings from showing up in the browser's address bar.
-It's often used for sensitive input like usernames and passwords.
-As a side effect, these pages can't (and often shouldn't) be bookmarked.
-But in some cases, it's safe and handy to create a shortcut nevertheless.</p>
+<p>Some pages transmit data via the <code>POST</code> method, which prevents filters and settings from showing up in the browser's address bar. It's often used for sensitive input like usernames and passwords. As a side effect, these pages can't (and often shouldn't) be bookmarked. But in some cases, it's safe and handy to create a shortcut nevertheless.</p>
 <h2 id="link-syntax"><img alt="" src="img/arrow.svg" /> Link syntax</h2>
 <p>A regular link becomes a <code>POST</code> link by appending <code>?POST?</code> followed by the data to be transmitted:</p>
 <pre><code class="language-text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=secret
 </code></pre>
-<p>In this example, the username <code>shortycut</code> and the password <code>secret</code> would be transmitted
-without showing up in the browser's address bar.
-The fields must be in <code>key=value</code> format and separated by an ampersand (<code>&amp;</code>).
-The placeholder <code>%s</code> can be used like in any other link:</p>
+<p>In this example, the username <code>shortycut</code> and the password <code>secret</code> would be transmitted without showing up in the browser's address bar. The fields must be in <code>key=value</code> format and separated by an ampersand (<code>&amp;</code>). The placeholder <code>%s</code> can be used like in any other link:</p>
 <pre><code class="language-text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=shortycut&amp;password=%s
 </code></pre>
-<p>In this example, the password needs to be entered alongside the keyword.
-Typing <code>ebay secret</code> in the browser's address bar would attempt to log in user <code>shortycut</code> with the password <code>secret</code>.</p>
+<p>In this example, the password needs to be entered alongside the keyword. Typing <code>ebay secret</code> in the browser's address bar would attempt to log in user <code>shortycut</code> with the password <code>secret</code>.</p>
 <h2 id="url-encoding"><img alt="" src="img/arrow.svg" /> URL-Encoding</h2>
-<p>All keys and values (except for the <code>%s</code> placeholder) must be URL-encoded.
-This means that most characters apart from letters and digits can't be used directly.
-One example is the <code>@</code> symbol, which needs to be written as <code>%40</code> instead.
-If the username was <code>me@gmail.com</code>, the login link would look like this:</p>
+<p>All keys and values (except for the <code>%s</code> placeholder) must be URL-encoded. This means that most characters apart from letters and digits can't be used directly. One example is the <code>@</code> symbol, which needs to be written as <code>%40</code> instead. If the username was <code>me@gmail.com</code>, the login link would look like this:</p>
 <pre><code class="language-text">[ebay] eBay http://localhost/my-app/sign-in?POST?user=me%40gmail.com&amp;password=%s
 </code></pre>
-<p>ShortyCut includes link tools, which can be used to quickly encode any text.
-It's accessed via the burger icon on the upper right-hand side of the homepage:</p>
+<p>ShortyCut includes link tools, which can be used to quickly encode any text. It's accessed via the burger icon on the upper right-hand side of the homepage:</p>
 <p><img alt="" src="img/menu-link-tools.png" /></p>
-<p>The section for URL-encoding contains two fields, one for the plain text and one for the URL-encoded version.
-Everything typed into the plain text field is encoded immediately.
-The result is displayed in the field below:</p>
+<p>The section for URL-encoding contains two fields, one for the plain text and one for the URL-encoded version. Everything typed into the plain text field is encoded immediately. The result is displayed in the field below:</p>
 <p><img alt="" src="img/url-encoding.png" /></p>
 <p>Text that is already encoded can also be decoded by entering it into the URL-encoded field.</p>
 <h2 id="extracting-post-links"><img alt="" src="img/arrow.svg" /> Extracting POST links</h2>
-<p>Preparing a <code>POST</code> link can be a bit of a  scavenger hunt.
-The field names can't be seen in the browser's address bar and usually need to be extracted from the page's source code.
-An easier way is to automatically extract the links from the network traffic recorded by the browser.
-The instructions below are based on Chrome, but it works similarly in most other browsers as well.</p>
-<p>The first step is to open the page and populate the form fields.
-Before clicking the submit button, right-click anywhere on the page and select "Inspect":</p>
+<p>Preparing a <code>POST</code> link can be a bit of a  scavenger hunt. The field names can't be seen in the browser's address bar and usually need to be extracted from the page's source code. An easier way is to automatically extract the links from the network traffic recorded by the browser. The instructions below are based on Chrome, but it works similarly in most other browsers as well.</p>
+<p>The first step is to open the page and populate the form fields. Before clicking the submit button, right-click anywhere on the page and select "Inspect":</p>
 <p><img alt="" src="img/har-01-inspect.png" /></p>
-<p>This will open the browser's developer tools on the side or at the bottom of the window.
-Switch to the "Network" tab and tick the "preserve log" checkbox.
-In some browsers, this might be hidden in the menu and have a different name (e.g. "persist log"):</p>
+<p>This will open the browser's developer tools on the side or at the bottom of the window. Switch to the "Network" tab and tick the "preserve log" checkbox. In some browsers, this might be hidden in the menu and have a different name (e.g. "persist log"):</p>
 <p><img alt="" src="img/har-02-dev-tools.png" /></p>
-<p>Now submit the form (in this example by clicking on "Log in &amp; check e-mails").
-The browser will record and display all network traffic in the "Network" tab:</p>
+<p>Now submit the form (in this example by clicking on "Log in &amp; check e-mails"). The browser will record and display all network traffic in the "Network" tab:</p>
 <p><img alt="" src="img/har-03-submit.png" /></p>
-<p>Once the page has been loaded, right-click on the network traffic
-and copy (or save) all requests as HAR (HTTP archive):</p>
+<p>Once the page has been loaded, right-click on the network traffic and copy (or save) all requests as HAR (HTTP archive):</p>
 <p><img alt="" src="img/har-04-copy.png" /></p>
 <p>Then open ShortyCut's link tools via the burger icon on the homepage:</p>
 <p><img alt="" src="img/menu-link-tools.png" /></p>
 <p>Scroll down to the section for extracting <code>POST</code> links and paste the HTTP archive (HAR) data into the text field:</p>
 <p><img alt="" src="img/har-05-extract.png" /></p>
-<p>ShortyCut will extract all <code>POST</code> requests and display the matching links below the input field.
-The links are already URL-encoded and can be modified as required (e.g. by replacing a value with the <code>%s</code> placeholder).</p>
+<p>ShortyCut will extract all <code>POST</code> requests and display the matching links below the input field. The links are already URL-encoded and can be modified as required (e.g. by replacing a value with the <code>%s</code> placeholder).</p>
               
             </div>
           </div>

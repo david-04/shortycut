@@ -141,23 +141,17 @@
             <div class="section">
               
                 <h1 id="default-search-engine"><img alt="" src="img/arrow.svg" /> Default search engine</h1>
-<p>ShortyCut's primary purpose is to open bookmarked pages through the use of keywords.
-But it also serves as an entry point for general web searches.
-Input that does not match any keyword is forwarded to a search engine.</p>
+<p>ShortyCut's primary purpose is to open bookmarked pages through the use of keywords. But it also serves as an entry point for general web searches. Input that does not match any keyword is forwarded to a search engine.</p>
 <h2 id="changing-the-search-engine"><img alt="" src="img/arrow.svg" /> Changing the search engine</h2>
-<p>By default, ShortyCut uses DuckDuckGo for web searches.
-It can be switched to any other search engine by adding a shortcut with the keyword <code>defaultsearchengine</code>.
-The link must contain the <code>%s</code> placeholder for the actual search term:</p>
+<p>By default, ShortyCut uses DuckDuckGo for web searches. It can be switched to any other search engine by adding a shortcut with the keyword <code>defaultsearchengine</code>. The link must contain the <code>%s</code> placeholder for the actual search term:</p>
 <pre><code class="language-text">[defaultsearchengine]   Google   https://www.google.com/search?&amp;q=%s
 </code></pre>
-<p>Sometimes it's useful to have shortcuts for different search engines and switch between them on a case-by-case basis
-by using the corresponding keyword:</p>
+<p>Sometimes it's useful to have shortcuts for different search engines and switch between them on a case-by-case basis by using the corresponding keyword:</p>
 <pre><code class="language-text">[b]  Bing     https://www.bing.com/search?q=%s
 [g]  Google   https://www.google.com/search?&amp;q=%s
 [y]  Yahoo    https://search.yahoo.com/search?p=%s
 </code></pre>
-<p>Any existing shortcut can be nominated as the default search engine without assigning the <code>defaultsearchengine</code> keyword,
-by setting the configuration property <a href="configuration.html#defaultsearchenginekeyword">keyword</a> instead:</p>
+<p>Any existing shortcut can be nominated as the default search engine without assigning the <code>defaultsearchengine</code> keyword, by setting the configuration property <a href="configuration.html#defaultsearchenginekeyword">keyword</a> instead:</p>
 <pre><code class="language-javascript">shortycut.configure({
     defaultSearchEngine: {
         keyword: 'g'
@@ -166,11 +160,7 @@ by setting the configuration property <a href="configuration.html#defaultsearche
 </code></pre>
 <p>In this example, the shortcut with the keyword <code>g</code> (Google) is set up as the default search engine.</p>
 <h2 id="disabling-the-search-engine"><img alt="" src="img/arrow.svg" /> Disabling the search engine</h2>
-<p>The default search engine can be disabled to enforce the use of keywords at all times.
-This can be done individually for the browser's address bar and ShortyCut's homepage
-by setting the configuration properties
-<a href="configuration.html#defaultsearchengineuseinaddressbar">useInAddressBar</a> and/or
-<a href="configuration.html#defaultsearchengineuseonhomepage">useOnHomepage</a> to <code>false</code>.</p>
+<p>The default search engine can be disabled to enforce the use of keywords at all times. This can be done individually for the browser's address bar and ShortyCut's homepage by setting the configuration properties <a href="configuration.html#defaultsearchengineuseinaddressbar">useInAddressBar</a> and/or <a href="configuration.html#defaultsearchengineuseonhomepage">useOnHomepage</a> to <code>false</code>.</p>
               
             </div>
           </div>

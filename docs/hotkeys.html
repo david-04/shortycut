@@ -143,12 +143,8 @@
                 <h1 id="hotkeys"><img alt="" src="img/arrow.svg" /> Hotkeys</h1>
 <p>When ShortyCut displays suggestions, it shows the keyword and highlights the next letters to type in the description:</p>
 <p><img alt="" src="img/hotkeys-automatic.png" /></p>
-<p>The letters highlighted as hotkeys might not be the best choice if keywords follow specific patterns.
-For example, they might be composed of the first letter of each word, like <code>tg</code> for "<code>T</code>yping <code>G</code>ames".
-The automatic highlighting does not consider those rules and highlights the wrong <code>g</code>.</p>
-<p>To work around this problem, hotkeys can be explicitly marked when defining shortcuts.
-This is done by putting a designated symbol in front of each hotkey within the description.
-Any symbol can be used, but it must be configured as <a href="configuration.html#shortcutformathotkeymarker">hotkeyMarker</a> first:</p>
+<p>The letters highlighted as hotkeys might not be the best choice if keywords follow specific patterns. For example, they might be composed of the first letter of each word, like <code>tg</code> for "<code>T</code>yping <code>G</code>ames". The automatic highlighting does not consider those rules and highlights the wrong <code>g</code>.</p>
+<p>To work around this problem, hotkeys can be explicitly marked when defining shortcuts. This is done by putting a designated symbol in front of each hotkey within the description. Any symbol can be used, but it must be configured as <a href="configuration.html#shortcutformathotkeymarker">hotkeyMarker</a> first:</p>
 <pre><code class="language-javascript">shortycut.configure({
     shortcutFormat: {
         hotkeyMarker: '_'
@@ -161,17 +157,9 @@ Any symbol can be used, but it must be configured as <a href="configuration.html
 [tg] _Typing _Games  https://www.typing.com/student/game
 [tc] _Tech_Crunch    https://techcrunch.com
 </code></pre>
-<p>It's important that the hotkeys are aligned with the keyword.
-ShortyCut disregards markers if the letters don't match.
-On the other hand, there's no need to mark hotkeys if the automatic highlighting would pick the right ones anyway.
-ShortyCut uses the designed hotkeys where possible, and resorts to automatic highlighting in all other cases:</p>
+<p>The hotkeys must be aligned with the keyword. ShortyCut disregards markers if the letters don't match. On the other hand, there's no need to mark hotkeys if the automatic highlighting would pick the right ones anyway. ShortyCut uses the designed hotkeys where possible, and resorts to automatic highlighting in all other cases:</p>
 <p><img alt="" src="img/hotkeys-manual.png" /></p>
-<p>The hotkey highlighting can be turned off by setting the configuration property
-<a href="configuration.html#homepagesuggestionsshowhotkeys">showHotkeys</a> to <code>false</code>.
-This can be useful if the description only rarely contains all letters from the keyword.
-On the other hand, if the descriptions are usually hotkey-friendly,
-the keywords displayed on the left-hand side can be hidden by setting the configuration property
-<a href="configuration.html#homepagesuggestionsshowkeywords">showKeywords</a> to <code>false</code>.</p>
+<p>The hotkey highlighting can be turned off by setting the configuration property <a href="configuration.html#homepagesuggestionsshowhotkeys">showHotkeys</a> to <code>false</code>. This can be useful if the description only rarely contains all letters from the keyword. On the other hand, if the descriptions are usually hotkey-friendly, the keywords displayed on the left-hand side can be hidden by setting the configuration property <a href="configuration.html#homepagesuggestionsshowkeywords">showKeywords</a> to <code>false</code>.</p>
               
             </div>
           </div>

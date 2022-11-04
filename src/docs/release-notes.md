@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) Release notes
 
-## Version 1.4.0 | 2022-11-04
+## Version 1.4 | 2022-11-04
 
 - Introduced [dynamic bookmarks](dynamic-links.md#dynamic-bookmarks)
 - Added the ability to dynamically [generate a variable number of links](dynamic-links.md#dynamic-multi-links)

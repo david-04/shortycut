@@ -141,10 +141,7 @@
             <div class="section">
               
                 <h1 id="grouping"><img alt="" src="img/arrow.svg" /> Grouping</h1>
-<p>Grouping can be used to reduce the number of suggestions on ShortyCut's homepage.
-This is useful when similar shortcuts have keywords that start with the same letters.
-One example is GitHub, where it can be handy to not only quickly access specific projects,
-but also their various pages (like releases, pull requests, and issues):</p>
+<p>Grouping can be used to reduce the number of suggestions on ShortyCut's homepage. This is useful when similar shortcuts have keywords that start with the same letters. One example is GitHub, where it can be handy to not only quickly access specific projects, but also their various pages (like releases, pull requests, and issues):</p>
 <pre><code class="language-text">[gh]       GitHub                          https://github.com/
 
 [ghsc]     GitHub ShortyCut                https://github.com/david-04/shortycut
@@ -159,17 +156,10 @@ but also their various pages (like releases, pull requests, and issues):</p>
 [ghmkdi]   GitHub MkDocs issues            https://github.com/.../issues
 [ghmkdpr]  GitHub MkDocs pull requests     https://github.com/.../pulls
 </code></pre>
-<p>This example uses a naming convention that's quite easy to remember.
-Keywords always start with <code>gh</code> for GitHub, followed by the project (e.g. <code>sc</code> for ShortyCut).
-An optional page (e.g. <code>i</code> for issues) can be appended at the end.</p>
-<p>Using this naming convention quickly leads to a lot of keywords starting with <code>gh</code>,
-which can mess up the suggestions on ShortyCut's homepage.
-Typing <code>g</code>, for example, would flood the list with GitHub suggestion,
-obstructing the view and hiding other (potentially more relevant) shortcuts:</p>
+<p>This example uses a naming convention that's quite easy to remember. Keywords always start with <code>gh</code> for GitHub, followed by the project (e.g. <code>sc</code> for ShortyCut). An optional page (e.g. <code>i</code> for issues) can be appended at the end.</p>
+<p>Using this naming convention quickly leads to a lot of keywords starting with <code>gh</code>, which can mess up the suggestions on ShortyCut's homepage. Typing <code>g</code>, for example, would flood the list with GitHub suggestions, obstructing the view and hiding other (potentially more relevant) shortcuts:</p>
 <p><img alt="" src="img/grouping-01.png" /></p>
-<p>Grouping can be used to reduce the number of suggestions and get more relevant results.
-It is disabled by default and needs to be activated by setting the configuration property
-<a href="configuration.html#shortcutformatenablegrouping">enableGrouping</a> to <code>true</code>:</p>
+<p>Grouping can be used to reduce the number of suggestions and get more relevant results. It is disabled by default and needs to be activated by setting the configuration property <a href="configuration.html#shortcutformatenablegrouping">enableGrouping</a> to <code>true</code>:</p>
 <pre><code class="language-javascript">shortycut.configure({
     shortcutFormat: {
         enableGrouping: true
@@ -192,13 +182,10 @@ It is disabled by default and needs to be activated by setting the configuration
 [gh] GitHub [mkd] MkDocs    [i]  issues          https://github.com/.../issues
 [gh] GitHub [mkd] MkDocs    [pr] pull requests   https://github.com/.../pulls
 </code></pre>
-<p>The square brackets (<code>[</code> and <code>]</code>) are usually optional, but they must be used for all shortcuts that use grouping.
-On the other hand, grouping itself is optional can be applied selectively to only those shortcuts that benefit from it.</p>
-<p>On ShortyCut's homepage, grouped shortcuts unfold level by level.
-For example, after typing <code>g</code>, all GitHub links are hidden behind a single suggestion:</p>
+<p>The square brackets (<code>[</code> and <code>]</code>) are usually optional, but they must be used for all shortcuts that use grouping. On the other hand, grouping itself is optional and can be applied selectively to only those shortcuts that benefit from it.</p>
+<p>On ShortyCut's homepage, grouped shortcuts unfold level by level. For example, after typing <code>g</code>, all GitHub links are hidden behind a single suggestion:</p>
 <p><img alt="" src="img/grouping-02.png" /></p>
-<p>Once the GitHub part of the keyword (<code>gh</code>) is entered completely, the individual projects become visible.
-Pages beneath them, like releases or issues, are still hidden:</p>
+<p>Once the GitHub part of the keyword (<code>gh</code>) is entered completely, the individual projects become visible. Pages beneath them, like releases or issues, are still hidden:</p>
 <p><img alt="" src="img/grouping-03.png" /></p>
 <p>The various pages for a single project become only visible when the input matches the full project part of the keyword:</p>
 <p><img alt="" src="img/grouping-04.png" /></p>

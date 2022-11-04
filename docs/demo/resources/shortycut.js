@@ -13,61 +13,65 @@ var shortycut;
         }
         for (var _a = 0, shortcuts_1 = shortcuts; _a < shortcuts_1.length; _a++) {
             var shortcut = shortcuts_1[_a];
-            if (Array.isArray(shortcut)) {
-                shortcut.forEach(function (item) { return shortycut.startupCache.shortcuts.push(item); });
+            if ("string" === typeof shortcut) {
+                shortycut.startupCache.shortcuts.push(shortcut);
             }
             else {
-                shortycut.startupCache.shortcuts.push(shortcut);
+                shortcut.forEach(function (item) { return shortycut.startupCache.shortcuts.push(item); });
             }
         }
     }
     shortycut.addShortcuts = addShortcuts;
-    var dynamicLinkIndex = 0;
-    function toUrl(dynamicLinkFunction) {
-        if ('function' !== typeof dynamicLinkFunction) {
-            shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create('div', 'The parameter passed to shortycut.toUrl() is not a function:'), shortycut.create('div', shortycut.create('tt', "".concat(dynamicLinkFunction)))));
+    function toUrl(fn) {
+        return registerDynamicLink("toUrl", fn);
+    }
+    shortycut.toUrl = toUrl;
+    function toQueryUrl(fn) {
+        return registerDynamicLink("toQueryUrl", fn);
+    }
+    shortycut.toQueryUrl = toQueryUrl;
+    function toBookmarkUrl(fn) {
+        return registerDynamicLink("toBookmarkUrl", fn);
+    }
+    shortycut.toBookmarkUrl = toBookmarkUrl;
+    function registerDynamicLink(entryPoint, fn) {
+        if ("function" !== typeof fn) {
+            shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create("div", "The parameter passed to shortycut.".concat(entryPoint, "() is not a function:")), shortycut.create("div", shortycut.create("tt", "".concat(fn)))));
+            fn = function () { return []; };
         }
-        var key = "".concat(shortycut.dynamicLinkProtocol, "://").concat(shortycut.startupCache.dynamicLinks.size, "-").concat(dynamicLinkIndex++);
+        var key = "".concat(shortycut.dynamicLinkProtocol, "://").concat(entryPoint, ".").concat(shortycut.startupCache.dynamicLinks.size + 1);
         shortycut.startupCache.dynamicLinks.put(key, {
-            generator: dynamicLinkFunction,
-            urlForFavicon: getUrlForFavicon(dynamicLinkFunction)
+            generator: fn,
+            isQuery: "toBookmarkUrl" !== entryPoint,
+            faviconUrls: getUrlsForFavicon(fn)
         });
         return key;
     }
-    shortycut.toUrl = toUrl;
-    function getUrlForFavicon(dynamicLinkFunction) {
-        var invalidUrl = undefined;
-        for (var _i = 0, _a = [undefined, null, '', '1']; _i < _a.length; _i++) {
+    function getUrlsForFavicon(dynamicLinkFunction) {
+        var valid = new Array();
+        var invalid = new Array();
+        for (var _i = 0, _a = [undefined, null, "", "1"]; _i < _a.length; _i++) {
             var searchTerm = _a[_i];
-            var result = getDynamicLinkUrl(dynamicLinkFunction, searchTerm);
-            if (result.url) {
-                return result.url;
+            try {
+                var result = analyzeUrls(dynamicLinkFunction(searchTerm));
+                result.valid.forEach(function (url) { return valid.push(url); });
+                result.invalid.forEach(function (url) { return invalid.push(url); });
             }
-            invalidUrl = invalidUrl || result.invalidUrl;
+            catch (_ignored) { }
         }
-        if (invalidUrl) {
-            shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create('div', 'The dynamic link function returned an invalid URL.'), shortycut.create('div', shortycut.create('tt', invalidUrl))));
+        if (invalid.length) {
+            var invalidLinksLike = 1 === invalid.length ? "an invalid URL" : "invalid URLs like";
+            shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create("div", "The dynamic link function returned ".concat(invalidLinksLike)), shortycut.create("div", shortycut.create("tt", invalid[0]))));
         }
-        return 'file:///';
+        return valid;
     }
-    function getDynamicLinkUrl(dynamicLinkFunction, searchTerm) {
-        var _a;
-        try {
-            var url = (_a = dynamicLinkFunction(searchTerm)) === null || _a === void 0 ? void 0 : _a.trim();
-            if (url) {
-                if (shortycut.isUrl(url)) {
-                    return { url: url };
-                }
-                else {
-                    var name_1 = (dynamicLinkFunction === null || dynamicLinkFunction === void 0 ? void 0 : dynamicLinkFunction.name) || 'function';
-                    var parameter = undefined === searchTerm || null === searchTerm ? "".concat(searchTerm) : "'".concat(searchTerm, "'");
-                    return { invalidUrl: "".concat(name_1, "(").concat(parameter, ") => ").concat(url) };
-                }
-            }
-        }
-        catch (exception) {
-        }
-        return {};
+    function analyzeUrls(result) {
+        var valid = new Array();
+        var invalid = new Array();
+        ("string" === typeof result ? [result] : result)
+            .map(function (link) { return "string" === typeof link ? link : link.url; })
+            .forEach(function (url) { return (url && shortycut.isUrl(url) ? valid : invalid).push(url); });
+        return { valid: valid, invalid: invalid };
     }
     var JavaScriptDependencyBuilder = (function () {
         function JavaScriptDependencyBuilder(dependencies) {
@@ -112,14 +116,12 @@ var shortycut;
             this.recalculateToday = this.recalculateToday.bind(this);
             this.saveCache = this.saveCache.bind(this);
             try {
-                this.storage = shortycut.config.favicons.rememberUrls ? localStorage : sessionStorage;
-                if (!this.canWriteToStorage()) {
-                    delete this.storage;
+                var storage = shortycut.config.favicons.rememberUrls ? localStorage : sessionStorage;
+                if (this.canWriteToStorage()) {
+                    this.storage = storage;
                 }
             }
-            catch (ignored) {
-                delete this.storage;
-            }
+            catch (_ignored) { }
             this.recalculateToday();
             shortycut.runAndIgnoreErrors(function () { return _this.loadCache(); });
         }
@@ -141,15 +143,15 @@ var shortycut;
         };
         FaviconCache.prototype.recalculateToday = function () {
             var epochMs = new Date().getTime();
-            var msPerDay = 24 * 60 * 60 * 1000;
+            var msPerDay = FaviconCache.MS_PER_DAY;
             this.today = Math.ceil(epochMs / msPerDay);
-            setTimeout(this.recalculateToday, this.today * msPerDay - epochMs + 5 * 60 * 1000);
+            setTimeout(this.recalculateToday, this.today * msPerDay - epochMs + FaviconCache.MS_PER_FIVE_MINUTES);
         };
         FaviconCache.prototype.deleteExpiredEntries = function (cache) {
             var _this = this;
             cache.forEach(function (domain, origins) {
                 origins.forEach(function (origin, entry) {
-                    if (14 < _this.today - entry.lastAccessed) {
+                    if (FaviconCache.CACHE_EXPIRY_DAYS < _this.today - entry.lastAccessed) {
                         origins.delete(origin);
                     }
                 });
@@ -160,10 +162,10 @@ var shortycut;
         };
         FaviconCache.prototype.scheduleSaveCache = function () {
             var _a;
-            this.saveJobTimeout = (_a = this.saveJobTimeout) !== null && _a !== void 0 ? _a : setTimeout(this.saveCache, 5 * 1000);
+            this.saveJobTimeout = (_a = this.saveJobTimeout) !== null && _a !== void 0 ? _a : setTimeout(this.saveCache, FaviconCache.MS_PER_FIVE_SECONDS);
         };
         FaviconCache.prototype.cancelScheduledSaveJob = function () {
-            if ('number' === typeof this.saveJobTimeout) {
+            if ("number" === typeof this.saveJobTimeout) {
                 clearTimeout(this.saveJobTimeout);
                 delete this.saveJobTimeout;
             }
@@ -195,13 +197,14 @@ var shortycut;
         };
         FaviconCache.prototype.deserializeCache = function (data) {
             var cache = new shortycut.Hashtable();
-            var table = data.split(FaviconCache.LINE_SEPARATOR).map(function (line) { return line.split(FaviconCache.COLUMN_SEPARATOR); });
+            var table = data.split(FaviconCache.LINE_SEPARATOR)
+                .map(function (line) { return line.split(FaviconCache.COLUMN_SEPARATOR); });
             for (var _i = 0, table_1 = table; _i < table_1.length; _i++) {
                 var row = table_1[_i];
-                if (1 === row.length % 3) {
+                if (1 === row.length % FaviconCache.COLUMNS_PER_ENTRY) {
                     var origins = cache.computeIfAbsent(row[0], function () { return new shortycut.Hashtable(); });
-                    for (var offset = 1; offset + 2 < row.length; offset += 3) {
-                        origins.put(row[offset], new FaviconCacheEntry(row[offset + 1], parseInt(row[offset + 2])));
+                    for (var offset = 1; offset + FaviconCache.COLUMNS_PER_ENTRY <= row.length; offset += FaviconCache.COLUMNS_PER_ENTRY) {
+                        origins.put(row[offset], new FaviconCacheEntry(row[offset + FaviconCache.FILENAME_OFFSET], parseInt(row[offset + FaviconCache.TIMESTAMP_OFFSET])));
                     }
                 }
                 else {
@@ -222,33 +225,35 @@ var shortycut;
             }
         };
         FaviconCache.prototype.writeStorage = function (data) {
-            if (this.storage) {
-                this.deleteStorage();
-                var index = 0;
-                var size = data.length;
-                while (data) {
-                    try {
-                        while (data) {
-                            this.storage.setItem(this.getStorageKey(index), data.substring(0, size));
-                            data = data.substring(size);
-                            size = Math.min(size, data.length);
-                            index++;
-                        }
+            if (!this.storage) {
+                return;
+            }
+            this.deleteStorage();
+            var index = 0;
+            var size = data.length;
+            while (data) {
+                try {
+                    while (data) {
+                        this.storage.setItem(this.getStorageKey(index), data.substring(0, size));
+                        data = data.substring(size);
+                        size = Math.min(size, data.length);
+                        index++;
                     }
-                    catch (exception) {
-                        if (size < 100) {
-                            throw exception;
-                        }
-                    }
-                    size = Math.min(Math.ceil(size / 2), data.length);
                 }
+                catch (exception) {
+                    if (size < FaviconCache.MIN_STORAGE_ITEM_SIZE) {
+                        throw exception;
+                    }
+                }
+                size = Math.min(Math.ceil(size / FaviconCache.TWO), data.length);
             }
         };
         FaviconCache.prototype.readStorage = function () {
-            var result = '';
+            var result = "";
             if (this.storage) {
-                for (var index = 0, segment = this.storage.getItem(this.getStorageKey(index)); segment; segment = this.storage.getItem(this.getStorageKey(index++))) {
+                for (var index = 0, segment = this.storage.getItem(this.getStorageKey(index)); segment; segment = this.storage.getItem(this.getStorageKey(index - 1))) {
                     result += segment;
+                    index++;
                 }
             }
             return result;
@@ -268,16 +273,33 @@ var shortycut;
             return canWrite;
         };
         FaviconCache.prototype.getStorageKey = function (index) {
-            return 'shortycut.favicon-cache' + (index ? ".".concat(index) : '');
+            return "shortycut.favicon-cache" + (index ? ".".concat(index) : "");
         };
-        FaviconCache.LINE_SEPARATOR = '\n';
-        FaviconCache.COLUMN_SEPARATOR = '\t';
+        FaviconCache.LINE_SEPARATOR = "\n";
+        FaviconCache.COLUMN_SEPARATOR = "\t";
+        FaviconCache.MIN_STORAGE_ITEM_SIZE = 100;
+        FaviconCache.CACHE_EXPIRY_DAYS = 14;
+        FaviconCache.MS_PER_SECOND = 1000;
+        FaviconCache.SECONDS_PER_MINUTE = 60;
+        FaviconCache.MINUTES_PER_HOUR = 60;
+        FaviconCache.HOURS_PER_DAY = 24;
+        FaviconCache.MS_PER_MINUTE = FaviconCache.SECONDS_PER_MINUTE * FaviconCache.MS_PER_SECOND;
+        FaviconCache.MS_PER_HOUR = FaviconCache.MINUTES_PER_HOUR * FaviconCache.MS_PER_MINUTE;
+        FaviconCache.MS_PER_DAY = FaviconCache.HOURS_PER_DAY * FaviconCache.MS_PER_HOUR;
+        FaviconCache.FIVE = 5;
+        FaviconCache.MS_PER_FIVE_SECONDS = FaviconCache.FIVE * FaviconCache.MS_PER_SECOND;
+        FaviconCache.MS_PER_FIVE_MINUTES = FaviconCache.FIVE * FaviconCache.MS_PER_MINUTE;
+        FaviconCache.TWO = 2;
+        FaviconCache.FILENAME_OFFSET = 1;
+        FaviconCache.TIMESTAMP_OFFSET = 2;
+        FaviconCache.COLUMNS_PER_ENTRY = 3;
         return FaviconCache;
     }());
     shortycut.FaviconCache = FaviconCache;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
+    var MAX_PARALLEL_FAVICON_JOBS = 10;
     var FaviconOriginType = (function () {
         function FaviconOriginType(isFetchService, isWebsite, isOffline) {
             this.isFetchService = isFetchService;
@@ -308,14 +330,14 @@ var shortycut;
     var FaviconLoadJob = (function () {
         function FaviconLoadJob(url) {
             this.url = url;
-            this.status = 'new';
+            this.status = "new";
             this.observers = new Array();
         }
         FaviconLoadJob.prototype.addObserver = function (file) {
-            if ('loaded' === this.status) {
+            if ("loaded" === this.status) {
                 file.onResolved();
             }
-            else if ('failed' === this.status) {
+            else if ("failed" === this.status) {
                 file.onRejected();
             }
             else {
@@ -324,14 +346,14 @@ var shortycut;
         };
         Object.defineProperty(FaviconLoadJob.prototype, "isNew", {
             get: function () {
-                return 'new' === this.status;
+                return "new" === this.status;
             },
             enumerable: false,
             configurable: true
         });
         Object.defineProperty(FaviconLoadJob.prototype, "isLoading", {
             get: function () {
-                return 'loading' === this.status;
+                return "loading" === this.status;
             },
             enumerable: false,
             configurable: true
@@ -345,34 +367,34 @@ var shortycut;
         });
         Object.defineProperty(FaviconLoadJob.prototype, "isLoaded", {
             get: function () {
-                return 'loaded' === this.status;
+                return "loaded" === this.status;
             },
             enumerable: false,
             configurable: true
         });
         Object.defineProperty(FaviconLoadJob.prototype, "hasFailed", {
             get: function () {
-                return 'failed' === this.status;
+                return "failed" === this.status;
             },
             enumerable: false,
             configurable: true
         });
         FaviconLoadJob.prototype.startLoad = function () {
             var _this = this;
-            if ('new' !== this.status) {
+            if ("new" !== this.status) {
                 return false;
             }
-            this.status = 'loading';
-            shortycut.create('img', function (element) {
-                element.addEventListener('load', function () { return _this.onLoadEnd(true); });
-                element.addEventListener('error', function () { return _this.onLoadEnd(false); });
+            this.status = "loading";
+            shortycut.create("img", function (element) {
+                element.addEventListener("load", function () { return _this.onLoadEnd(true); });
+                element.addEventListener("error", function () { return _this.onLoadEnd(false); });
                 element.src = _this.url;
             });
             return true;
         };
         FaviconLoadJob.prototype.onLoadEnd = function (success) {
             var _a;
-            this.status = success ? 'loaded' : 'failed';
+            this.status = success ? "loaded" : "failed";
             this.observers.forEach(function (observer) { return success ? observer.onResolved() : observer.onRejected(); });
             (_a = this.observers[0]) === null || _a === void 0 ? void 0 : _a.origin.domain.registry.startNextLoad();
         };
@@ -403,11 +425,11 @@ var shortycut;
             this.url = url;
             this.files = new Array();
             if (type.isFetchService) {
-                var urlWithoutPort = this.url.replace(/%s/g, this.domain.name.replace(/:\d+$/, ''));
+                var urlWithoutPort = this.url.replace(/%s/g, this.domain.name.replace(/:\d+$/, ""));
                 this.files = [new FaviconFile(this, urlWithoutPort, urlWithoutPort)];
             }
             else {
-                var basename_1 = type.isWebsite ? 'favicon' : this.domain.name.replace(/:/g, '!');
+                var basename_1 = type.isWebsite ? "favicon" : this.domain.name.replace(/:/g, "!");
                 this.files = FaviconOrigin.EXTENSIONS
                     .map(function (extension) { return "".concat(basename_1, ".").concat(extension); })
                     .map(function (filename) { return new FaviconFile(_this, filename, _this.url.replace(/%s/g, filename)); });
@@ -475,11 +497,11 @@ var shortycut;
         FaviconOrigin.prototype.onRejected = function (file) {
             this.files = this.files.filter(function (currentFile) { return currentFile.name !== file.name; });
             if (!this.files.length) {
-                this.domain.registry.cache.set(this.domain.name, this.name, '');
+                this.domain.registry.cache.set(this.domain.name, this.name, "");
                 this.domain.onOriginRejected(this);
             }
         };
-        FaviconOrigin.EXTENSIONS = ['ico', 'png', 'jpg', 'gif', 'svg', 'jpeg'];
+        FaviconOrigin.EXTENSIONS = ["ico", "png", "jpg", "gif", "svg", "jpeg"];
         return FaviconOrigin;
     }());
     var FaviconDomain = (function () {
@@ -493,7 +515,7 @@ var shortycut;
             this.observers = new Array();
             this.createOrigins();
             this.createParentDomain();
-            this.displayName = this.name.replace(/^www\./i, '');
+            this.displayName = this.name.replace(/^www\./i, "");
         }
         FaviconDomain.prototype.createOrigins = function () {
             var _this = this;
@@ -504,9 +526,9 @@ var shortycut;
             }
             shortycut.config.favicons.localFolders.forEach(function (origin) {
                 if (!origin.match(/^[a-z]+:\/\//i)) {
-                    origin = window.location.href.replace(/\/[^/]+$/, '') + '/' + origin;
+                    origin = "".concat(window.location.href.replace(/\/[^/]+$/, ""), "/").concat(origin);
                 }
-                origin = origin.replace(/\/$/, '');
+                origin = origin.replace(/\/$/, "");
                 var type = origin.match(/^file:/) ? FaviconOriginType.CACHE_OFFLINE : FaviconOriginType.CACHE_ONLINE;
                 _this.origins.put(origin, new FaviconOrigin(_this, origin, type, "".concat(origin, "/%s")));
             });
@@ -516,12 +538,12 @@ var shortycut;
             }
             if (this.registry.readCache) {
                 this.origins.keys
-                    .filter(function (origin) { return '' === _this.registry.cache.get(_this.name, origin); })
+                    .filter(function (origin) { return "" === _this.registry.cache.get(_this.name, origin); })
                     .forEach(function (origin) { return _this.origins.delete(origin); });
             }
         };
         FaviconDomain.prototype.createParentDomain = function () {
-            var parentDomain = this.name.replace(/^[^.]+\./, '');
+            var parentDomain = this.name.replace(/^[^.]+\./, "");
             if (parentDomain !== this.name) {
                 this.parentDomain = this.registry.addDomain(parentDomain, this.protocols, false);
                 this.parentDomain.subDomains.put(this.name, this);
@@ -537,11 +559,8 @@ var shortycut;
             var _loop_1 = function (type) {
                 for (var _b = 0, _c = this_1.origins.values.filter(function (currentOrigin) { return currentOrigin.type === type; }); _b < _c.length; _b++) {
                     var origin_1 = _c[_b];
-                    for (var _d = 0, _e = [[false, false], [true, false], [true, true]]; _d < _e.length; _d++) {
-                        var parameters = _e[_d];
-                        if (origin_1.startNextLoad(parameters[0], parameters[1])) {
-                            return { value: true };
-                        }
+                    if (this_1.startNextLoadPrioritized(origin_1)) {
+                        return { value: true };
                     }
                 }
             };
@@ -553,6 +572,15 @@ var shortycut;
                     return state_1.value;
             }
             return !!((_a = this.parentDomain) === null || _a === void 0 ? void 0 : _a.startNextLoad(scope));
+        };
+        FaviconDomain.prototype.startNextLoadPrioritized = function (origin) {
+            for (var _i = 0, _a = [[false, false], [true, false], [true, true]]; _i < _a.length; _i++) {
+                var parameters = _a[_i];
+                if (origin.startNextLoad(parameters[0], parameters[1])) {
+                    return true;
+                }
+            }
+            return false;
         };
         FaviconDomain.prototype.onOriginResolved = function (origin) {
             var _this = this;
@@ -605,7 +633,7 @@ var shortycut;
         FaviconDomain.prototype.getFavicon = function () {
             var _this = this;
             var _a, _b;
-            var img = shortycut.create('img');
+            var img = shortycut.create("img");
             var domain = this;
             while (!domain.resolvedOrigin && domain.parentDomain) {
                 domain = domain.parentDomain;
@@ -617,8 +645,8 @@ var shortycut;
             else {
                 this.observers.push(img);
             }
-            return shortycut.create('div.favicon', img, function (element) {
-                element.dataset['domain'] = _this.name;
+            return shortycut.create("div.favicon", img, function (element) {
+                element.dataset["domain"] = _this.name;
             });
         };
         return FaviconDomain;
@@ -655,7 +683,7 @@ var shortycut;
             if (((_b = this.currentlyDisplayedDomains) === null || _b === void 0 ? void 0 : _b.filter(function (domain) { return domain.isLoading; }).length) || !this.preload) {
                 return;
             }
-            var remainingJobs = Math.max(0, 10 - this.currentJobCount);
+            var remainingJobs = Math.max(0, MAX_PARALLEL_FAVICON_JOBS - this.currentJobCount);
             for (var _i = 0, _c = [FaviconLoadScope.OFFLINE, FaviconLoadScope.ONLINE, FaviconLoadScope.FETCH_SERVICE]; _i < _c.length; _i++) {
                 var scope = _c[_i];
                 var domains = this.domains.values.filter(function (domain) { return domain.isPrimary && !domain.isResolved; });
@@ -694,27 +722,26 @@ var shortycut;
             this.domains = new shortycut.Hashtable();
             this.cache = new shortycut.FaviconCache();
             shortycut.shortcuts.values.forEach(function (shortcut) {
-                shortcut.all.map(function (item) { return item.link; }).map(function (link) { return link.urlForFavicon; }).forEach(function (url) {
-                    var _a = FaviconManager.extractProtocolAndDomain(url), protocol = _a.protocol, domain = _a.domain;
-                    if ('file' !== protocol) {
-                        var protocols = _this.domains.computeIfAbsent(domain, function () { return new Array(); });
-                        if (!protocols.filter(function (currentProtocol) { return currentProtocol === protocol; }).length) {
-                            if ('https' === protocol) {
-                                protocols.unshift(protocol);
-                            }
-                            else {
-                                protocols.push(protocol);
+                shortcut.all.map(function (item) { return item.link; }).map(function (link) { return link.faviconUrls; }).forEach(function (urls) {
+                    urls.forEach(function (url) {
+                        var _a = FaviconManager.extractProtocolAndDomain(url), protocol = _a.protocol, domain = _a.domain;
+                        if ("file" !== protocol) {
+                            var protocols = _this.domains.computeIfAbsent(domain, function () { return new Array(); });
+                            if (!protocols.filter(function (currentProtocol) { return currentProtocol === protocol; }).length) {
+                                "https" === protocol ? protocols.unshift(protocol) : protocols.push(protocol);
                             }
                         }
-                    }
+                    });
                 });
             });
             this.registry = new FaviconRegistry(this.cache, true, false, this.domains);
         }
         FaviconManager.extractProtocolAndDomain = function (url) {
             return {
-                protocol: shortycut.assertNotNull(url.match(/^([a-z]+:\/\/)?/i))[0].replace(/:.*/, '').toLocaleLowerCase() || 'http',
-                domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, '').replace(/\/.*/, '').toLowerCase()
+                protocol: shortycut.assertNotNull(url.match(/^([a-z]+:\/\/)?/i))[0]
+                    .replace(/:.*/, "")
+                    .toLocaleLowerCase() || "http",
+                domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, "").replace(/\/.*/, "").toLowerCase()
             };
         };
         FaviconManager.prototype.startPreload = function () {
@@ -735,14 +762,13 @@ var shortycut;
             this.registry.removeCurrentlyDisplayedDomains();
         };
         FaviconManager.prototype.getFavicon = function (url) {
-            var _a = FaviconManager.extractProtocolAndDomain(url), protocol = _a.protocol, domain = _a.domain;
-            if ('file' === protocol || !this.registry.domains.get(domain)) {
-                var div = shortycut.create('div.favicon', shortycut.createImage('resources/local.svg'));
-                div.dataset['domain'] = domain;
-                return div;
+            var createDiv = function (url) { return shortycut.create("div.favicon", shortycut.createImage(url)); };
+            if (url === null || url === void 0 ? void 0 : url.trim()) {
+                var _a = FaviconManager.extractProtocolAndDomain(url), protocol = _a.protocol, domain = _a.domain;
+                return "file" === protocol ? createDiv("resources/local.svg") : this.registry.getFavicon(domain);
             }
             else {
-                return this.registry.getFavicon(domain);
+                return createDiv("resources/unknown.svg");
             }
         };
         FaviconManager.prototype.getPendingDomains = function () {
@@ -778,9 +804,9 @@ var shortycut;
                     domain = domain.parentDomain;
                 }
                 if (((_b = (_a = domain.resolvedOrigin) === null || _a === void 0 ? void 0 : _a.resolvedFile) === null || _b === void 0 ? void 0 : _b.job.url) && domain.resolvedOrigin.type.isWebsite) {
-                    var name_2 = domain.displayName.replace(/:/g, '!');
-                    var extension = (_d = (_c = domain.resolvedOrigin) === null || _c === void 0 ? void 0 : _c.resolvedFile.name.replace(/^.*\./, '')) !== null && _d !== void 0 ? _d : 'ico';
-                    files.put("".concat(name_2, ".").concat(extension), domain.resolvedOrigin.resolvedFile.job.url);
+                    var name_1 = domain.displayName.replace(/:/g, "!");
+                    var extension = (_d = (_c = domain.resolvedOrigin) === null || _c === void 0 ? void 0 : _c.resolvedFile.name.replace(/^.*\./, "")) !== null && _d !== void 0 ? _d : "ico";
+                    files.put("".concat(name_1, ".").concat(extension), domain.resolvedOrigin.resolvedFile.job.url);
                 }
             });
             return files.entries
@@ -790,7 +816,7 @@ var shortycut;
         FaviconManager.prototype.getOfflineDomains = function () {
             var _this = this;
             var files = new shortycut.Hashtable();
-            var prefix = window.location.href.replace(/\/[^/]+$/, '') + '/';
+            var prefix = window.location.href.replace(/\/[^/]+$/, "") + "/";
             this.registry.domains.values.filter(function (domain) { return domain.isPrimary && domain.isResolved; }).forEach(function (domain) {
                 var _a, _b, _c, _d;
                 while (!domain.resolvedOrigin && domain.parentDomain) {
@@ -810,7 +836,7 @@ var shortycut;
                 return -1;
             }
             else {
-                return s1 == s2 ? 0 : 1;
+                return s1 === s2 ? 0 : 1;
             }
         };
         return FaviconManager;
@@ -820,21 +846,21 @@ var shortycut;
 var shortycut;
 (function (shortycut) {
     function initialize() {
-        window.addEventListener('error', function (exception) { shortycut.startupCache.exceptions.push(exception); });
+        window.addEventListener("error", function (exception) { return shortycut.startupCache.exceptions.push(exception); });
         if (document && document.title !== undefined) {
-            document.title = '...';
+            document.title = "...";
         }
-        window.addEventListener('DOMContentLoaded', function () {
-            document.title = '...';
-            ['icon', 'shortcut icon'].forEach(function (rel) { return addLink(rel, 'image/x-icon', 'resources/favicon.ico', ''); });
-            addLink('search', 'application/opensearchdescription+xml', 'data/search.xml', 'ShortyCut');
+        window.addEventListener("DOMContentLoaded", function () {
+            document.title = "...";
+            ["icon", "shortcut icon"].forEach(function (rel) { return addLink(rel, "image/x-icon", "resources/favicon.ico", ""); });
+            addLink("search", "application/opensearchdescription+xml", "data/search.xml", "ShortyCut");
         });
         shortycut.javaScriptLoader = new shortycut.JavaScriptLoader();
-        window.addEventListener('load', function () { return shortycut.handleExceptions(shortycut.displayError, function () { return shortycut.javaScriptLoader.onComplete(startApplication); }); });
+        window.addEventListener("load", function () { return shortycut.handleExceptions(shortycut.displayError, function () { return shortycut.javaScriptLoader.onComplete(startApplication); }); });
     }
     shortycut.initialize = initialize;
     function addLink(rel, type, href, title) {
-        var link = document.createElement('link');
+        var link = document.createElement("link");
         link.rel = rel;
         link.type = type;
         link.href = href;
@@ -845,12 +871,12 @@ var shortycut;
         if ("undefined" !== typeof __SHORTYCUT_BODY_INNER_HTML) {
             document.body.innerHTML = __SHORTYCUT_BODY_INNER_HTML;
         }
-        var self = window.location.href.replace(/[?#].*/, '');
+        var self = window.location.href.replace(/[?#].*/, "");
         document.body.innerHTML = document.body.innerHTML.replace(/self:\/\//g, self);
         shortycut.initializeVariables();
         shortycut.applyAndValidateConfig();
         if (!shortycut.startupCache.config.length && !shortycut.queryParameters.setup) {
-            window.location.href = "".concat(window.location.href.replace(/[#?].*/, ''), "?").concat(shortycut.QueryParameters.SETUP, "=welcome");
+            window.location.href = "".concat(window.location.href.replace(/[#?].*/, ""), "?").concat(shortycut.QueryParameters.SETUP, "=welcome");
             return;
         }
         shortycut.parseShortcuts(function (result) { return shortycut.handleExceptions(shortycut.displayError, function () { return onParseShortcutsComplete(result); }); });
@@ -861,19 +887,33 @@ var shortycut;
         }
         else {
             if (shortycut.queryParameters.facets.newTabs) {
-                var links = document.getElementsByTagName('a');
-                for (var index = 0; index < links.length; index++) {
-                    var link = links.item(index);
-                    if (link) {
-                        link.target = '_blank';
-                    }
-                }
+                addBlankTargetToAllLinksOnPage();
             }
             shortycut.faviconManager = new shortycut.FaviconManager();
             shortycut.redirector.processQuery();
         }
     }
+    function addBlankTargetToAllLinksOnPage() {
+        var links = document.getElementsByTagName("a");
+        for (var index = 0; index < links.length; index++) {
+            var link = links.item(index);
+            if (link) {
+                link.target = "_blank";
+            }
+        }
+    }
 })(shortycut || (shortycut = {}));
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var shortycut;
 (function (shortycut) {
     var RedirectMode;
@@ -888,91 +928,113 @@ var shortycut;
             this.showRedirectPage = true;
         }
         Redirector.prototype.processQuery = function () {
-            var _a, _b;
             var shortcut = shortycut.shortcuts.get(shortycut.queryParameters.keyword) || undefined;
-            var setup = shortycut.queryParameters.setup;
+            var setup = shortycut.queryParameters.setup, redirect = shortycut.queryParameters.redirect;
             var isHomepageKeyword = shortycut.config.homepage.keywords.some(function (keyword) { return keyword === shortycut.queryParameters.keyword; });
             if (setup) {
-                document.title = 'ShortyCut';
+                document.title = "ShortyCut";
                 this.showSetupPage(setup);
             }
+            else if (redirect) {
+                this.processAuxiliaryRedirect(redirect);
+            }
             else if (shortcut) {
-                this.redirectShortcut(shortcut);
+                this.processShortcut(shortcut);
             }
             else if (shortycut.isUrl(shortycut.queryParameters.fullQuery)) {
                 this.openUrl(shortycut.queryParameters.fullQuery, RedirectMode.ERASE_HISTORY);
             }
-            else if (!shortycut.queryParameters.keyword || !shortycut.defaultSearchEngine || !shortycut.config.defaultSearchEngine.useInAddressBar || isHomepageKeyword) {
-                this.alwaysOpenNewTabs = shortycut.queryParameters.facets.newTabs;
-                this.showRedirectPage = false;
-                document.title = 'ShortyCut';
-                shortycut.router.goto(shortycut.pages.home.populate(isHomepageKeyword
-                    ? shortycut.queryParameters.fullQuery.replace(/^\s*[^\s]+/, '').trim()
-                    : shortycut.queryParameters.fullQuery));
-                if (shortycut.queryParameters.facets.noFocus) {
-                    shortycut.pages.home.removeFocus();
-                }
+            else if (!shortycut.queryParameters.keyword
+                || !shortycut.defaultSearchEngine
+                || !shortycut.config.defaultSearchEngine.useInAddressBar
+                || isHomepageKeyword) {
+                this.openHomepage(isHomepageKeyword);
             }
             else {
-                shortycut.defaultSearchEngine.replacePlaceholders(shortycut.queryParameters.fullQuery);
-                var links = ((_a = shortycut.defaultSearchEngine.queries) === null || _a === void 0 ? void 0 : _a.current) || ((_b = shortycut.defaultSearchEngine.bookmarks) === null || _b === void 0 ? void 0 : _b.current);
-                this.redirect(shortycut.assertNotNull(links), shortycut.OnMultiLink.OPEN_IN_NEW_TAB, shortycut.queryParameters.fullQuery, RedirectMode.ERASE_HISTORY);
+                var links = shortycut.defaultSearchEngine.getFinalizedLinks(shortycut.queryParameters.fullQuery);
+                this.redirect(__assign(__assign({}, links), { onMultiLink: shortycut.OnMultiLink.OPEN_IN_NEW_TAB }), RedirectMode.ERASE_HISTORY);
             }
         };
-        Redirector.prototype.redirectShortcut = function (shortcut) {
-            shortcut.replacePlaceholders(shortycut.queryParameters.searchTerm);
-            if (shortycut.queryParameters.index && shortcut.all[shortycut.queryParameters.index]) {
-                this.redirect([shortcut.all[shortycut.queryParameters.index].link], shortycut.OnMultiLink.OPEN_IN_NEW_TAB, shortycut.queryParameters.searchTerm, RedirectMode.ERASE_HISTORY);
+        Redirector.prototype.processAuxiliaryRedirect = function (redirect) {
+            var url = redirect.url, postFields = redirect.postFields;
+            var permalink = shortycut.Link.constructFinalizedPermalink(url, postFields);
+            var finalizedLinks = {
+                onMultiLink: shortycut.OnMultiLink.OPEN_IN_NEW_TAB,
+                links: [{ htmlDescription: "", urls: [{ url: url, postFields: postFields, permalink: permalink }] }]
+            };
+            this.redirect(finalizedLinks, RedirectMode.ERASE_HISTORY);
+        };
+        Redirector.prototype.openHomepage = function (isHomepageKeyword) {
+            this.alwaysOpenNewTabs = shortycut.queryParameters.facets.newTabs;
+            this.showRedirectPage = false;
+            document.title = "ShortyCut";
+            var query = isHomepageKeyword
+                ? shortycut.queryParameters.fullQuery.replace(/^\s*[^\s]+/, "").trim()
+                : shortycut.queryParameters.fullQuery;
+            shortycut.router.goto(shortycut.pages.home.populate(query));
+            if (shortycut.queryParameters.facets.noFocus) {
+                shortycut.pages.home.removeFocus();
             }
-            else if (shortcut.queries && (shortycut.queryParameters.searchTerm || !shortcut.bookmarks)) {
-                this.redirect(shortcut.queries.current, shortcut.queries.onMultiLink, shortycut.queryParameters.searchTerm, RedirectMode.ERASE_HISTORY);
+        };
+        Redirector.prototype.processShortcut = function (shortcut) {
+            if (shortcut.queries && (shortycut.queryParameters.searchTerm || !shortcut.bookmarks)) {
+                this.redirect(shortcut.getFinalizedQueries(shortycut.queryParameters.searchTerm), RedirectMode.ERASE_HISTORY);
             }
             else if (shortcut.bookmarks) {
-                this.redirect(shortcut.bookmarks.current, shortcut.bookmarks.onMultiLink, shortycut.queryParameters.searchTerm, RedirectMode.ERASE_HISTORY);
+                this.redirect(shortcut.getFinalizedBookmarks(), RedirectMode.ERASE_HISTORY);
             }
             else {
-                throw new shortycut.Exception('Internal error', 'Found no links to use for redirection');
+                throw new shortycut.Exception("Internal error", "Found no links to use for redirection");
             }
         };
-        Redirector.prototype.redirect = function (links, onMultiLink, searchTerm, mode) {
-            links.forEach(function (link) { return link.replacePlaceholder(searchTerm); });
-            if (1 === links.length) {
-                this.openLink(links[0], searchTerm, mode);
+        Redirector.prototype.redirect = function (finalizedLinks, mode) {
+            var _a, _b;
+            var urls = this.flattenUrls(finalizedLinks);
+            var htmlDescription = (_b = (_a = finalizedLinks.links[0]) === null || _a === void 0 ? void 0 : _a.htmlDescription) !== null && _b !== void 0 ? _b : "";
+            if (1 === urls.length) {
+                this.openLink(htmlDescription, urls[0], mode);
             }
-            else if (onMultiLink === shortycut.OnMultiLink.SHOW_MENU) {
+            else if (1 < finalizedLinks.links.length && finalizedLinks.onMultiLink === shortycut.OnMultiLink.SHOW_MENU) {
                 this.showRedirectPage = false;
-                setTimeout(function () { return shortycut.router.goto(shortycut.pages.shortlist.populate(links, searchTerm)); }, 0);
-            }
-            else if (this.alwaysOpenNewTabs) {
-                links.forEach(function (link) { return window.open(link.url); });
-                shortycut.router.goBackToAndResetHomepage();
+                setTimeout(function () { return shortycut.router.goto(shortycut.pages.shortlist.populate(finalizedLinks)); }, 0);
             }
             else {
-                links.slice(1).forEach(function (link) { return window.open(link.url); });
-                this.openLink(links[0], searchTerm, mode);
-            }
-        };
-        Redirector.prototype.openLink = function (link, searchTerm, mode) {
-            if (this.showRedirectPage) {
-                shortycut.router.goto(shortycut.pages.redirect.populate(link));
-            }
-            if (link.postFields) {
-                if (RedirectMode.NEW_TAB === mode || this.alwaysOpenNewTabs) {
-                    this.openUrl(link.getHref(searchTerm), mode);
+                if (this.alwaysOpenNewTabs) {
+                    urls.forEach(function (link) { return window.open(link.permalink); });
+                    shortycut.router.goBackToAndResetHomepage();
                 }
                 else {
-                    this.submitForm(link);
+                    urls.slice(1).forEach(function (link) { return window.open(link.permalink); });
+                    this.openLink(htmlDescription, urls[0], mode);
+                }
+            }
+        };
+        Redirector.prototype.flattenUrls = function (finalizedLinks) {
+            var finalizedUrls = new Array();
+            finalizedLinks.links.forEach(function (link) { return link.urls.forEach(function (url) { return finalizedUrls.push(url); }); });
+            return finalizedUrls;
+        };
+        Redirector.prototype.openLink = function (htmlDescription, url, mode) {
+            if (this.showRedirectPage) {
+                shortycut.router.goto(shortycut.pages.redirect.populate(htmlDescription, url.url));
+            }
+            if (url.postFields) {
+                if (RedirectMode.NEW_TAB === mode || this.alwaysOpenNewTabs) {
+                    this.openUrl(url.permalink, mode);
+                }
+                else {
+                    this.submitForm(url);
                 }
             }
             else {
-                this.openUrl(link.url, mode);
+                this.openUrl(url.url, mode);
             }
         };
         Redirector.prototype.openUrl = function (url, mode) {
             if (RedirectMode.PRESERVE_HISTORY === mode && !this.alwaysOpenNewTabs) {
                 window.location.href = url;
             }
-            else if (RedirectMode.ERASE_HISTORY == mode && !this.alwaysOpenNewTabs) {
+            else if (RedirectMode.ERASE_HISTORY === mode && !this.alwaysOpenNewTabs) {
                 window.location.replace(url);
             }
             else {
@@ -983,14 +1045,14 @@ var shortycut;
             }
         };
         Redirector.prototype.submitForm = function (link) {
-            var form = document.createElement('form');
+            var form = document.createElement("form");
             form.action = link.url;
-            form.method = 'post';
-            form.style.display = 'none';
+            form.method = "post";
+            form.style.display = "none";
             for (var _i = 0, _a = (link.postFields || []); _i < _a.length; _i++) {
                 var field = _a[_i];
-                var input = document.createElement('input');
-                input.type = 'text';
+                var input = document.createElement("input");
+                input.type = "text";
                 input.name = field.key;
                 input.value = field.value;
                 form.appendChild(input);
@@ -1018,8 +1080,8 @@ var shortycut;
             this.goHome = this.goHome.bind(this);
             this.onHashChange = this.onHashChange.bind(this);
             this.onKeyDown = this.onKeyDown.bind(this);
-            window.addEventListener('hashchange', this.onHashChange);
-            document.addEventListener('keydown', this.onKeyDown);
+            window.addEventListener("hashchange", this.onHashChange);
+            document.addEventListener("keydown", this.onKeyDown);
         }
         Router.prototype.goto = function (page) {
             this.history.length = this.getCurrentHistoryIndex() + 1;
@@ -1054,7 +1116,7 @@ var shortycut;
             this.showIndex(this.getCurrentHistoryIndex());
         };
         Router.prototype.getCurrentHistoryIndex = function () {
-            var index = parseInt(window.location.hash.replace('#', ''));
+            var index = parseInt(window.location.hash.replace("#", ""));
             return Math.min(Math.max(isNaN(index) ? 0 : index, 0), this.history.length - 1);
         };
         Router.prototype.showIndex = function (index) {
@@ -1076,7 +1138,7 @@ var shortycut;
             }
         };
         Router.prototype.onKeyDown = function (event) {
-            if (('Escape' === event.key || 'Esc' === event.key)) {
+            if (("Escape" === event.key || "Esc" === event.key)) {
                 if (this.history[this.history.length - 1] !== shortycut.pages.home) {
                     this.goBackOrHome();
                     event.preventDefault();
@@ -1096,7 +1158,7 @@ var shortycut;
             var _this = this;
             this.url = url;
             this.dependencies = new Array();
-            this.status = 'waiting';
+            this.status = "waiting";
             dependencies === null || dependencies === void 0 ? void 0 : dependencies.forEach(function (dependency) { return _this.dependencies.push(dependency); });
         }
         return JavaScriptFile;
@@ -1107,10 +1169,10 @@ var shortycut;
         }
         Object.defineProperty(JavaScriptLoader.prototype, "files", {
             get: function () {
-                var _a;
-                var key = 'shortycut.JavaScriptLoader.files';
-                window[key] = (_a = window[key]) !== null && _a !== void 0 ? _a : new shortycut.Hashtable();
-                return window[key];
+                var _a, _b;
+                var result = (_a = window.shortycutJavaScriptLoaderFiles) !== null && _a !== void 0 ? _a : new shortycut.Hashtable();
+                (_b = window.shortycutJavaScriptLoaderFiles) !== null && _b !== void 0 ? _b : (window.shortycutJavaScriptLoaderFiles = result);
+                return result;
             },
             enumerable: false,
             configurable: true
@@ -1126,37 +1188,37 @@ var shortycut;
             var files = this.files.values;
             for (var _i = 0, files_1 = files; _i < files_1.length; _i++) {
                 var file = files_1[_i];
-                if (file.status === 'waiting' && !file.dependencies.filter(function (dep) { return dep.status !== 'completed'; }).length) {
+                if (file.status === "waiting" && !file.dependencies.filter(function (dep) { return dep.status !== "completed"; }).length) {
                     this.startLoad(file);
                 }
             }
-            var waitingFiles = files.filter(function (file) { return file.status === 'waiting'; });
+            var waitingFiles = files.filter(function (file) { return file.status === "waiting"; });
             var hasWaitingFiles = !!waitingFiles.length;
-            var hasLoadingFiles = !!files.filter(function (file) { return file.status === 'loading'; }).length;
+            var hasLoadingFiles = !!files.filter(function (file) { return file.status === "loading"; }).length;
             if (!hasWaitingFiles && !hasLoadingFiles && this.onCompleteHandler) {
                 this.onCompleteHandler();
             }
             if (hasWaitingFiles && !hasLoadingFiles) {
-                shortycut.startupCache.initializationErrors.push(new shortycut.ScriptLoadingError("\n                    There's a cyclic dependency (&quot;deadlock&quot;) between the following JavaScript files:\n                    ".concat((waitingFiles).map(function (file) { return shortycut.sanitize(file.url); }).join(' and '), "\n                ").trim()));
+                shortycut.startupCache.initializationErrors.push(new shortycut.ScriptLoadingError("\n                    There's a cyclic dependency (&quot;deadlock&quot;) between the following JavaScript files:\n                    ".concat((waitingFiles).map(function (file) { return shortycut.sanitize(file.url); }).join(" and "), "\n                ").trim()));
                 waitingFiles.forEach(function (file) { return _this.startLoad(file); });
             }
         };
         JavaScriptLoader.prototype.startLoad = function (file) {
             var _this = this;
-            file.status = 'loading';
-            var script = document.createElement('script');
-            script.addEventListener('load', function () { return _this.onLoad(file); });
-            script.addEventListener('error', function () { return _this.onError(file); });
-            script.type = 'text/javascript';
+            file.status = "loading";
+            var script = document.createElement("script");
+            script.addEventListener("load", function () { return _this.onLoad(file); });
+            script.addEventListener("error", function () { return _this.onError(file); });
+            script.type = "text/javascript";
             script.src = file.url.match(/^[a-z]+:\/\/.*/i) ? file.url : "data/".concat(file.url);
-            document.getElementsByTagName('head')[0].appendChild(script);
+            document.getElementsByTagName("head")[0].appendChild(script);
         };
         JavaScriptLoader.prototype.onLoad = function (file) {
-            file.status = 'completed';
+            file.status = "completed";
             this.checkDependenciesAndLoadFiles();
         };
         JavaScriptLoader.prototype.onError = function (file) {
-            file.status = 'completed';
+            file.status = "completed";
             shortycut.startupCache.initializationErrors.push(new shortycut.ScriptLoadingError("Failed to load ".concat(shortycut.sanitize(file.url))));
             this.checkDependenciesAndLoadFiles();
         };
@@ -1170,12 +1232,13 @@ var shortycut;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
+    var SHORTCUTS_PER_BATCH = 2000;
     function parseShortcuts(callback) {
         shortycut.handleExceptions(callback, function () {
             var lines = new Array();
             shortycut.startupCache.shortcuts.forEach(function (shortcut) { return lines.push.apply(lines, shortcut.split(/\r?\n/)); });
             var parser = new shortycut.ShortcutParser();
-            parseBatch(parser, lines, 0, 2000, shortycut.shortcuts, callback);
+            parseBatch(parser, lines, 0, SHORTCUTS_PER_BATCH, shortycut.shortcuts, callback);
         });
     }
     shortycut.parseShortcuts = parseShortcuts;
@@ -1193,31 +1256,32 @@ var shortycut;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
+    var JSON_TAB_SIZE = 4;
     shortycut.DEFAULT_CONFIG = {
         shortcutFormat: {
-            comment: '//',
+            comment: "//",
             keyword: {
                 caseSensitive: false,
-                openingDelimiter: '[',
-                separator: '|',
-                closingDelimiter: ']',
+                openingDelimiter: "[",
+                separator: "|",
+                closingDelimiter: "]",
             },
             enableGrouping: false,
-            hotkeyMarker: '',
+            hotkeyMarker: "",
             url: {
-                searchTermPlaceholder: '%s',
-                postIndicator: '?POST?',
+                searchTermPlaceholder: "%s",
+                postIndicator: "?POST?",
                 multiLinkIndicator: {
-                    replacePrevious: '=',
-                    openInNewTab: '^',
-                    showMenu: '?',
-                    searchBucket: '#',
-                    default: 'showMenu'
+                    replacePrevious: "=",
+                    openInNewTab: "^",
+                    showMenu: "?",
+                    searchBucket: "#",
+                    default: "showMenu"
                 }
             }
         },
         homepage: {
-            keywords: ['?', 'help', 'home', 'homepage', 'sc', 'shortycut'],
+            keywords: ["?", "help", "home", "homepage", "sc", "shortycut"],
             suggestions: {
                 showKeywords: true,
                 showHotkeys: true,
@@ -1225,15 +1289,15 @@ var shortycut;
             }
         },
         defaultSearchEngine: {
-            keyword: 'defaultsearchengine',
+            keyword: "defaultsearchengine",
             useInAddressBar: true,
             useOnHomepage: true
         },
         favicons: {
             preloadOnStart: true,
             rememberUrls: true,
-            fetchService: 'https://www.google.com/s2/favicons?sz=32&domain=%s',
-            localFolders: ['data/favicons']
+            fetchService: "https://www.google.com/s2/favicons?sz=32&domain=%s",
+            localFolders: ["data/favicons"]
         }
     };
     function applyAndValidateConfig() {
@@ -1264,103 +1328,110 @@ var shortycut;
         }
     }
     function mergeConfig(target, patch, patchRoot) {
-        for (var key in patch) {
-            var targetValue = target[key];
-            var patchValue = patch[key];
+        shortycut.forEachProperty(patch, function (key, patchValue) {
+            var targetValue = shortycut.getProperty(target, key);
             validateBeforeConfigMerge(key, target, targetValue, patchValue);
-            if (patchValue && 'object' === typeof patchValue && !(patchValue instanceof Array)) {
+            if (patchValue && "object" === typeof patchValue && !(patchValue instanceof Array)) {
                 mergeConfig(targetValue, patchValue, patchRoot);
             }
             else {
-                if ('string' === typeof patchValue) {
+                if ("string" === typeof patchValue) {
                     patchValue = patchValue.trim() || undefined;
                 }
                 if (null === patchValue) {
                     patchValue = undefined;
                 }
-                target[key] = 'string' === typeof patchValue ? patchValue.trim() : patchValue;
+                target[key] = "string" === typeof patchValue
+                    ? patchValue.trim()
+                    : patchValue;
             }
-        }
+        });
     }
     function validateBeforeConfigMerge(key, target, targetValue, patchValue) {
         return [
             [
                 !Object.prototype.hasOwnProperty.call(target, key),
-                'is not supported'
+                "is not supported"
             ],
             [
                 isObject(targetValue) && !isObject(patchValue),
-                'must be a nested object'
+                "must be a nested object"
             ],
             [
                 targetValue instanceof Array && (!patchValue || !(patchValue instanceof Array)),
-                'must be an array'
+                "must be an array"
             ],
             [
-                'boolean' === typeof targetValue && 'boolean' != typeof patchValue,
-                'must be boolean (true or false)'
+                "boolean" === typeof targetValue && "boolean" != typeof patchValue,
+                "must be boolean (true or false)"
             ],
             [
                 isStringy(targetValue) && !isStringy(patchValue),
-                'must be a string'
+                "must be a string"
             ],
         ];
     }
     function validateConfig() {
         var onMultiLink = shortycut.config.shortcutFormat.url.multiLinkIndicator;
-        [
+        var rules = [
             [
                 shortycut.config.shortcutFormat.keyword.openingDelimiter && !shortycut.config.shortcutFormat.keyword.closingDelimiter,
-                'When using an openingDelimiter, the closingDelimiter must be set as well',
-                ['openingDelimiter', 'closingDelimiter']
+                "When using an openingDelimiter, the closingDelimiter must be set as well",
+                ["openingDelimiter", "closingDelimiter"]
             ],
             [
                 !shortycut.config.shortcutFormat.keyword.openingDelimiter && shortycut.config.shortcutFormat.keyword.closingDelimiter,
-                'The closingDelimiter can only be used if the openingDelimiter is set as well',
-                ['openingDelimiter', 'closingDelimiter']
+                "The closingDelimiter can only be used if the openingDelimiter is set as well",
+                ["openingDelimiter", "closingDelimiter"]
             ],
             [
                 !shortycut.config.shortcutFormat.url.searchTermPlaceholder,
-                'The searchTermPlaceholder must not be empty or null',
-                ['searchTermPlaceholder']
+                "The searchTermPlaceholder must not be empty or null",
+                ["searchTermPlaceholder"]
             ],
             [
-                !onMultiLink.default || !onMultiLink.default.match(/^(replacePreviousDefinition|openInNewTab|showMenu)$/),
+                !onMultiLink.default
+                    || !onMultiLink.default.match(/^(replacePreviousDefinition|openInNewTab|showMenu)$/),
                 'default must be "replacePreviousDefinition", "openInNewTab" or "showMenu"',
-                ['default']
+                ["default"]
             ],
             [
-                shortycut.startsWith(onMultiLink.openInNewTab, onMultiLink.replacePrevious)
-                    || shortycut.startsWith(onMultiLink.openInNewTab, onMultiLink.showMenu)
-                    || shortycut.startsWith(onMultiLink.openInNewTab, onMultiLink.searchBucket)
-                    || shortycut.startsWith(onMultiLink.replacePrevious, onMultiLink.openInNewTab)
-                    || shortycut.startsWith(onMultiLink.replacePrevious, onMultiLink.showMenu)
-                    || shortycut.startsWith(onMultiLink.replacePrevious, onMultiLink.searchBucket)
-                    || shortycut.startsWith(onMultiLink.showMenu, onMultiLink.openInNewTab)
-                    || shortycut.startsWith(onMultiLink.showMenu, onMultiLink.replacePrevious)
-                    || shortycut.startsWith(onMultiLink.showMenu, onMultiLink.searchBucket)
-                    || shortycut.startsWith(onMultiLink.searchBucket, onMultiLink.openInNewTab)
-                    || shortycut.startsWith(onMultiLink.searchBucket, onMultiLink.replacePrevious)
-                    || shortycut.startsWith(onMultiLink.searchBucket, onMultiLink.showMenu),
-                'The symbols for replacePreviousDefinition, openInNewTab, showMenu or searchBucket must not be (partially) identical',
-                ['openInNewTab', 'replacePreviousDefinition', 'showMenu', 'searchBucket']
+                multiLinkSymbolsOverlap(onMultiLink),
+                "The symbols symbols indicating how to handle multiple links per keyword must not overlap",
+                ["openInNewTab", "replacePreviousDefinition", "showMenu", "searchBucket"]
             ],
             [
                 shortycut.config.homepage.keywords.some(function (shortcut) { return !shortcut.trim(); }),
-                'help must not contain empty strings (but the array can be empty)',
-                ['homepageKeywords']
+                "help must not contain empty strings (but the array can be empty)",
+                ["homepageKeywords"]
             ],
-        ].forEach(function (value) { return throwConfigExceptionIf(!!value[0], value[1], value[2]); });
+        ];
+        rules.forEach(function (value) {
+            var isValid = value[0], errorMessage = value[1], fields = value[2];
+            throwConfigExceptionIf(!!isValid, errorMessage, fields);
+        });
+    }
+    function multiLinkSymbolsOverlap(onMultiLink) {
+        var symbols = [
+            onMultiLink.openInNewTab,
+            onMultiLink.replacePrevious,
+            onMultiLink.showMenu,
+            onMultiLink.searchBucket
+        ];
+        var overlaps = symbols.filter(function (symbol1, index1) {
+            return !!symbols.filter(function (symbol2, index2) { return index1 !== index2 && shortycut.startsWith(symbol1, symbol2); }).length;
+        });
+        return !!overlaps.length;
     }
     function isObject(value) {
-        return null !== value && undefined !== value
-            && 'object' === typeof value
+        var isObject = null !== value && undefined !== value && "object" === typeof value;
+        return isObject
             && !(value instanceof Array)
             && !(value instanceof Function)
             && !(value instanceof RegExp);
     }
     function isStringy(value) {
-        return null === value || undefined === value || 'string' === typeof value;
+        return null === value || undefined === value || "string" === typeof value;
     }
     function toArray(value) {
         if (Array.isArray(value)) {
@@ -1379,16 +1450,16 @@ var shortycut;
         }
     }
     function throwConfigException(description, properties, overrideConfig) {
-        throw new shortycut.Exception('Configuration error', shortycut.create('p', "There's a problem with the configuration:"), shortycut.create('p.errorMessage', description), shortycut.create('p', overrideConfig
-            ? 'The error occurred while applying the following configuration:'
-            : 'The configuration (which might include non-overridden default settings) looks like this:'), shortycut.create('pre', renderJson(overrideConfig || shortycut.config, properties)));
+        throw new shortycut.Exception("Configuration error", shortycut.create("p", "There's a problem with the configuration:"), shortycut.create("p.errorMessage", description), shortycut.create("p", overrideConfig
+            ? "The error occurred while applying the following configuration:"
+            : "The configuration (which might include non-overridden default settings) looks like this:"), shortycut.create("pre", renderJson(overrideConfig || shortycut.config, properties)));
     }
     function renderJson(config, properties) {
         replaceRegexpFunctionsAndUndefinedValues(config);
-        var result = shortycut.sanitize(JSON.stringify(config, undefined, 4));
+        var result = shortycut.sanitize(JSON.stringify(config, undefined, JSON_TAB_SIZE));
         for (var _i = 0, properties_1 = properties; _i < properties_1.length; _i++) {
             var property = properties_1[_i];
-            result = shortycut.replaceAll(result, "&quot;".concat(property, "&quot;"), "&quot;<span class='jsonError'>".concat(property, "</span>&quot;"), true);
+            result = shortycut.replaceAll(result, "&quot;".concat(property, "&quot;"), "&quot;<span class=\"jsonError\">".concat(property, "</span>&quot;"), true);
         }
         return result;
     }
@@ -1398,10 +1469,10 @@ var shortycut;
                 if (object[key] instanceof RegExp) {
                     object[key] = "/".concat(object[key].source, "/");
                 }
-                else if ('function' === typeof object[key]) {
-                    object[key] = object[key].toString();
+                else if ("function" === typeof object[key]) {
+                    object[key] = "".concat(object[key]);
                 }
-                else if ('object' === typeof object[key]) {
+                else if ("object" === typeof object[key]) {
                     replaceRegexpFunctionsAndUndefinedValues(object[key]);
                 }
             }
@@ -1413,6 +1484,7 @@ var shortycut;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
+    var MAX_LEVEL = 999;
     var DictionaryItem = (function () {
         function DictionaryItem(level, shortcuts) {
             this.level = level;
@@ -1443,7 +1515,7 @@ var shortycut;
             var dictionary = new shortycut.Hashtable();
             this.shortcuts.forEach(function (shortcut) {
                 if (_this.level < shortcut.keyword.length) {
-                    var letter = shortcut.keyword ? shortcut.keyword.charAt(_this.level) : '';
+                    var letter = shortcut.keyword ? shortcut.keyword.charAt(_this.level) : "";
                     dictionary.computeIfAbsent(letter, function () { return new DictionaryItem(_this.level + 1, []); })
                         .shortcuts.push(shortcut);
                 }
@@ -1452,7 +1524,7 @@ var shortycut;
         };
         DictionaryItem.prototype.childSuggestions = function (maxResults, postKeywordInput) {
             if (!this._suggestions) {
-                var shortcuts_2 = this.getChildShortcuts(postKeywordInput ? this.level : 999);
+                var shortcuts_2 = this.getChildShortcuts(postKeywordInput ? this.level : MAX_LEVEL);
                 this._suggestions = this.calculateChildSuggestions(maxResults, shortcuts_2);
             }
             return this._suggestions;
@@ -1469,8 +1541,10 @@ var shortycut;
                         nonPartialMatch.match.hidesMoreChildren = true;
                         return "continue";
                     }
-                    matches.computeIfAbsent(match.fingerprint, function () { count++; return { match: match, shortcuts: [] }; })
-                        .shortcuts.push(shortcut);
+                    matches.computeIfAbsent(match.fingerprint, function () {
+                        count++;
+                        return { match: match, shortcuts: [] };
+                    }).shortcuts.push(shortcut);
                     if (maxResults <= count) {
                         return "break";
                     }
@@ -1498,14 +1572,14 @@ var shortycut;
             return shortcuts;
         };
         DictionaryItem.prototype.createChildSuggestion = function (match, shortcuts) {
-            var keyword = "".concat(match.keyword).concat(match.isPartial ? '...' : '');
-            var keywordHtml = shortycut.create('div', shortycut.create('span.matched', keyword.substring(0, this.level)), shortycut.create('span.unmatched', keyword.substring(this.level))).innerHTML;
+            var keyword = "".concat(match.keyword).concat(match.isPartial ? "..." : "");
+            var keywordHtml = shortycut.create("div", shortycut.create("span.matched", keyword.substring(0, this.level)), shortycut.create("span.unmatched", keyword.substring(this.level))).innerHTML;
             var descriptionHtmlSuffix = !match.isPartial && shortcuts[0].searchable
-                ? " <span class='more-indicator-text'>".concat(shortycut.Segments.SEPARATOR_HTML, " ...</span>")
-                : '';
-            var segmentOrSuggestion = match.isPartial ? 'segment' : 'suggestion';
+                ? " <span class=\"more-indicator-text\">".concat(shortycut.Segments.SEPARATOR_HTML, " ...</span>")
+                : "";
+            var segmentOrSuggestion = match.isPartial ? "segment" : "suggestion";
             return {
-                type: this.level === match.keyword.length ? 'match' : segmentOrSuggestion,
+                type: this.level === match.keyword.length ? "match" : segmentOrSuggestion,
                 keyword: match.keyword,
                 keywordHtml: keywordHtml,
                 descriptionHtml: match.descriptionHtml + descriptionHtmlSuffix,
@@ -1515,22 +1589,22 @@ var shortycut;
             };
         };
         DictionaryItem.prototype.getShortcutType = function (shortcuts) {
-            if (shortcuts.some(function (shortcut) { return 'both' === shortcut.type; })) {
-                return 'both';
+            if (shortcuts.some(function (shortcut) { return "both" === shortcut.type; })) {
+                return "both";
             }
-            else if (shortcuts.some(function (shortcut) { return 'bookmark' === shortcut.type; })) {
-                if (shortcuts.some(function (shortcut) { return 'query' === shortcut.type; })) {
-                    return 'both';
+            else if (shortcuts.some(function (shortcut) { return "bookmark" === shortcut.type; })) {
+                if (shortcuts.some(function (shortcut) { return "query" === shortcut.type; })) {
+                    return "both";
                 }
                 else {
-                    return 'bookmark';
+                    return "bookmark";
                 }
             }
-            else if (shortcuts.some(function (shortcut) { return 'query' === shortcut.type; })) {
-                return 'query';
+            else if (shortcuts.some(function (shortcut) { return "query" === shortcut.type; })) {
+                return "query";
             }
             else {
-                return 'none';
+                return "none";
             }
         };
         return DictionaryItem;
@@ -1559,8 +1633,8 @@ var shortycut;
             return result;
         };
         Filter.prototype.createSuggestion = function (searchTerms, searchableLink, result) {
-            var keywordMask = searchableLink.keyword.split('').map(function () { return false; });
-            var descriptionMask = searchableLink.description.split('').map(function () { return false; });
+            var keywordMask = searchableLink.keyword.split("").map(function () { return false; });
+            var descriptionMask = searchableLink.description.split("").map(function () { return false; });
             for (var _i = 0, searchTerms_1 = searchTerms; _i < searchTerms_1.length; _i++) {
                 var searchTerm = searchTerms_1[_i];
                 var matched = this.markMatch(searchTerm, searchableLink.keywordLowerCase, keywordMask);
@@ -1570,11 +1644,11 @@ var shortycut;
                 }
             }
             result.push({
-                type: 'search-result',
+                type: "search-result",
                 keyword: searchableLink.keyword,
                 keywordHtml: this.highlightMatch(searchableLink.keyword, keywordMask),
                 descriptionHtml: this.highlightMatch(searchableLink.description, descriptionMask),
-                shortcutType: searchableLink.link.isQuery ? 'query' : 'bookmark',
+                shortcutType: searchableLink.link.isQuery ? "query" : "bookmark",
                 shortcut: searchableLink.shortcut,
                 link: searchableLink.link,
                 hidesMoreChildren: false
@@ -1600,11 +1674,11 @@ var shortycut;
                 }
                 var section = shortycut.sanitize(text.substring(start, end));
                 if (mask[start]) {
-                    section = "<span class='matched-substring'>".concat(section, "</span>");
+                    section = "<span class=\"matched-substring\">".concat(section, "</span>");
                 }
                 result.push(section);
             }
-            return shortycut.replaceAll(result.join(''), shortycut.Segments.SEPARATOR_PLACEHOLDER, shortycut.Segments.SEPARATOR_HTML, false);
+            return shortycut.replaceAll(result.join(""), shortycut.Segments.SEPARATOR_PLACEHOLDER, shortycut.Segments.SEPARATOR_HTML, false);
         };
         Object.defineProperty(Filter.prototype, "dictionary", {
             get: function () {
@@ -1656,9 +1730,9 @@ var shortycut;
 (function (shortycut) {
     var ParserContext = (function () {
         function ParserContext() {
-            this.line = '';
-            this.description = '';
-            this.urlOrDynamicLink = '';
+            this.line = "";
+            this.description = "";
+            this.urlOrDynamicShortcut = "";
             this.isStandardProtocol = false;
             this.onMultiLink = shortycut.OnMultiLink.OPEN_IN_NEW_TAB;
             this.combination = new Array();
@@ -1667,7 +1741,7 @@ var shortycut;
     }());
     var ShortcutParser = (function () {
         function ShortcutParser() {
-            this.KNOWN_PROTOCOLS = ['file', 'ftp', 'http', 'https', shortycut.dynamicLinkProtocol].map(function (p) { return "".concat(p, "://"); });
+            this.KNOWN_PROTOCOLS = ["file", "ftp", "http", "https", shortycut.dynamicLinkProtocol].map(function (p) { return "".concat(p, "://"); });
         }
         ShortcutParser.prototype.parseLines = function (lines, startIndex, endIndex, shortcuts) {
             var _a;
@@ -1679,38 +1753,42 @@ var shortycut;
                         this.parseLineAndStoreShortcut(context, shortcuts);
                     }
                     catch (exception) {
-                        if (exception instanceof shortycut.ParserError) {
-                            shortycut.startupCache.initializationErrors.push(exception);
-                        }
-                        else {
-                            throw exception;
-                        }
+                        this.handleParserError(exception);
                     }
                 }
             }
-            if ('defaultsearchengine' === shortycut.config.defaultSearchEngine.keyword) {
+            if ("defaultsearchengine" === shortycut.config.defaultSearchEngine.keyword) {
                 shortcuts.delete(shortycut.config.defaultSearchEngine.keyword);
             }
             if (!shortycut.defaultSearchEngine) {
-                shortycut.defaultSearchEngine = new shortycut.Shortcut('config.defaultSearchEngine.keyword', [], shortycut.OnMultiLink.SHOW_MENU, 'https://duckduckgo.com/?q='
-                    + shortycut.config.shortcutFormat.url.searchTermPlaceholder
-                    + '&kah=us-en%2Chk-tzh&kav=1&kam=google-maps&kak=-1&kax=-1&kaq=-1&kap=-1&kao=-1&kau=-1', undefined);
+                shortycut.defaultSearchEngine = new shortycut.Shortcut("config.defaultSearchEngine.keyword", [], shortycut.OnMultiLink.SHOW_MENU, [
+                    "https://duckduckgo.com/?q=",
+                    shortycut.config.shortcutFormat.url.searchTermPlaceholder,
+                    "&kah=us-en%2Chk-tzh&kav=1&kam=google-maps&kak=-1&kax=-1&kaq=-1&kap=-1&kao=-1&kau=-1"
+                ].join(""));
+            }
+        };
+        ShortcutParser.prototype.handleParserError = function (exception) {
+            if (exception instanceof shortycut.ParserError) {
+                shortycut.startupCache.initializationErrors.push(exception);
+            }
+            else {
+                throw exception;
             }
         };
         ShortcutParser.prototype.parseLineAndStoreShortcut = function (context, shortcuts) {
             this.splitDescriptionAndUrl(context);
             this.parseOnMultiLink(context);
-            this.parsePostFields(context);
             var keywords = this.formKeywords(context, this.parseKeywordsAndDescription(context));
             var hasKeywords = false;
             keywords.entries.filter(function (entry) { return entry.key; }).forEach(function (entry) {
                 var keyword = entry.key;
                 var sections = entry.value;
                 if (shortcuts.get(keyword)) {
-                    shortcuts.get(keyword).addLink(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields);
+                    shortcuts.get(keyword).addLink(keyword, sections, context.onMultiLink, context.urlOrDynamicShortcut);
                 }
                 else {
-                    shortcuts.put(keyword, new shortycut.Shortcut(keyword, sections, context.onMultiLink, context.urlOrDynamicLink, context.postFields));
+                    shortcuts.put(keyword, new shortycut.Shortcut(keyword, sections, context.onMultiLink, context.urlOrDynamicShortcut));
                 }
                 if (keyword === shortycut.config.defaultSearchEngine.keyword) {
                     shortycut.defaultSearchEngine = shortcuts.get(keyword);
@@ -1718,19 +1796,19 @@ var shortycut;
                 hasKeywords = true;
             });
             if (!hasKeywords) {
-                throw new shortycut.ParserError('Failed to retrieve the keyword', context.line);
+                throw new shortycut.ParserError("Failed to retrieve the keyword", context.line);
             }
             return shortcuts;
         };
         ShortcutParser.prototype.splitDescriptionAndUrl = function (context) {
             var _a = this.getUrl(context.line), url = _a.url, isStandardProtocol = _a.isStandardProtocol;
             context.isStandardProtocol = isStandardProtocol;
-            context.urlOrDynamicLink = url;
+            context.urlOrDynamicShortcut = url;
             context.description = context.line.substring(0, context.line.length - url.length);
-            if (0 === context.urlOrDynamicLink.indexOf(shortycut.dynamicLinkProtocol)) {
-                context.urlOrDynamicLink = shortycut.startupCache.dynamicLinks.get(context.urlOrDynamicLink);
-                if (!context.urlOrDynamicLink) {
-                    throw new shortycut.ParserError('The dynamic link created via shortycut.toUrl() must be at the end of the line', context.line);
+            if (0 === context.urlOrDynamicShortcut.indexOf(shortycut.dynamicLinkProtocol)) {
+                context.urlOrDynamicShortcut = shortycut.startupCache.dynamicLinks.get(context.urlOrDynamicShortcut);
+                if (!context.urlOrDynamicShortcut) {
+                    throw new shortycut.ParserError("The dynamic link created via shortycut.toUrl() must be at the end of the line", context.line);
                 }
             }
         };
@@ -1754,38 +1832,43 @@ var shortycut;
         ShortcutParser.prototype.getNonStandardProtocolUrl = function (line, lineLowerCase) {
             var offset = 0;
             while (offset < line.length) {
-                var index = line.indexOf('://', offset);
+                var index = line.indexOf(ShortcutParser.PROTOCOL_SEPARATOR, offset);
                 if (0 < index) {
-                    if ('a' <= lineLowerCase.charAt(index - 1) && lineLowerCase.charAt(index - 1) <= 'z') {
-                        var start = index - 1;
-                        while (0 < start
-                            && 'a' <= lineLowerCase.charAt(start - 1)
-                            && lineLowerCase.charAt(start - 1) <= 'z') {
-                            start--;
-                        }
+                    if ("a" <= lineLowerCase.charAt(index - 1) && lineLowerCase.charAt(index - 1) <= "z") {
+                        var start = this.getProtocolStartOffset(index, lineLowerCase);
                         return { isStandardProtocol: false, url: line.substring(start) };
                     }
                     else {
-                        offset = index + 3;
+                        offset = index + ShortcutParser.PROTOCOL_SEPARATOR.length;
                     }
                 }
                 else {
                     offset = line.length;
                 }
             }
-            throw new shortycut.ParserError('Unable to retrieve the link (make sure it starts with a protocol like https://)', line);
+            throw new shortycut.ParserError("Unable to retrieve the link (make sure it starts with a protocol like https://)", line);
+        };
+        ShortcutParser.prototype.getProtocolStartOffset = function (index, lineLowerCase) {
+            var start = index - 1;
+            while (0 < start
+                && "a" <= lineLowerCase.charAt(start - 1)
+                && lineLowerCase.charAt(start - 1) <= "z") {
+                start--;
+            }
+            return start;
         };
         ShortcutParser.prototype.parseOnMultiLink = function (context) {
+            var _a;
             var multiLinkIndicator = shortycut.config.shortcutFormat.url.multiLinkIndicator;
-            for (var pass = 0; pass < 2; pass++) {
-                for (var _i = 0, _a = shortycut.OnMultiLink.values; _i < _a.length; _i++) {
-                    var onMultiLink = _a[_i];
-                    var symbol = multiLinkIndicator[onMultiLink.key];
+            for (var pass = 0; pass <= 1; pass++) {
+                for (var _i = 0, _b = shortycut.OnMultiLink.values; _i < _b.length; _i++) {
+                    var onMultiLink = _b[_i];
+                    var symbol = (_a = shortycut.getProperty(multiLinkIndicator, onMultiLink.key)) !== null && _a !== void 0 ? _a : "~!@#$%^&*()_+";
                     if (!pass && context.isStandardProtocol
-                        && 'string' === typeof context.urlOrDynamicLink
-                        && shortycut.startsWith(context.urlOrDynamicLink, symbol)) {
+                        && "string" === typeof context.urlOrDynamicShortcut
+                        && shortycut.startsWith(context.urlOrDynamicShortcut, symbol)) {
                         context.onMultiLink = onMultiLink;
-                        context.urlOrDynamicLink = context.urlOrDynamicLink.substring(symbol.length).trim();
+                        context.urlOrDynamicShortcut = context.urlOrDynamicShortcut.substring(symbol.length).trim();
                         return;
                     }
                     else if (pass && shortycut.endsWith(context.description, symbol)) {
@@ -1797,19 +1880,8 @@ var shortycut;
             }
             context.onMultiLink = shortycut.OnMultiLink.getDefault();
         };
-        ShortcutParser.prototype.parsePostFields = function (context) {
-            context.postFields = undefined;
-            if ('string' === typeof context.urlOrDynamicLink) {
-                var separator = shortycut.config.shortcutFormat.url.postIndicator;
-                var index = separator ? shortycut.adjustCase(context.urlOrDynamicLink).indexOf(separator) : -1;
-                if (separator && 0 <= index) {
-                    context.postFields = context.urlOrDynamicLink.substring(index + separator.length);
-                    context.urlOrDynamicLink = context.urlOrDynamicLink.substring(0, index);
-                }
-            }
-        };
         ShortcutParser.prototype.parseKeywordsAndDescription = function (context) {
-            context.description = context.description.replace(/\s+/, ' ');
+            context.description = context.description.replace(/\s+/, " ");
             if (shortycut.startsWith(context.description, shortycut.config.shortcutFormat.keyword.openingDelimiter)) {
                 return this.parseSegments(context, context.description);
             }
@@ -1880,10 +1952,10 @@ var shortycut;
             while (hasMoreCombinations) {
                 var array = new Array();
                 for (var index = 0; index < segments.length; index++) {
-                    keyword[index] = (_a = segments[index].keywords[context.combination[index]]) !== null && _a !== void 0 ? _a : '';
+                    keyword[index] = (_a = segments[index].keywords[context.combination[index]]) !== null && _a !== void 0 ? _a : "";
                     array.push(this.createSegment(keyword[index], segments[index].description));
                 }
-                result.put(keyword.join(''), array);
+                result.put(keyword.join(""), array);
                 hasMoreCombinations = false;
                 for (var index = segments.length - 1; 0 <= index; index--) {
                     if (context.combination[index] + 1 < segments[index].keywords.length) {
@@ -1901,9 +1973,9 @@ var shortycut;
         ShortcutParser.prototype.createSegment = function (keyword, description) {
             var marker = shortycut.config.shortcutFormat.hotkeyMarker;
             if (marker) {
-                var sections = shortycut.replaceAll(description, "".concat(marker).concat(marker), '\n', true)
+                var sections = shortycut.replaceAll(description, "".concat(marker).concat(marker), "\n", true)
                     .split(marker)
-                    .map(function (item) { return shortycut.replaceAll(item, '\n', "".concat(marker).concat(marker), true); });
+                    .map(function (item) { return shortycut.replaceAll(item, "\n", "".concat(marker).concat(marker), true); });
                 var repeat = false;
                 for (var index = 1; index < sections.length; index = index + (repeat ? 0 : 1)) {
                     var keywordChar = shortycut.adjustCase(keyword.charAt(index - 1));
@@ -1917,10 +1989,11 @@ var shortycut;
                         repeat = false;
                     }
                 }
-                return new shortycut.Segment(keyword, keyword.length + 1 === sections.length ? sections : [sections.join('')]);
+                return new shortycut.Segment(keyword, keyword.length + 1 === sections.length ? sections : [sections.join("")]);
             }
             return new shortycut.Segment(keyword, [description]);
         };
+        ShortcutParser.PROTOCOL_SEPARATOR = "://";
         return ShortcutParser;
     }());
     shortycut.ShortcutParser = ShortcutParser;
@@ -1935,46 +2008,46 @@ var shortycut;
                 noFocus: false
             };
             this.queryParameters = this.getQueryParameters();
-            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, '').replace(/\+/g, ' ');
-            this.keyword = shortycut.adjustCase(this.fullQuery).replace(/\s.*/, '');
-            this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, '');
-            this.index = this.queryParameters.getOrDefault(QueryParameters.INDEX, '').match(/^\d+$/)
-                ? parseInt(this.queryParameters.getOrDefault(QueryParameters.INDEX, ''))
-                : undefined;
+            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, "").replace(/\+/g, " ");
+            this.keyword = shortycut.adjustCase(this.fullQuery).replace(/\s.*/, "");
+            this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, "");
+            var redirect = this.queryParameters.get(QueryParameters.REDIRECT);
+            this.redirect = redirect ? JSON.parse(redirect) : undefined;
             this.setup = this.queryParameters.get(QueryParameters.SETUP);
             this.queryParameters
-                .getOrDefault(QueryParameters.FACETS, '')
-                .split(',')
+                .getOrDefault(QueryParameters.FACETS, "")
+                .split(",")
                 .map(function (facet) { return facet.trim().toLowerCase(); })
                 .filter(function (facet) { return facet; })
                 .forEach(function (facet) { return _this.applyFacet(facet); });
         }
         QueryParameters.prototype.applyFacet = function (facet) {
-            if ('new-tabs' === facet) {
+            if ("new-tabs" === facet) {
                 this.facets.newTabs = true;
             }
-            else if ('no-focus' === facet) {
+            else if ("no-focus" === facet) {
                 this.facets.noFocus = true;
             }
             else {
-                shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create('div', 'Facet ', shortycut.create('tt', facet), ' (in this page\'s address) is not supported')));
+                shortycut.startupCache.initializationErrors.push(new shortycut.InitializationError(shortycut.create("div", "Facet ", shortycut.create("tt", facet), " (in this page's address) is not supported")));
             }
         };
         QueryParameters.prototype.getQueryParameters = function () {
             var result = new shortycut.Hashtable();
-            if (window.location.search) {
-                for (var _i = 0, _a = window.location.search.trim().replace(/^\?/, '').trim().split('&'); _i < _a.length; _i++) {
-                    var parameter = _a[_i];
-                    var index = parameter.indexOf('=');
-                    if (0 < index) {
-                        var key = this.urlDecode(parameter.substring(0, index));
-                        if (key) {
-                            result.put(key, this.urlDecode(parameter.substring(index + 1)));
-                        }
+            if (!window.location.search) {
+                return result;
+            }
+            for (var _i = 0, _a = window.location.search.trim().replace(/^\?/, "").trim().split("&"); _i < _a.length; _i++) {
+                var parameter = _a[_i];
+                var index = parameter.indexOf("=");
+                if (0 < index) {
+                    var key = this.urlDecode(parameter.substring(0, index));
+                    if (key) {
+                        result.put(key, this.urlDecode(parameter.substring(index + 1)));
                     }
-                    else {
-                        result.put(this.urlDecode(parameter), '');
-                    }
+                }
+                else {
+                    result.put(this.urlDecode(parameter), "");
                 }
             }
             return result;
@@ -1984,13 +2057,13 @@ var shortycut;
                 return decodeURIComponent(value).trim();
             }
             catch (error) {
-                throw new shortycut.Exception('URL syntax error', shortycut.create('p', 'A query parameter passed in the URL is not url-encoded:'), shortycut.create('p', value));
+                throw new shortycut.Exception("URL syntax error", shortycut.create("p", "A query parameter passed in the URL is not url-encoded:"), shortycut.create("p", value));
             }
         };
-        QueryParameters.QUERY = 'q';
-        QueryParameters.INDEX = 'i';
-        QueryParameters.SETUP = 'setup';
-        QueryParameters.FACETS = 'facets';
+        QueryParameters.QUERY = "q";
+        QueryParameters.REDIRECT = "r";
+        QueryParameters.SETUP = "setup";
+        QueryParameters.FACETS = "facets";
         return QueryParameters;
     }());
     shortycut.QueryParameters = QueryParameters;
@@ -2017,43 +2090,78 @@ var shortycut;
         };
         OnMultiLink.values = new Array();
         OnMultiLink.byName = {};
-        OnMultiLink.REPLACE_PREVIOUS = new OnMultiLink('replacePrevious');
-        OnMultiLink.OPEN_IN_NEW_TAB = new OnMultiLink('openInNewTab');
-        OnMultiLink.SHOW_MENU = new OnMultiLink('showMenu');
-        OnMultiLink.SEARCH_BUCKET = new OnMultiLink('searchBucket');
+        OnMultiLink.REPLACE_PREVIOUS = new OnMultiLink("replacePrevious");
+        OnMultiLink.OPEN_IN_NEW_TAB = new OnMultiLink("openInNewTab");
+        OnMultiLink.SHOW_MENU = new OnMultiLink("showMenu");
+        OnMultiLink.SEARCH_BUCKET = new OnMultiLink("searchBucket");
         return OnMultiLink;
     }());
     shortycut.OnMultiLink = OnMultiLink;
     var Link = (function () {
-        function Link(keyword, index, segments, onMultiLink, isSearchable, urlOrDynamicLink, _postFields) {
-            var _a;
+        function Link(keyword, index, segments, onMultiLink, isSearchable, urlOrDynamicShortcut) {
             this.keyword = keyword;
             this.index = index;
             this.segments = segments;
             this.onMultiLink = onMultiLink;
             this.isSearchable = isSearchable;
-            this.urlOrDynamicLink = urlOrDynamicLink;
-            this._postFields = _postFields;
+            this.urlOrDynamicShortcut = urlOrDynamicShortcut;
             this._overridden = false;
-            this.searchTerm = '';
-            this.isQuery = 'string' !== typeof this.urlOrDynamicLink
-                || 0 <= shortycut.adjustCase(this.urlOrDynamicLink).indexOf(shortycut.config.shortcutFormat.url.searchTermPlaceholder)
-                || 0 <= shortycut.adjustCase((_a = this._postFields) !== null && _a !== void 0 ? _a : '').indexOf(shortycut.config.shortcutFormat.url.searchTermPlaceholder);
+            this.isQuery = "string" === typeof this.urlOrDynamicShortcut
+                ? 0 <= shortycut.adjustCase(this.urlOrDynamicShortcut).indexOf(shortycut.config.shortcutFormat.url.searchTermPlaceholder)
+                : this.urlOrDynamicShortcut.isQuery;
         }
-        Object.defineProperty(Link.prototype, "url", {
+        Link.prototype.toFinalizedLinks = function (searchTerm) {
+            if ("string" === typeof this.urlOrDynamicShortcut) {
+                return this.constructFinalizedLinks([this.urlOrDynamicShortcut], searchTerm);
+            }
+            else {
+                var urlOrUrls = this.urlOrDynamicShortcut.generator(searchTerm);
+                if ("string" === typeof urlOrUrls) {
+                    return this.constructFinalizedLinks([urlOrUrls], searchTerm);
+                }
+                else {
+                    return this.constructFinalizedLinks(urlOrUrls, searchTerm);
+                }
+            }
+        };
+        Link.prototype.constructFinalizedLinks = function (urls, searchTerm) {
+            var _this = this;
+            if (0 === urls.filter(function (link) { var _a; return "string" !== typeof link && ((_a = link.description) === null || _a === void 0 ? void 0 : _a.trim()); }).length) {
+                return [
+                    this.constructFinalizedLink("", urls.map(function (link) { return "string" === typeof link ? link : link.url; }), searchTerm)
+                ];
+            }
+            else {
+                return urls.map(function (link) { return "string" === typeof link ? { description: "", url: link } : link; })
+                    .map(function (link) { return _this.constructFinalizedLink(link.description, [link.url], searchTerm); });
+            }
+        };
+        Link.prototype.constructFinalizedLink = function (description, urls, searchTerm) {
+            var _this = this;
+            var segment = new Segments(__spreadArray(__spreadArray([], this.segments.segments, true), [new Segment("", [description])], false));
+            return {
+                htmlDescription: (description ? segment : this.segments).descriptionHtml,
+                urls: urls.map(function (url) { return _this.constructFinalizedUrl(url, searchTerm); })
+            };
+        };
+        Link.prototype.constructFinalizedUrl = function (link, searchTerm) {
+            var parsedLink = Link.splitUrlAndPostFields(link);
+            var url = Link.insertSearchTerm(parsedLink.url, searchTerm);
+            var postFields = Link.constructFinalizedPostFields(parsedLink.postFields, searchTerm);
+            var permalink = postFields ? Link.constructFinalizedPermalink(url, postFields) : url;
+            return { url: url, postFields: postFields, permalink: permalink };
+        };
+        Link.constructFinalizedPermalink = function (finalizedUrl, finalizedPostFields) {
+            var baseUrl = window.location.href.replace(/[#?].*/g, "");
+            var json = { url: finalizedUrl, postFields: finalizedPostFields };
+            var redirect = encodeURIComponent(JSON.stringify(json));
+            return "".concat(baseUrl, "?").concat(shortycut.QueryParameters.REDIRECT, "=").concat(redirect);
+        };
+        Object.defineProperty(Link.prototype, "faviconUrls", {
             get: function () {
-                return shortycut.replaceAll('string' === typeof this.urlOrDynamicLink
-                    ? this.urlOrDynamicLink
-                    : this.urlOrDynamicLink.generator(this.searchTerm), shortycut.config.shortcutFormat.url.searchTermPlaceholder, encodeURIComponent(this.searchTerm || ''), shortycut.config.shortcutFormat.keyword.caseSensitive);
-            },
-            enumerable: false,
-            configurable: true
-        });
-        Object.defineProperty(Link.prototype, "urlForFavicon", {
-            get: function () {
-                return 'string' === typeof (this.urlOrDynamicLink)
-                    ? this.urlOrDynamicLink
-                    : this.urlOrDynamicLink.urlForFavicon;
+                return "string" === typeof this.urlOrDynamicShortcut
+                    ? [this.urlOrDynamicShortcut]
+                    : this.urlOrDynamicShortcut.faviconUrls;
             },
             enumerable: false,
             configurable: true
@@ -2071,56 +2179,46 @@ var shortycut;
         Object.defineProperty(Link.prototype, "filterSummary", {
             get: function () {
                 if (!this._filterSummary) {
-                    this._filterSummary = "".concat(this.keyword, " ").concat(this.segments.description).toLocaleLowerCase().replace(/\s/g, '');
+                    this._filterSummary = "".concat(this.keyword, " ").concat(this.segments.description)
+                        .toLocaleLowerCase()
+                        .replace(/\s/g, "");
                 }
                 return this._filterSummary;
             },
             enumerable: false,
             configurable: true
         });
-        Link.prototype.replacePlaceholder = function (searchTerm) {
-            this.searchTerm = searchTerm;
+        Link.insertSearchTerm = function (text, searchTerm) {
+            return shortycut.replaceAll(text, shortycut.config.shortcutFormat.url.searchTermPlaceholder, encodeURIComponent(searchTerm), shortycut.config.shortcutFormat.keyword.caseSensitive);
         };
-        Link.prototype.getHref = function (searchTerm) {
-            if (this._postFields) {
-                var query = "".concat(this.keyword, " ").concat(decodeURIComponent(searchTerm)).trim();
-                return window.location.href.replace(/[#?].*/g, '')
-                    + "?".concat(shortycut.QueryParameters.QUERY, "=").concat(query)
-                    + "&".concat(shortycut.QueryParameters.INDEX, "=").concat(this.index);
+        Link.splitUrlAndPostFields = function (url) {
+            var separator = shortycut.config.shortcutFormat.url.postIndicator;
+            var index = separator ? shortycut.adjustCase(url).indexOf(separator) : -1;
+            if (separator && 0 <= index) {
+                return { url: url.substring(0, index), postFields: url.substring(index + separator.length) };
             }
             else {
-                return this.url;
+                return { url: url };
             }
         };
-        Object.defineProperty(Link.prototype, "postFields", {
-            get: function () {
-                if (this._postFields) {
-                    return shortycut.replaceAll(this._postFields, shortycut.config.shortcutFormat.url.searchTermPlaceholder, encodeURIComponent(this.searchTerm), shortycut.config.shortcutFormat.keyword.caseSensitive)
-                        .split('&')
-                        .filter(function (parameter) { return parameter; })
-                        .map(function (parameter) {
-                        var index = parameter.indexOf('=');
-                        if (index < 1) {
-                            throw new shortycut.Exception('Shortcut definition error', "Post parameter ".concat(shortycut.sanitize(parameter), " is not in key=value format"));
-                        }
-                        try {
-                            return {
-                                key: decodeURIComponent(parameter.substring(0, index)),
-                                value: decodeURIComponent(parameter.substring(index + 1))
-                            };
-                        }
-                        catch (exception) {
-                            throw new shortycut.Exception('Shortcut definition error', "Post parameter ".concat(shortycut.sanitize(parameter), " is not URL encoded"));
-                        }
-                    });
-                }
-                else {
-                    return undefined;
-                }
-            },
-            enumerable: false,
-            configurable: true
-        });
+        Link.constructFinalizedPostFields = function (postFields, searchTerm) {
+            var _this = this;
+            return postFields === null || postFields === void 0 ? void 0 : postFields.split("&").filter(function (field) { return field; }).map(function (field) { return _this.constructFinalizedPostField(field, searchTerm); });
+        };
+        Link.constructFinalizedPostField = function (parameter, searchTerm) {
+            var index = parameter.indexOf("=");
+            if (index < 1) {
+                throw new shortycut.Exception("Shortcut definition error", "Post parameter ".concat(shortycut.sanitize(parameter), " is not in key=value format"));
+            }
+            try {
+                var key = decodeURIComponent(this.insertSearchTerm(parameter.substring(0, index), searchTerm));
+                var value = decodeURIComponent(this.insertSearchTerm(parameter.substring(index + 1), searchTerm));
+                return { key: key, value: value };
+            }
+            catch (exception) {
+                throw new shortycut.Exception("Shortcut definition error", "Post parameter ".concat(shortycut.sanitize(parameter), " is not URL encoded"));
+            }
+        };
         return Link;
     }());
     shortycut.Link = Link;
@@ -2141,7 +2239,8 @@ var shortycut;
         };
         Object.defineProperty(Links.prototype, "onMultiLink", {
             get: function () {
-                return this.current[this.current.length - 1].onMultiLink;
+                var _a;
+                return (_a = this.current[this.current.length - 1].onMultiLink) !== null && _a !== void 0 ? _a : OnMultiLink.getDefault();
             },
             enumerable: false,
             configurable: true
@@ -2163,16 +2262,13 @@ var shortycut;
         Object.defineProperty(Links.prototype, "filterSummary", {
             get: function () {
                 var _a;
-                var filterSummary = (_a = this._filterSummary) !== null && _a !== void 0 ? _a : this.current.map(function (link) { return link.filterSummary; }).join(' ');
+                var filterSummary = (_a = this._filterSummary) !== null && _a !== void 0 ? _a : this.current.map(function (link) { return link.filterSummary; }).join(" ");
                 this._filterSummary = filterSummary;
                 return filterSummary;
             },
             enumerable: false,
             configurable: true
         });
-        Links.prototype.replacePlaceholders = function (searchTerm) {
-            [this.overridden, this.current].forEach(function (array) { return array.forEach(function (link) { return link.replacePlaceholder(searchTerm); }); });
-        };
         Object.defineProperty(Links.prototype, "descriptionHtml", {
             get: function () {
                 var _a;
@@ -2200,7 +2296,8 @@ var shortycut;
                     if (!matches) {
                         break;
                     }
-                } while (++length_1);
+                    length_1++;
+                } while (length_1);
                 if (length_1 < 0) {
                     return this.current[0].segments.descriptionHtml;
                 }
@@ -2210,6 +2307,22 @@ var shortycut;
                         .join(Segments.SEPARATOR_HTML);
                 }
             }
+        };
+        Links.prototype.toFinalizedLinks = function (searchTerm) {
+            var links = new Array();
+            var onMultiLink = this.onMultiLink;
+            for (var _i = 0, _a = this.current; _i < _a.length; _i++) {
+                var link = _a[_i];
+                var newLinks = link.toFinalizedLinks(searchTerm);
+                newLinks.forEach(function (link) { return links.push(link); });
+                if (1 < newLinks.length && 1 === this.current.length) {
+                    onMultiLink = OnMultiLink.SHOW_MENU;
+                }
+            }
+            if (1 < links.length && onMultiLink !== OnMultiLink.SHOW_MENU) {
+                onMultiLink = OnMultiLink.OPEN_IN_NEW_TAB;
+            }
+            return { onMultiLink: onMultiLink, links: links };
         };
         return Links;
     }());
@@ -2221,7 +2334,7 @@ var shortycut;
         }
         Object.defineProperty(Segment.prototype, "description", {
             get: function () {
-                return this.sections.join('');
+                return this.sections.join("");
             },
             enumerable: false,
             configurable: true
@@ -2266,17 +2379,17 @@ var shortycut;
             enumerable: false,
             configurable: true
         });
-        Segments.SEPARATOR_TEXT = ' » ';
-        Segments.SEPARATOR_HTML = ' &raquo; ';
-        Segments.SEPARATOR_PLACEHOLDER = '\n';
+        Segments.SEPARATOR_TEXT = " » ";
+        Segments.SEPARATOR_HTML = " &raquo; ";
+        Segments.SEPARATOR_PLACEHOLDER = "\n";
         return Segments;
     }());
     shortycut.Segments = Segments;
     var MatchingSegment = (function () {
         function MatchingSegment(segments, length) {
-            this.fingerprint = '';
-            this.keyword = '';
-            this.descriptionHtml = '';
+            this.fingerprint = "";
+            this.keyword = "";
+            this.descriptionHtml = "";
             this.hidesMoreChildren = false;
             this.isPartial = false;
             var lengthOffset = 0;
@@ -2287,7 +2400,7 @@ var shortycut;
                     this.keyword += segment.keyword;
                     if (segment.description && index < segmentsToDisplay) {
                         var description = this.getDescription(segment.sections, length - lengthOffset, lengthOffset, length);
-                        this.descriptionHtml += "".concat(this.descriptionHtml ? Segments.SEPARATOR_HTML : '').concat(description);
+                        this.descriptionHtml += "".concat(this.descriptionHtml ? Segments.SEPARATOR_HTML : "").concat(description);
                     }
                     this.fingerprint += MatchingSegment.getFingerprint(segment, index + 1 !== segments.length);
                     lengthOffset += segment.keyword.length;
@@ -2299,20 +2412,20 @@ var shortycut;
             }
         }
         MatchingSegment.getFingerprint = function (segment, appendDescription) {
-            var openingDelimiter = shortycut.config.shortcutFormat.keyword.openingDelimiter || '[';
-            var closingDelimiter = shortycut.config.shortcutFormat.keyword.closingDelimiter || ']';
-            var suffix = appendDescription ? segment.description.trim().toLocaleLowerCase() : '';
+            var openingDelimiter = shortycut.config.shortcutFormat.keyword.openingDelimiter || "[";
+            var closingDelimiter = shortycut.config.shortcutFormat.keyword.closingDelimiter || "]";
+            var suffix = appendDescription ? segment.description.trim().toLocaleLowerCase() : "";
             return openingDelimiter + segment.keyword + closingDelimiter + suffix;
         };
         MatchingSegment.prototype.countSegmentsToDisplay = function (segments) {
             var segmentsToDisplay = segments.length;
-            for (; 0 < segmentsToDisplay && !segments[segmentsToDisplay - 1].keyword; segmentsToDisplay--)
-                ;
+            for (; 0 < segmentsToDisplay && !segments[segmentsToDisplay - 1].keyword; segmentsToDisplay--) {
+            }
             return Math.max(0, segmentsToDisplay);
         };
         MatchingSegment.prototype.getDescription = function (sections, hotkeysMatched, lengthOffset, length) {
             if (!shortycut.config.homepage.suggestions.showHotkeys) {
-                return shortycut.sanitize(sections.join(''));
+                return shortycut.sanitize(sections.join(""));
             }
             else if (1 === sections.length) {
                 return this.autoDetectHotkeys(sections[0], this.keyword.substring(lengthOffset), length - lengthOffset);
@@ -2321,7 +2434,7 @@ var shortycut;
                 var result = shortycut.sanitize(sections[0]);
                 for (var index = 1; index < sections.length; index++) {
                     if (hotkeysMatched < index) {
-                        result += shortycut.create('span.hotkey', shortycut.sanitize(sections[index].charAt(0))).outerHTML;
+                        result += shortycut.create("span.hotkey", shortycut.sanitize(sections[index].charAt(0))).outerHTML;
                         result += shortycut.sanitize(sections[index].substring(1));
                     }
                     else {
@@ -2333,17 +2446,17 @@ var shortycut;
         };
         MatchingSegment.prototype.autoDetectHotkeys = function (description, keyword, hotkeysMatched) {
             return shortycut.hotkeySelector.selectHotkeys(keyword, description, hotkeysMatched)
-                .map(function (item) { return item.isHotkey ? shortycut.create('span.hotkey', item.text).outerHTML : shortycut.sanitize(item.text); })
-                .join('');
+                .map(function (item) { return item.isHotkey ? shortycut.create("span.hotkey", item.text).outerHTML : shortycut.sanitize(item.text); })
+                .join("");
         };
         return MatchingSegment;
     }());
     shortycut.MatchingSegment = MatchingSegment;
     var Shortcut = (function () {
-        function Shortcut(keyword, segments, onMultiLink, urlOrDynamicLink, postParameters) {
+        function Shortcut(keyword, segments, onMultiLink, urlOrDynamicShortcut) {
             this.keyword = keyword;
             this.all = new Array();
-            this.addLink(keyword, segments, onMultiLink, urlOrDynamicLink, postParameters);
+            this.addLink(keyword, segments, onMultiLink, urlOrDynamicShortcut);
         }
         Object.defineProperty(Shortcut.prototype, "bookmarks", {
             get: function () {
@@ -2369,20 +2482,20 @@ var shortycut;
         Object.defineProperty(Shortcut.prototype, "type", {
             get: function () {
                 if (this.bookmarks) {
-                    return this.queries ? 'both' : 'bookmark';
+                    return this.queries ? "both" : "bookmark";
                 }
                 else if (this.queries) {
-                    return 'query';
+                    return "query";
                 }
                 else {
-                    return 'none';
+                    return "none";
                 }
             },
             enumerable: false,
             configurable: true
         });
-        Shortcut.prototype.addLink = function (keyword, segments, onMultiLink, urlOrDynamicLink, postParameters) {
-            var link = new Link(keyword, this.all.length, new Segments(segments), OnMultiLink.SEARCH_BUCKET === onMultiLink ? OnMultiLink.getDefault() : onMultiLink, OnMultiLink.SEARCH_BUCKET === onMultiLink, urlOrDynamicLink, postParameters);
+        Shortcut.prototype.addLink = function (keyword, segments, onMultiLink, urlOrDynamicShortcut) {
+            var link = new Link(keyword, this.all.length, new Segments(segments), OnMultiLink.SEARCH_BUCKET === onMultiLink ? OnMultiLink.getDefault() : onMultiLink, OnMultiLink.SEARCH_BUCKET === onMultiLink, urlOrDynamicShortcut);
             if (link.isSearchable) {
                 this._searchable = this.createOrAdd(link, this._searchable);
             }
@@ -2403,9 +2516,18 @@ var shortycut;
             this.all[link.index] = { link: link, links: links };
             return links;
         };
-        Shortcut.prototype.replacePlaceholders = function (searchTerm) {
-            var _a;
-            (_a = this._queries) === null || _a === void 0 ? void 0 : _a.replacePlaceholders(searchTerm);
+        Shortcut.prototype.getFinalizedBookmarks = function () {
+            return this.createFinalizedLinks(this.bookmarks);
+        };
+        Shortcut.prototype.getFinalizedQueries = function (searchTerm) {
+            return this.createFinalizedLinks(this.queries, searchTerm);
+        };
+        Shortcut.prototype.getFinalizedLinks = function (searchTerm) {
+            return this.createFinalizedLinks(this.bookmarks && (!(searchTerm === null || searchTerm === void 0 ? void 0 : searchTerm.trim()) || !this.queries) ? this.bookmarks : this.queries, searchTerm);
+        };
+        Shortcut.prototype.createFinalizedLinks = function (links, searchTerm) {
+            var _a, _b;
+            return (_b = links === null || links === void 0 ? void 0 : links.toFinalizedLinks((_a = searchTerm === null || searchTerm === void 0 ? void 0 : searchTerm.trim()) !== null && _a !== void 0 ? _a : "")) !== null && _b !== void 0 ? _b : { onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB, links: [] };
         };
         Shortcut.prototype.getSegmentMatches = function (length) {
             var _a, _b;
@@ -2429,12 +2551,15 @@ var shortycut;
     shortycut.config = null;
     shortycut.shortcuts = null;
     shortycut.defaultSearchEngine = null;
+    shortycut.defaultSearchEngine !== null && shortycut.defaultSearchEngine !== void 0 ? shortycut.defaultSearchEngine : (shortycut.defaultSearchEngine = null);
     shortycut.queryParameters = null;
     shortycut.redirector = null;
     shortycut.router = null;
     shortycut.faviconManager = null;
     shortycut.javaScriptLoader = null;
     shortycut.hotkeySelector = null;
+    shortycut.faviconManager !== null && shortycut.faviconManager !== void 0 ? shortycut.faviconManager : (shortycut.faviconManager = null);
+    shortycut.javaScriptLoader !== null && shortycut.javaScriptLoader !== void 0 ? shortycut.javaScriptLoader : (shortycut.javaScriptLoader = null);
     var Pages = (function () {
         function Pages() {
             this.pages = {
@@ -2449,10 +2574,8 @@ var shortycut;
             };
         }
         Pages.prototype.hideAllExcept = function (page) {
-            var _this = this;
-            Object.keys(this.pages).forEach(function (key) {
-                var value = _this.pages[key];
-                if (value && value !== page && 'object' === typeof value && 'function' === typeof value.hide) {
+            shortycut.forEachProperty(this.pages, function (_key, value) {
+                if (value && value !== page && "object" === typeof value && "function" === typeof value.hide) {
                     value.hide();
                 }
             });
@@ -2540,7 +2663,7 @@ var shortycut;
         return Pages;
     }());
     shortycut.pages = new Pages();
-    shortycut.dynamicLinkProtocol = 'function';
+    shortycut.dynamicLinkProtocol = "function";
     var StartupCache = (function () {
         function StartupCache() {
             this.exceptions = new Array();
@@ -2576,46 +2699,46 @@ var shortycut;
     var BrowserIntegration = (function () {
         function BrowserIntegration() {
             this.dom = {
-                browserIntegration: document.querySelector('#browser-integration'),
-                homepage: document.querySelector('#browser-integration .homepage'),
+                browserIntegration: document.querySelector("#browser-integration"),
+                homepage: document.querySelector("#browser-integration .homepage"),
                 facets: {
-                    newTabs: document.querySelector('#browser-integration .new-tabs'),
-                    noFocus: document.querySelector('#browser-integration .no-focus')
+                    newTabs: document.querySelector("#browser-integration .new-tabs"),
+                    noFocus: document.querySelector("#browser-integration .no-focus")
                 },
-                form: document.querySelector('#browser-integration .form'),
-                keyword: document.querySelector('#browser-integration .keyword'),
-                webServerRequired: document.querySelector('#browser-integration .web-server-required'),
-                searchEngine: document.querySelector('#browser-integration .search-engine'),
-                openSearch: document.querySelector('#browser-integration .open-search'),
-                popUp: document.querySelector('#browser-integration .pop-up')
+                form: document.querySelector("#browser-integration .form"),
+                keyword: document.querySelector("#browser-integration .keyword"),
+                webServerRequired: document.querySelector("#browser-integration .web-server-required"),
+                searchEngine: document.querySelector("#browser-integration .search-engine"),
+                openSearch: document.querySelector("#browser-integration .open-search"),
+                popUp: document.querySelector("#browser-integration .pop-up")
             };
             this.updateHomepageLink = this.updateHomepageLink.bind(this);
             this.dom.facets.newTabs.checked = shortycut.queryParameters.facets.newTabs;
             this.dom.facets.noFocus.checked = shortycut.queryParameters.facets.noFocus;
             this.updateHomepageLink();
-            var baseUrl = window.location.href.replace(/[#?].*/, '');
+            var baseUrl = window.location.href.replace(/[#?].*/, "");
             this.dom.form.action = baseUrl;
             this.dom.keyword.innerHTML = "".concat(shortycut.sanitize(baseUrl), "?q=%s");
             this.dom.keyword.href = "".concat(baseUrl, "?q=%s");
             if (window.location.href.match(/^http.*/)) {
-                this.dom.searchEngine.style.display = 'block';
+                this.dom.searchEngine.style.display = "block";
             }
             else {
-                this.dom.webServerRequired.style.display = 'block';
+                this.dom.webServerRequired.style.display = "block";
             }
             var baseFolder = shortycut.getWindowLocationPath();
             this.dom.openSearch.href = "".concat(baseFolder, "data/search.xml");
             this.dom.openSearch.innerHTML = shortycut.sanitize("".concat(baseFolder, "data/search.xml"));
-            this.dom.popUp.addEventListener('click', function () {
-                for (var index = 0; index < 2; index++) {
-                    var popUp = window.open('');
+            this.dom.popUp.addEventListener("click", function () {
+                for (var index = 0; index <= 1; index++) {
+                    var popUp = window.open("");
                     if (popUp === null || popUp === void 0 ? void 0 : popUp.document) {
                         popUp.document.write([
-                            'This window was opened by ShortyCut.',
-                            'Pop-ups are not being blocked.',
-                            'You can close this windows.'
-                        ].join('<br>'));
-                        popUp.document.title = 'ShortyCut Pop-Up Test';
+                            "This window was opened by ShortyCut.",
+                            "Pop-ups are not being blocked.",
+                            "You can close this windows."
+                        ].join("<br>"));
+                        popUp.document.title = "ShortyCut Pop-Up Test";
                     }
                 }
             });
@@ -2624,34 +2747,34 @@ var shortycut;
             return true;
         };
         BrowserIntegration.prototype.show = function () {
-            this.dom.browserIntegration.style.display = 'flex';
+            this.dom.browserIntegration.style.display = "flex";
             this.addEventHandlers();
         };
         BrowserIntegration.prototype.hide = function () {
-            this.dom.browserIntegration.style.display = 'none';
+            this.dom.browserIntegration.style.display = "none";
             this.removeEventHandlers();
         };
         BrowserIntegration.prototype.addEventHandlers = function () {
             var _this = this;
-            Object.keys(this.dom.facets)
-                .map(function (key) { return _this.dom.facets[key]; })
-                .forEach(function (checkbox) { return checkbox.addEventListener('click', _this.updateHomepageLink); });
+            shortycut.forEachProperty(this.dom.facets, function (_key, checkbox) {
+                return checkbox.addEventListener("click", _this.updateHomepageLink);
+            });
         };
         BrowserIntegration.prototype.removeEventHandlers = function () {
             var _this = this;
-            Object.keys(this.dom.facets)
-                .map(function (key) { return _this.dom.facets[key]; })
-                .forEach(function (checkbox) { return checkbox.removeEventListener('click', _this.updateHomepageLink); });
+            shortycut.forEachProperty(this.dom.facets, function (_key, checkbox) {
+                return checkbox.removeEventListener("click", _this.updateHomepageLink);
+            });
         };
         BrowserIntegration.prototype.updateHomepageLink = function () {
             var _this = this;
             var facets = Object.keys(this.dom.facets)
-                .filter(function (facet) { return _this.dom.facets[facet].checked; })
-                .map(function (facet) { return 'noFocus' === facet ? 'no-focus' : facet; })
-                .map(function (facet) { return 'newTabs' === facet ? 'new-tabs' : facet; });
-            var url = window.location.href.replace(/[#?].*/, '');
+                .filter(function (facet) { var _a; return (_a = shortycut.getProperty(_this.dom.facets, facet)) === null || _a === void 0 ? void 0 : _a.checked; })
+                .map(function (facet) { return "noFocus" === facet ? "no-focus" : facet; })
+                .map(function (facet) { return "newTabs" === facet ? "new-tabs" : facet; });
+            var url = window.location.href.replace(/[#?].*/, "");
             if (facets.length) {
-                url += "?facets=".concat(facets.join(','));
+                url += "?facets=".concat(facets.join(","));
             }
             this.dom.homepage.innerHTML = shortycut.sanitize(url);
             this.dom.homepage.href = url;
@@ -2665,9 +2788,9 @@ var shortycut;
     var ErrorPage = (function () {
         function ErrorPage() {
             this.dom = {
-                error: document.querySelector('#error'),
-                title: document.querySelector('#error .title'),
-                message: document.querySelector('#error .message')
+                error: document.querySelector("#error"),
+                title: document.querySelector("#error .title"),
+                message: document.querySelector("#error .message")
             };
         }
         ErrorPage.prototype.populate = function (titleOrException) {
@@ -2680,12 +2803,12 @@ var shortycut;
                 this.dom.title.innerHTML = titleOrException.title;
                 message = titleOrException.content;
             }
-            else if ('string' === typeof titleOrException) {
+            else if ("string" === typeof titleOrException) {
                 this.dom.title.innerHTML = titleOrException;
             }
             message.forEach(function (item) {
                 (Array.isArray(item) ? item : [item]).forEach(function (element) {
-                    if ('object' === typeof element) {
+                    if ("object" === typeof element) {
                         _this.dom.message.appendChild(element);
                     }
                     else {
@@ -2699,10 +2822,10 @@ var shortycut;
             return false;
         };
         ErrorPage.prototype.show = function () {
-            this.dom.error.style.display = 'flex';
+            this.dom.error.style.display = "flex";
         };
         ErrorPage.prototype.hide = function () {
-            this.dom.error.style.display = 'none';
+            this.dom.error.style.display = "none";
         };
         return ErrorPage;
     }());
@@ -2713,47 +2836,47 @@ var shortycut;
     var FaviconTools = (function () {
         function FaviconTools() {
             this.dom = {
-                faviconTools: document.querySelector('#favicon-tools'),
-                configWarning: document.querySelector('#favicon-tools .config-warning'),
-                curlLink: document.querySelector('#favicon-tools .online a.curl'),
-                curlTextarea: document.querySelector('#favicon-tools .online textarea.curl'),
-                pending: document.querySelector('#favicon-tools .pending'),
-                pendingListing: document.querySelector('#favicon-tools .pending .listing'),
-                online: document.querySelector('#favicon-tools .online'),
-                onlineListing: document.querySelector('#favicon-tools .online .listing'),
-                missing: document.querySelector('#favicon-tools .missing'),
-                missingListing: document.querySelector('#favicon-tools .missing .listing'),
-                offline: document.querySelector('#favicon-tools .offline'),
-                offlineListing: document.querySelector('#favicon-tools .offline .listing'),
+                faviconTools: document.querySelector("#favicon-tools"),
+                configWarning: document.querySelector("#favicon-tools .config-warning"),
+                curlLink: document.querySelector("#favicon-tools .online a.curl"),
+                curlTextarea: document.querySelector("#favicon-tools .online textarea.curl"),
+                pending: document.querySelector("#favicon-tools .pending"),
+                pendingListing: document.querySelector("#favicon-tools .pending .listing"),
+                online: document.querySelector("#favicon-tools .online"),
+                onlineListing: document.querySelector("#favicon-tools .online .listing"),
+                missing: document.querySelector("#favicon-tools .missing"),
+                missingListing: document.querySelector("#favicon-tools .missing .listing"),
+                offline: document.querySelector("#favicon-tools .offline"),
+                offlineListing: document.querySelector("#favicon-tools .offline .listing"),
             };
             this.showCurlCommands = this.showCurlCommands.bind(this);
             this.selectAllCurlCommands = this.selectAllCurlCommands.bind(this);
-            this.dom.configWarning.style.display = shortycut.config.homepage.suggestions.showFavicons ? 'none' : 'block';
+            this.dom.configWarning.style.display = shortycut.config.homepage.suggestions.showFavicons ? "none" : "block";
         }
         FaviconTools.prototype.hasMenu = function () {
             return true;
         };
         FaviconTools.prototype.show = function () {
             this.addEventHandlers();
-            this.dom.faviconTools.style.display = 'flex';
+            this.dom.faviconTools.style.display = "flex";
             shortycut.faviconManager.startFullRescan();
             this.refreshPageContent();
         };
         FaviconTools.prototype.hide = function () {
             this.removeEventHandlers();
-            this.dom.faviconTools.style.display = 'none';
+            this.dom.faviconTools.style.display = "none";
         };
         FaviconTools.prototype.addEventHandlers = function () {
-            this.dom.curlLink.addEventListener('click', this.showCurlCommands);
-            this.dom.curlTextarea.addEventListener('focus', this.selectAllCurlCommands);
+            this.dom.curlLink.addEventListener("click", this.showCurlCommands);
+            this.dom.curlTextarea.addEventListener("focus", this.selectAllCurlCommands);
         };
         FaviconTools.prototype.removeEventHandlers = function () {
-            this.dom.curlLink.removeEventListener('click', this.showCurlCommands);
-            this.dom.curlTextarea.addEventListener('focus', this.selectAllCurlCommands);
+            this.dom.curlLink.removeEventListener("click", this.showCurlCommands);
+            this.dom.curlTextarea.addEventListener("focus", this.selectAllCurlCommands);
         };
         FaviconTools.prototype.showCurlCommands = function (event) {
-            this.dom.curlLink.style.display = 'none';
-            this.dom.curlTextarea.style.display = 'block';
+            this.dom.curlLink.style.display = "none";
+            this.dom.curlTextarea.style.display = "block";
             event.preventDefault();
             return false;
         };
@@ -2761,7 +2884,7 @@ var shortycut;
             this.dom.curlTextarea.select();
         };
         FaviconTools.prototype.refreshPageContent = function () {
-            if ('none' !== this.dom.faviconTools.style.display) {
+            if ("none" !== this.dom.faviconTools.style.display) {
                 this.refreshPageContentPending();
                 this.refreshPageContentMissing();
                 this.refreshPageContentOnline();
@@ -2772,46 +2895,46 @@ var shortycut;
             var domains = shortycut.faviconManager.getPendingDomains();
             if (domains.length) {
                 this.dom.pendingListing.innerHTML =
-                    shortycut.create('div', domains.map(function (domain) { return shortycut.create('div.row', shortycut.sanitize(domain)); })).innerHTML;
+                    shortycut.create("div", domains.map(function (domain) { return shortycut.create("div.row", shortycut.sanitize(domain)); })).innerHTML;
             }
-            this.dom.pending.style.display = domains.length ? 'block' : 'none';
+            this.dom.pending.style.display = domains.length ? "block" : "none";
         };
         FaviconTools.prototype.refreshPageContentMissing = function () {
             var domains = shortycut.faviconManager.getMissingDomains();
             if (domains.length) {
                 this.dom.missingListing.innerHTML =
-                    shortycut.create('div', domains.map(function (domain) { return shortycut.create('div.row', shortycut.sanitize(domain)); })).innerHTML;
+                    shortycut.create("div", domains.map(function (domain) { return shortycut.create("div.row", shortycut.sanitize(domain)); })).innerHTML;
             }
-            this.dom.missing.style.display = domains.length ? 'block' : 'none';
+            this.dom.missing.style.display = domains.length ? "block" : "none";
         };
         FaviconTools.prototype.refreshPageContentOnline = function () {
             var icons = shortycut.faviconManager.getOnlineDomains();
             if (icons.length) {
                 this.dom.curlTextarea.value =
-                    icons.map(function (item) { return "curl -s -L -o \"".concat(item.filename, "\" \"").concat(item.url, "\""); }).join('\n') + '\n';
+                    icons.map(function (item) { return "curl -s -L -o \"".concat(item.filename, "\" \"").concat(item.url, "\""); }).join("\n") + "\n";
                 this.dom.onlineListing.innerHTML = icons.map(function (item) {
-                    return shortycut.create('div.row', [
-                        shortycut.create('div.icon', shortycut.create('a', shortycut.createImage(item.url), function (element) {
+                    return shortycut.create("div.row", [
+                        shortycut.create("div.icon", shortycut.create("a", shortycut.createImage(item.url), function (element) {
                             element.download = item.filename;
                             element.href = item.url;
                         })),
-                        shortycut.create('div.domain', shortycut.sanitize(item.filename))
+                        shortycut.create("div.domain", shortycut.sanitize(item.filename))
                     ]);
-                }).map(function (element) { return element.outerHTML; }).join('');
+                }).map(function (element) { return element.outerHTML; }).join("");
             }
-            this.dom.online.style.display = icons.length ? 'block' : 'none';
+            this.dom.online.style.display = icons.length ? "block" : "none";
         };
         FaviconTools.prototype.refreshPageContentOffline = function () {
             var icons = shortycut.faviconManager.getOfflineDomains();
             if (icons.length) {
                 this.dom.offlineListing.innerHTML = icons.map(function (item) {
-                    return shortycut.create('div.row', [
-                        shortycut.create('div.icon', shortycut.createImage(item.url)),
-                        shortycut.create('div.domain', shortycut.sanitize(item.path))
+                    return shortycut.create("div.row", [
+                        shortycut.create("div.icon", shortycut.createImage(item.url)),
+                        shortycut.create("div.domain", shortycut.sanitize(item.path))
                     ]);
-                }).map(function (element) { return element.outerHTML; }).join('');
+                }).map(function (element) { return element.outerHTML; }).join("");
             }
-            this.dom.offline.style.display = icons.length ? 'block' : 'none';
+            this.dom.offline.style.display = icons.length ? "block" : "none";
         };
         return FaviconTools;
     }());
@@ -2944,22 +3067,19 @@ var shortycut;
             document.removeEventListener("keydown", this.onKeyBody);
         };
         Homepage.prototype.onKeyBody = function (event) {
-            var isRightArrow = ("ArrowRight" === event.key || "Right" === event.key)
-                && 0 <= this.selectedIndex
-                && (this.suggestions[this.selectedIndex].hidesMoreChildren
-                    || "segment" === this.suggestions[this.selectedIndex].type);
+            var isRightArrow = this.treatAsRightArrow(event);
             if (!shortycut.queryParameters.facets.noFocus) {
                 this.dom.filter.focus();
             }
-            if ("Escape" === event.key || "Esc" === event.key) {
+            if (this.isEscape(event)) {
                 return this.onEscape(event);
             }
-            else if ("ArrowDown" === event.key || "Down" === event.key) {
+            else if (this.isArrowDown(event)) {
                 this.selectSuggestion(this.selectedIndex + 1);
                 event.preventDefault();
                 return false;
             }
-            else if ("ArrowUp" === event.key || "Up" === event.key) {
+            else if (this.isArrowUp(event)) {
                 this.selectSuggestion(this.selectedIndex - 1);
                 event.preventDefault();
                 return false;
@@ -2971,6 +3091,24 @@ var shortycut;
                 this.dom.filter.focus();
             }
             return true;
+        };
+        Homepage.prototype.treatAsRightArrow = function (event) {
+            return (this.isArrowRight(event))
+                && 0 <= this.selectedIndex
+                && (this.suggestions[this.selectedIndex].hidesMoreChildren
+                    || "segment" === this.suggestions[this.selectedIndex].type);
+        };
+        Homepage.prototype.isArrowUp = function (event) {
+            return "ArrowUp" === event.key || "Up" === event.key;
+        };
+        Homepage.prototype.isArrowDown = function (event) {
+            return "ArrowDown" === event.key || "Down" === event.key;
+        };
+        Homepage.prototype.isEscape = function (event) {
+            return "Escape" === event.key || "Esc" === event.key;
+        };
+        Homepage.prototype.isArrowRight = function (event) {
+            return "ArrowRight" === event.key || "Right" === event.key;
         };
         Homepage.prototype.onEscape = function (event) {
             if (shortycut.queryParameters.facets.noFocus) {
@@ -3019,8 +3157,8 @@ var shortycut;
             this.lastCancelClearFilterEvent = new Date().getTime();
         };
         Homepage.prototype.scheduleClearFilter = function () {
-            if (100 <= new Date().getTime() - this.lastCancelClearFilterEvent) {
-                this.clearFilterJob = setTimeout(this.clearFilter, 10);
+            if (Homepage.DEBOUNCE_MS <= new Date().getTime() - this.lastCancelClearFilterEvent) {
+                this.clearFilterJob = setTimeout(this.clearFilter, Homepage.DEBOUNCE_POLLING_MS);
             }
         };
         Homepage.prototype.clearFilter = function () {
@@ -3045,7 +3183,7 @@ var shortycut;
             this.renderSuggestions(input, autoSelectFirstRow);
         };
         Homepage.prototype.collectSuggestions = function (keyword, splitInput, postKeywordInput, shortcut) {
-            var _a, _b, _c;
+            var _a, _b;
             if (shortcut && shortcut.queries && postKeywordInput) {
                 this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
             }
@@ -3053,20 +3191,24 @@ var shortycut;
                 (_a = this.suggestions).push.apply(_a, this.filter.keywordSearch(keyword, postKeywordInput));
             }
             else if (shortcut) {
-                if (shortcut.searchable) {
-                    (_b = this.suggestions).push.apply(_b, this.createSearchBucketSuggestions(shortcut, splitInput.slice(1)));
-                }
-                if (!this.suggestions.length) {
-                    if (shortcut.queries && 1 < splitInput.length && shortcut.queries) {
-                        this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
-                    }
-                    else if (shortcut.bookmarks && !postKeywordInput) {
-                        this.suggestions.push(this.createSuggestion(shortcut, "match", "bookmark"));
-                    }
-                }
+                this.collectSuggestionsForShortcut(shortcut, splitInput, postKeywordInput);
             }
             if (!this.suggestions.length) {
-                (_c = this.suggestions).push.apply(_c, this.filter.fullTextSearch(splitInput));
+                (_b = this.suggestions).push.apply(_b, this.filter.fullTextSearch(splitInput));
+            }
+        };
+        Homepage.prototype.collectSuggestionsForShortcut = function (shortcut, splitInput, postKeywordInput) {
+            var _a;
+            if (shortcut.searchable) {
+                (_a = this.suggestions).push.apply(_a, this.createSearchBucketSuggestions(shortcut, splitInput.slice(1)));
+            }
+            if (!this.suggestions.length) {
+                if (shortcut.queries && 1 < splitInput.length && shortcut.queries) {
+                    this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
+                }
+                else if (shortcut.bookmarks && !postKeywordInput) {
+                    this.suggestions.push(this.createSuggestion(shortcut, "match", "bookmark"));
+                }
             }
         };
         Homepage.prototype.renderSuggestions = function (input, autoSelectFirstRow) {
@@ -3132,7 +3274,7 @@ var shortycut;
                             ? shortycut.create("div.keyword:html", suggestion.keywordHtml)
                             : "",
                         shortycut.config.homepage.suggestions.showFavicons
-                            ? shortycut.faviconManager.getFavicon(suggestion.shortcut.all[0].link.urlForFavicon)
+                            ? shortycut.faviconManager.getFavicon(suggestion.shortcut.all[0].link.faviconUrls[0])
                             : "",
                         shortycut.create("div.description:html", _this.getDescription(suggestion))
                     ], function (rowContent) { return rowContent.addEventListener("click", function (event) {
@@ -3210,8 +3352,7 @@ var shortycut;
                 this.updateInputFieldHighlight();
             }
         };
-        Homepage.prototype.applySuggestion = function (selectedIndex, mode, viaRightArrow) {
-            var _a;
+        Homepage.prototype.applySuggestion = function (selectedIndex, mode, viaRightArrow, searchTerm) {
             var suggestion = this.suggestions[selectedIndex];
             var shortcut = suggestion.shortcut;
             if (suggestion.type === "segment" || (viaRightArrow && suggestion.hidesMoreChildren)) {
@@ -3221,67 +3362,76 @@ var shortycut;
                 this.applySearchResult(suggestion, viaRightArrow, mode);
             }
             else if (shortcut.bookmarks) {
-                shortycut.redirector.redirect(shortcut.bookmarks.current, viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : shortcut.bookmarks.onMultiLink, "", mode);
+                this.redirectToLinks(shortcut.getFinalizedBookmarks(), viaRightArrow, mode);
             }
             else if (shortcut.queries) {
-                var searchTerm = (_a = prompt("Search term")) === null || _a === void 0 ? void 0 : _a.trim();
+                searchTerm = (searchTerm === null || searchTerm === void 0 ? void 0 : searchTerm.trim()) || this.promptForSearchTerm();
                 if (searchTerm) {
-                    shortycut.redirector.redirect(shortcut.queries.current, viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : shortycut.assertNotNull(shortcut.queries).onMultiLink, searchTerm, mode);
+                    this.redirectToLinks(shortcut.getFinalizedQueries(searchTerm), viaRightArrow, mode);
                 }
             }
         };
+        Homepage.prototype.redirectToLinks = function (links, viaRightArrow, mode) {
+            shortycut.redirector.redirect(viaRightArrow ? __assign(__assign({}, links), { onMultiLink: shortycut.OnMultiLink.OPEN_IN_NEW_TAB }) : links, mode);
+        };
         Homepage.prototype.applySearchResult = function (suggestion, viaRightArrow, mode) {
-            var _a, _b;
+            var _a, _b, _c;
             if ((_a = suggestion.link) === null || _a === void 0 ? void 0 : _a.isQuery) {
-                var searchTerm = (_b = prompt("Search term")) === null || _b === void 0 ? void 0 : _b.trim();
+                var searchTerm = this.promptForSearchTerm();
                 if (searchTerm) {
-                    shortycut.redirector.redirect([suggestion.link], viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink, searchTerm, mode);
+                    this.redirectToLinks({
+                        links: suggestion.link.toFinalizedLinks(searchTerm),
+                        onMultiLink: (_b = suggestion.link.onMultiLink) !== null && _b !== void 0 ? _b : shortycut.OnMultiLink.getDefault()
+                    }, viaRightArrow, mode);
                 }
             }
             else if (suggestion.link) {
-                shortycut.redirector.redirect([suggestion.link], viaRightArrow ? shortycut.OnMultiLink.OPEN_IN_NEW_TAB : suggestion.link.onMultiLink, "", mode);
+                this.redirectToLinks({
+                    links: suggestion.link.toFinalizedLinks(""),
+                    onMultiLink: (_c = suggestion.link.onMultiLink) !== null && _c !== void 0 ? _c : shortycut.OnMultiLink.getDefault()
+                }, viaRightArrow, mode);
             }
         };
-        Homepage.prototype.redirect = function (mode) {
+        Homepage.prototype.promptForSearchTerm = function () {
             var _a;
+            return (_a = prompt("Search term")) === null || _a === void 0 ? void 0 : _a.trim();
+        };
+        Homepage.prototype.redirect = function (mode) {
             var input = this.dom.filter.value.trim();
             var keyword = shortycut.adjustCase(input.replace(/\s.*/, ""));
             var shortcut = shortycut.shortcuts.get(keyword);
             var postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
-            var searchTerm = input.replace(/^[^\s]*\s*/, "");
-            if (postKeywordInput && (shortcut.searchable || !shortcut.queries) && this.suggestions.length) {
-                return this.applySuggestion(0, mode, false);
-            }
-            if (!(shortcut === null || shortcut === void 0 ? void 0 : shortcut.bookmarks) && (shortcut === null || shortcut === void 0 ? void 0 : shortcut.queries) && !searchTerm) {
-                searchTerm = searchTerm || ((_a = prompt("Search term")) === null || _a === void 0 ? void 0 : _a.trim());
-                if (!searchTerm) {
-                    return;
-                }
-            }
+            var searchTerm = postKeywordInput.trim();
             var links = (shortcut === null || shortcut === void 0 ? void 0 : shortcut.queries) && searchTerm ? shortcut === null || shortcut === void 0 ? void 0 : shortcut.queries : shortcut === null || shortcut === void 0 ? void 0 : shortcut.bookmarks;
-            this.performRedirect(input, keyword, searchTerm, mode, links);
+            this.getSearchTermAndRedirect(mode, input, shortcut, postKeywordInput, searchTerm, links);
         };
-        Homepage.prototype.performRedirect = function (input, keyword, searchTerm, mode, links) {
+        Homepage.prototype.getSearchTermAndRedirect = function (mode, input, shortcut, postKeywordInput, searchTerm, links) {
+            if (postKeywordInput && (shortcut.searchable || !shortcut.queries) && this.suggestions.length) {
+                this.applySuggestion(0, mode, false, postKeywordInput);
+            }
+            else {
+                if (!(shortcut === null || shortcut === void 0 ? void 0 : shortcut.bookmarks) && (shortcut === null || shortcut === void 0 ? void 0 : shortcut.queries)) {
+                    searchTerm || (searchTerm = this.promptForSearchTerm());
+                    if (!searchTerm) {
+                        return;
+                    }
+                }
+                this.performRedirect(input, searchTerm !== null && searchTerm !== void 0 ? searchTerm : "", mode, links);
+            }
+        };
+        Homepage.prototype.performRedirect = function (input, searchTerm, mode, links) {
             if (links) {
-                if (1 < links.current.length && shortycut.RedirectMode.NEW_TAB === mode) {
-                    var url = window.location.href.replace(/[?#].*/, "");
-                    var query = encodeURIComponent("".concat(keyword, " ").concat(searchTerm).trim());
-                    shortycut.redirector.openUrl("".concat(url, "?").concat(shortycut.QueryParameters.QUERY, "=").concat(query), mode);
-                }
-                else {
-                    shortycut.redirector.redirect(links.current, links.onMultiLink, searchTerm, mode);
-                }
+                shortycut.redirector.redirect(links.toFinalizedLinks(searchTerm.trim()), mode);
             }
             else if (shortycut.isUrl(input)) {
                 shortycut.redirector.openUrl(input, mode);
             }
             else if ((shortycut.defaultSearchEngine === null || shortycut.defaultSearchEngine === void 0 ? void 0 : shortycut.defaultSearchEngine.queries) && shortycut.config.defaultSearchEngine.useOnHomepage) {
-                shortycut.defaultSearchEngine.replacePlaceholders(input);
-                shortycut.redirector.redirect(shortycut.defaultSearchEngine.queries.current, shortycut.defaultSearchEngine.queries.onMultiLink, input, mode);
+                shortycut.redirector.redirect(shortycut.defaultSearchEngine.getFinalizedLinks(input), mode);
             }
             else if (this.suggestions.length) {
                 this.selectedIndex = 0;
-                this.applySuggestion(this.selectedIndex, mode, false);
+                this.applySuggestion(this.selectedIndex, mode, false, searchTerm);
             }
         };
         Homepage.prototype.removeFocus = function () {
@@ -3290,7 +3440,8 @@ var shortycut;
         };
         Homepage.prototype.updateFaviconManagerParameters = function (homepageIsVisible) {
             if (homepageIsVisible) {
-                shortycut.faviconManager.setCurrentlyDisplayedLinks(this.suggestions.map(function (suggestion) { return suggestion.shortcut.all[0].link.urlForFavicon; }));
+                shortycut.faviconManager.setCurrentlyDisplayedLinks(this.suggestions.map(function (suggestion) { return suggestion.shortcut.all[0].link.faviconUrls[0]; })
+                    .filter(function (url) { return url; }));
                 if (shortycut.config.favicons.preloadOnStart) {
                     shortycut.faviconManager.startPreload();
                 }
@@ -3300,6 +3451,8 @@ var shortycut;
             }
         };
         Homepage.MAX_SUGGESTIONS = 12;
+        Homepage.DEBOUNCE_MS = 100;
+        Homepage.DEBOUNCE_POLLING_MS = 10;
         return Homepage;
     }());
     shortycut.Homepage = Homepage;
@@ -3309,14 +3462,14 @@ var shortycut;
     var LinkTools = (function () {
         function LinkTools() {
             this.dom = {
-                linkTools: document.querySelector('#link-tools'),
+                linkTools: document.querySelector("#link-tools"),
                 harParser: {
-                    input: document.querySelector('#link-tools .har-parser .input'),
-                    output: document.querySelector('#link-tools .har-parser .output')
+                    input: document.querySelector("#link-tools .har-parser .input"),
+                    output: document.querySelector("#link-tools .har-parser .output")
                 },
                 urlEncoding: {
-                    decoded: document.querySelector('#link-tools input.decoded'),
-                    encoded: document.querySelector('#link-tools input.encoded'),
+                    decoded: document.querySelector("#link-tools input.decoded"),
+                    encoded: document.querySelector("#link-tools input.encoded"),
                 }
             };
             this.onDecodedChanged = this.onDecodedChanged.bind(this);
@@ -3327,25 +3480,25 @@ var shortycut;
             return true;
         };
         LinkTools.prototype.populate = function () {
-            this.dom.urlEncoding.decoded.value = '';
-            this.dom.urlEncoding.encoded.classList.remove('invalid');
-            this.dom.urlEncoding.encoded.value = '';
-            this.dom.harParser.input.classList.remove('invalid');
-            this.dom.harParser.input.value = '';
-            this.dom.harParser.output.innerHTML = '';
+            this.dom.urlEncoding.decoded.value = "";
+            this.dom.urlEncoding.encoded.classList.remove("invalid");
+            this.dom.urlEncoding.encoded.value = "";
+            this.dom.harParser.input.classList.remove("invalid");
+            this.dom.harParser.input.value = "";
+            this.dom.harParser.output.innerHTML = "";
             return this;
         };
         LinkTools.prototype.show = function () {
             this.addEventHandlers();
-            this.dom.linkTools.style.display = 'flex';
+            this.dom.linkTools.style.display = "flex";
         };
         LinkTools.prototype.hide = function () {
             this.removeEventHandlers();
-            this.dom.linkTools.style.display = 'none';
+            this.dom.linkTools.style.display = "none";
         };
         LinkTools.prototype.addEventHandlers = function () {
             var _this = this;
-            ['change', 'keydown', 'input'].forEach(function (event) {
+            ["change", "keydown", "input"].forEach(function (event) {
                 _this.dom.urlEncoding.encoded.addEventListener(event, _this.onEncodedChanged);
                 _this.dom.urlEncoding.decoded.addEventListener(event, _this.onDecodedChanged);
                 _this.dom.harParser.input.addEventListener(event, _this.onHarInputChanged);
@@ -3353,7 +3506,7 @@ var shortycut;
         };
         LinkTools.prototype.removeEventHandlers = function () {
             var _this = this;
-            ['change', 'keydown', 'input'].forEach(function (event) {
+            ["change", "keydown", "input"].forEach(function (event) {
                 _this.dom.urlEncoding.encoded.removeEventListener(event, _this.onEncodedChanged);
                 _this.dom.urlEncoding.decoded.removeEventListener(event, _this.onDecodedChanged);
                 _this.dom.harParser.input.removeEventListener(event, _this.onHarInputChanged);
@@ -3365,47 +3518,48 @@ var shortycut;
         LinkTools.prototype.onEncodedChanged = function () {
             try {
                 this.dom.urlEncoding.decoded.value = decodeURIComponent(this.dom.urlEncoding.encoded.value);
-                this.dom.urlEncoding.encoded.classList.remove('invalid');
+                this.dom.urlEncoding.encoded.classList.remove("invalid");
             }
             catch (exception) {
-                this.dom.urlEncoding.decoded.value = '';
-                this.dom.urlEncoding.encoded.classList.add('invalid');
+                this.dom.urlEncoding.decoded.value = "";
+                this.dom.urlEncoding.encoded.classList.add("invalid");
             }
         };
         LinkTools.prototype.onHarInputChanged = function () {
             var _this = this;
             var input = this.dom.harParser.input.value.trim() || '{"log":{"entries":[]}}';
             try {
-                this.dom.harParser.output.innerHTML = '';
-                var links = this.extractPostLinks(JSON.parse(input));
+                this.dom.harParser.output.innerHTML = "";
+                var links = this.extractPostLinks(input);
                 if (links.length) {
-                    this.dom.harParser.output.appendChild(shortycut.create('p', "This HAR file contain the following POST link".concat(1 < links.length ? 's' : '', ":")));
+                    this.dom.harParser.output.appendChild(shortycut.create("p", "This HAR file contain the following POST link".concat(1 < links.length ? "s" : "", ":")));
                     links.forEach(function (url) { return _this.dom.harParser.output.appendChild(url); });
                 }
                 else if (this.dom.harParser.input.value.trim()) {
-                    this.dom.harParser.output.appendChild(shortycut.create('p', 'This HAR file does not contain any POST links.'));
+                    this.dom.harParser.output.appendChild(shortycut.create("p", "This HAR file does not contain any POST links."));
                 }
-                this.dom.harParser.input.classList.remove('invalid');
+                this.dom.harParser.input.classList.remove("invalid");
             }
             catch (exception) {
-                this.dom.harParser.input.classList.add('invalid');
+                this.dom.harParser.input.classList.add("invalid");
             }
         };
-        LinkTools.prototype.extractPostLinks = function (har) {
+        LinkTools.prototype.extractPostLinks = function (input) {
             var _a, _b, _c;
+            var har = JSON.parse(input);
             var result = new Array();
             for (var _i = 0, _d = har.log.entries; _i < _d.length; _i++) {
                 var entry = _d[_i];
-                if ('POST' === ((_a = entry === null || entry === void 0 ? void 0 : entry.request) === null || _a === void 0 ? void 0 : _a.method)) {
+                if ("POST" === ((_a = entry === null || entry === void 0 ? void 0 : entry.request) === null || _a === void 0 ? void 0 : _a.method)) {
                     var url = entry.request.url;
                     var postParameters = (_c = (_b = entry === null || entry === void 0 ? void 0 : entry.request) === null || _b === void 0 ? void 0 : _b.postData) === null || _c === void 0 ? void 0 : _c.params;
                     for (var index = 0; postParameters && index < postParameters.length; index++) {
-                        url += 0 == index ? shortycut.config.shortcutFormat.url.postIndicator : '&';
-                        var name_3 = encodeURIComponent(postParameters[index].name);
+                        url += 0 === index ? shortycut.config.shortcutFormat.url.postIndicator : "&";
+                        var name_2 = encodeURIComponent(postParameters[index].name);
                         var value = encodeURIComponent(postParameters[index].value);
-                        url += "".concat(name_3, "=").concat(value);
+                        url += "".concat(name_2, "=").concat(value);
                     }
-                    result.push(shortycut.create('p.url', shortycut.sanitize(url)));
+                    result.push(shortycut.create("p.url", shortycut.sanitize(url)));
                 }
             }
             return result;
@@ -3419,10 +3573,10 @@ var shortycut;
     var Menu = (function () {
         function Menu() {
             this.dom = {
-                menu: document.querySelector('#menu'),
-                burgerIcon: document.querySelector('#menu .burger-icon'),
-                closeIcon: document.querySelector('#menu .close-icon'),
-                items: document.querySelector('#menu .items')
+                menu: document.querySelector("#menu"),
+                burgerIcon: document.querySelector("#menu .burger-icon"),
+                closeIcon: document.querySelector("#menu .close-icon"),
+                items: document.querySelector("#menu .items")
             };
             this.onClickCloseIcon = this.onClickCloseIcon.bind(this);
             this.onClickBurgerIcon = this.onClickBurgerIcon.bind(this);
@@ -3437,58 +3591,58 @@ var shortycut;
         }
         Menu.prototype.populateItems = function () {
             var _this = this;
-            this.dom.items.innerHTML = '';
+            this.dom.items.innerHTML = "";
             var menuItems = [
                 ["ShortyCut ".concat(shortycut.getVersionNumber()), this.onShortyCut],
-                ['Documentation', this.onDocumentation],
-                ['Link tools', this.onLinkTools],
-                ['Browser integration', this.onBrowserIntegration],
-                ['Favicons', this.onFavicons]
+                ["Documentation", this.onDocumentation],
+                ["Link tools", this.onLinkTools],
+                ["Browser integration", this.onBrowserIntegration],
+                ["Favicons", this.onFavicons]
             ];
             menuItems.forEach(function (array) {
-                return _this.dom.items.appendChild(shortycut.create('a', array[0], function (element) { return element.addEventListener('click', array[1]); }));
+                return _this.dom.items.appendChild(shortycut.create("a", array[0], function (element) { return element.addEventListener("click", array[1]); }));
             });
         };
         Menu.prototype.addEventListeners = function () {
-            this.dom.closeIcon.addEventListener('click', this.onClickCloseIcon);
-            this.dom.burgerIcon.addEventListener('click', this.onClickBurgerIcon);
-            document.body.addEventListener('click', this.onClickBody);
-            document.body.addEventListener('keydown', this.onKeyDown);
+            this.dom.closeIcon.addEventListener("click", this.onClickCloseIcon);
+            this.dom.burgerIcon.addEventListener("click", this.onClickBurgerIcon);
+            document.body.addEventListener("click", this.onClickBody);
+            document.body.addEventListener("keydown", this.onKeyDown);
         };
         Menu.prototype.removeEventListeners = function () {
-            this.dom.closeIcon.removeEventListener('click', this.onClickCloseIcon);
-            this.dom.burgerIcon.removeEventListener('click', this.onClickBurgerIcon);
-            document.body.removeEventListener('click', this.onClickBody);
-            document.body.removeEventListener('keydown', this.onKeyDown);
+            this.dom.closeIcon.removeEventListener("click", this.onClickCloseIcon);
+            this.dom.burgerIcon.removeEventListener("click", this.onClickBurgerIcon);
+            document.body.removeEventListener("click", this.onClickBody);
+            document.body.removeEventListener("keydown", this.onKeyDown);
         };
         Menu.prototype.showBurgerIcon = function () {
-            if (this.dom.menu.style.display === 'none') {
+            if (this.dom.menu.style.display === "none") {
                 this.addEventListeners();
             }
-            this.dom.burgerIcon.style.display = 'block';
-            this.dom.closeIcon.style.display = 'none';
-            this.dom.items.style.display = 'none';
-            this.dom.menu.style.display = 'block';
+            this.dom.burgerIcon.style.display = "block";
+            this.dom.closeIcon.style.display = "none";
+            this.dom.items.style.display = "none";
+            this.dom.menu.style.display = "block";
         };
         Menu.prototype.showCloseIcon = function (onClose) {
             this.onClose = onClose;
-            if (this.dom.menu.style.display === 'none') {
+            if (this.dom.menu.style.display === "none") {
                 this.addEventListeners();
             }
-            this.dom.burgerIcon.style.display = 'none';
-            this.dom.closeIcon.style.display = 'block';
-            this.dom.items.style.display = 'none';
-            this.dom.menu.style.display = 'block';
+            this.dom.burgerIcon.style.display = "none";
+            this.dom.closeIcon.style.display = "block";
+            this.dom.items.style.display = "none";
+            this.dom.menu.style.display = "block";
         };
         Menu.prototype.hide = function () {
             this.removeEventListeners();
-            this.dom.menu.style.display = 'none';
+            this.dom.menu.style.display = "none";
         };
         Menu.prototype.closeMenu = function () {
-            this.dom.items.style.display = 'none';
+            this.dom.items.style.display = "none";
         };
         Menu.prototype.onClickBurgerIcon = function (event) {
-            this.dom.items.style.display = 'none' === this.dom.items.style.display ? 'block' : 'none';
+            this.dom.items.style.display = "none" === this.dom.items.style.display ? "block" : "none";
             return this.cancelEvent(event);
         };
         Menu.prototype.onClickCloseIcon = function (event) {
@@ -3503,7 +3657,7 @@ var shortycut;
         };
         Menu.prototype.onShortyCut = function (event) {
             this.closeMenu();
-            var url = 'https://github.com/david-04/shortycut';
+            var url = "https://github.com/david-04/shortycut";
             if (shortycut.queryParameters.facets.newTabs) {
                 window.open(url);
             }
@@ -3514,7 +3668,7 @@ var shortycut;
         };
         Menu.prototype.onDocumentation = function (event) {
             this.closeMenu();
-            var url = shortycut.getWindowLocationPath() + '../index.html';
+            var url = shortycut.getWindowLocationPath() + "../index.html";
             if (shortycut.queryParameters.facets.newTabs) {
                 window.open(url);
             }
@@ -3544,8 +3698,8 @@ var shortycut;
             return false;
         };
         Menu.prototype.onKeyDown = function (event) {
-            if (('Escape' === event.key || 'Esc' === event.key)) {
-                if (this.dom.items.style.display !== 'none') {
+            if (("Escape" === event.key || "Esc" === event.key)) {
+                if (this.dom.items.style.display !== "none") {
                     this.closeMenu();
                     event.preventDefault();
                     return false;
@@ -3562,24 +3716,24 @@ var shortycut;
     var RedirectPage = (function () {
         function RedirectPage() {
             this.dom = {
-                redirect: document.querySelector('#redirect'),
-                title: document.querySelector('#redirect .title'),
-                url: document.querySelector('#redirect .url'),
+                redirect: document.querySelector("#redirect"),
+                title: document.querySelector("#redirect .title"),
+                url: document.querySelector("#redirect .url"),
             };
         }
-        RedirectPage.prototype.populate = function (link) {
-            this.dom.title.innerHTML = link.segments.descriptionHtml;
-            this.dom.url.innerHTML = shortycut.sanitize(link.url);
+        RedirectPage.prototype.populate = function (htmlDescription, url) {
+            this.dom.title.innerHTML = htmlDescription;
+            this.dom.url.innerHTML = shortycut.sanitize(url);
             return this;
         };
         RedirectPage.prototype.hasMenu = function () {
             return false;
         };
         RedirectPage.prototype.show = function () {
-            document.body.append(shortycut.create('div:html', '&nbsp;'));
+            document.body.append(shortycut.create("div:html", "&nbsp;"));
         };
         RedirectPage.prototype.hide = function () {
-            this.dom.redirect.style.display = 'none';
+            this.dom.redirect.style.display = "none";
         };
         return RedirectPage;
     }());
@@ -3591,12 +3745,12 @@ var shortycut;
         function SetupInstructions() {
             this.setupComplete = false;
             this.dom = {
-                setup: document.querySelector('#setup'),
-                error: document.querySelector('#setup .error'),
-                rootPath: document.querySelector('#setup .root-path'),
-                header: document.querySelector('#setup h1'),
-                pre: document.querySelector('#setup pre'),
-                syntaxWarning: document.querySelector('#setup .syntax-warning')
+                setup: document.querySelector("#setup"),
+                error: document.querySelector("#setup .error"),
+                rootPath: document.querySelector("#setup .root-path"),
+                header: document.querySelector("#setup h1"),
+                pre: document.querySelector("#setup pre"),
+                syntaxWarning: document.querySelector("#setup .syntax-warning")
             };
         }
         SetupInstructions.prototype.hasMenu = function () {
@@ -3605,38 +3759,38 @@ var shortycut;
         SetupInstructions.prototype.populate = function (mode) {
             if (SetupInstructions.VALIDATE === mode) {
                 if (!shortycut.startupCache.config.length || !shortycut.startupCache.shortcuts.length) {
-                    this.dom.error.style.display = 'block';
-                    this.dom.header.style.display = 'none';
+                    this.dom.error.style.display = "block";
+                    this.dom.header.style.display = "none";
                 }
                 else {
                     this.setupComplete = true;
-                    shortycut.redirector.openUrl(window.location.href.replace(/\?.*/, ''), shortycut.RedirectMode.PRESERVE_HISTORY);
+                    shortycut.redirector.openUrl(window.location.href.replace(/\?.*/, ""), shortycut.RedirectMode.PRESERVE_HISTORY);
                 }
             }
-            var indexPath = 'shortycut';
+            var indexPath = "shortycut";
             if (0 === window.location.href.search(/^(file:\/{2}|[a-z]:|\/)/i)) {
                 indexPath = shortycut.getWindowLocationPath()
-                    .replace(/^file:\/+/, '')
-                    .replace(/[?#].*/, '')
-                    .replace(/\/$/, '');
-                if (':' === indexPath.charAt(1)) {
-                    indexPath = indexPath.replace(/\//g, '\\');
+                    .replace(/^file:\/+/, "")
+                    .replace(/[?#].*/, "")
+                    .replace(/\/$/, "");
+                if (":" === indexPath.charAt(1)) {
+                    indexPath = indexPath.replace(/\//g, "\\");
                 }
             }
             this.dom.rootPath.innerHTML = shortycut.sanitize(indexPath);
-            this.dom.pre.innerHTML = this.dom.pre.innerHTML.replace(/\n[ \t]+/g, '\n');
-            this.dom.syntaxWarning.style.display = shortycut.supportsBacktickSyntax() ? 'none' : 'block';
+            this.dom.pre.innerHTML = this.dom.pre.innerHTML.replace(/\n[ \t]+/g, "\n");
+            this.dom.syntaxWarning.style.display = shortycut.supportsBacktickSyntax() ? "none" : "block";
             return this;
         };
         SetupInstructions.prototype.show = function () {
             if (!this.setupComplete) {
-                this.dom.setup.style.display = 'flex';
+                this.dom.setup.style.display = "flex";
             }
         };
         SetupInstructions.prototype.hide = function () {
-            this.dom.setup.style.display = 'none';
+            this.dom.setup.style.display = "none";
         };
-        SetupInstructions.VALIDATE = 'validate';
+        SetupInstructions.VALIDATE = "validate";
         return SetupInstructions;
     }());
     shortycut.SetupInstructions = SetupInstructions;
@@ -3646,11 +3800,10 @@ var shortycut;
     var Shortlist = (function () {
         function Shortlist() {
             this.dom = {
-                shortlist: shortycut.assertNotNull(document.getElementById('shortlist')),
+                shortlist: shortycut.assertNotNull(document.getElementById("shortlist")),
                 listItems: new Array()
             };
-            this.links = new Array();
-            this.searchTerm = '';
+            this.links = new Array;
             this.focusIndex = 0;
             this.onKey = this.onKey.bind(this);
             this.openAll = this.openAll.bind(this);
@@ -3658,61 +3811,63 @@ var shortycut;
         Shortlist.prototype.hasMenu = function () {
             return true;
         };
-        Shortlist.prototype.populate = function (links, searchTerm) {
+        Shortlist.prototype.populate = function (links) {
             var _this = this;
-            this.links = __spreadArray([null], links, true);
-            this.searchTerm = searchTerm;
+            this.links = __spreadArray([null], links.links, true);
             this.dom.listItems = __spreadArray([
                 this.createHeader()
-            ], this.links.slice(1).map(function (link, index) { return _this.createLink(index + 1, link.getHref(_this.searchTerm), link.segments.descriptionHtml, function (event) { return _this.openSelected(event, index + 1); }, shortycut.sanitize(link.url.replace(/^[a-z]+:\/\/+/i, '').replace(/[#?].*/, '')), link.url); }), true);
-            this.dom.shortlist.innerHTML = '';
+            ], this.links.slice(1).map(function (link, index) {
+                var _a, _b, _c;
+                return _this.createLink(index + 1, link.urls[0].permalink, link.htmlDescription, function (event) { return _this.openSelected(event, index + 1); }, shortycut.sanitize((_b = (_a = link.urls[0]) === null || _a === void 0 ? void 0 : _a.url.replace(/^[a-z]+:\/\/+/i, "").replace(/[#?].*/, "")) !== null && _b !== void 0 ? _b : ""), (_c = link.urls[0]) === null || _c === void 0 ? void 0 : _c.url);
+            }), true);
+            this.dom.shortlist.innerHTML = "";
             this.dom.listItems.forEach(function (href) { return _this.dom.shortlist.appendChild(href); });
             this.focusIndex = 0;
             return this;
         };
         Shortlist.prototype.createHeader = function () {
-            return this.createLink(0, 'javascript:void(0)', 'Open all', this.openAll);
+            return this.createLink(0, "javascript:void(0)", "Open all", this.openAll);
         };
-        Shortlist.prototype.createLink = function (index, href, title, onClick, subtitle, url) {
-            var a = document.createElement('a');
-            a.href = href;
+        Shortlist.prototype.createLink = function (index, permalink, title, onClick, subtitle, url) {
+            var a = document.createElement("a");
+            a.href = permalink;
             a.id = "shortlist".concat(index);
-            var favicon = url && shortycut.config.homepage.suggestions.showFavicons ? shortycut.faviconManager.getFavicon(url) : '';
-            a.innerHTML = shortycut.create('div.row', [
-                shortycut.create('div.icon', shortycut.createImage('resources/arrow.svg')),
-                shortycut.create('div.text', [
-                    shortycut.create('div.title', title),
-                    url && subtitle ? shortycut.create('div.url', favicon, subtitle) : ''
+            var favicon = url && shortycut.config.homepage.suggestions.showFavicons ? shortycut.faviconManager.getFavicon(url) : "";
+            a.innerHTML = shortycut.create("div.row", [
+                shortycut.create("div.icon", shortycut.createImage("resources/arrow.svg")),
+                shortycut.create("div.text", [
+                    shortycut.create("div.title", title),
+                    url && subtitle ? shortycut.create("div.url", favicon, subtitle) : ""
                 ])
             ]).outerHTML;
-            a.addEventListener('click', onClick);
+            a.addEventListener("click", onClick);
             return a;
         };
         Shortlist.prototype.show = function () {
             this.addEventHandlers();
-            this.dom.shortlist.style.display = 'flex';
+            this.dom.shortlist.style.display = "flex";
             this.dom.listItems[this.focusIndex].focus();
         };
         Shortlist.prototype.hide = function () {
             this.removeEventHandlers();
-            this.dom.shortlist.style.display = 'none';
+            this.dom.shortlist.style.display = "none";
         };
         Shortlist.prototype.addEventHandlers = function () {
             var _this = this;
-            ['keyup', 'keydown'].forEach(function (event) { return document.addEventListener(event, _this.onKey); });
+            ["keyup", "keydown"].forEach(function (event) { return document.addEventListener(event, _this.onKey); });
         };
         Shortlist.prototype.removeEventHandlers = function () {
             var _this = this;
-            ['keyup', 'keydown'].forEach(function (event) { return document.removeEventListener(event, _this.onKey); });
+            ["keyup", "keydown"].forEach(function (event) { return document.removeEventListener(event, _this.onKey); });
         };
         Shortlist.prototype.onKey = function (event) {
             var _a;
-            if ('keyup' === event.type) {
+            if ("keyup" === event.type) {
                 return false;
             }
-            var id = ((_a = document.activeElement) === null || _a === void 0 ? void 0 : _a.id) || '';
-            var current = id.match(/^shortlist\d+$/) ? parseInt(id.replace(/shortlist/, '')) : -1;
-            if ('Enter' === event.key) {
+            var id = ((_a = document.activeElement) === null || _a === void 0 ? void 0 : _a.id) || "";
+            var current = id.match(/^shortlist\d+$/) ? parseInt(id.replace(/shortlist/, "")) : -1;
+            if ("Enter" === event.key) {
                 if (0 === current) {
                     return this.openAll(event);
                 }
@@ -3731,34 +3886,37 @@ var shortycut;
             }
         };
         Shortlist.prototype.openSelected = function (event, current) {
-            shortycut.redirector.redirect([this.links[current]], shortycut.OnMultiLink.OPEN_IN_NEW_TAB, this.searchTerm, shortycut.queryParameters.facets.newTabs ? shortycut.RedirectMode.NEW_TAB : shortycut.RedirectMode.PRESERVE_HISTORY);
+            shortycut.redirector.redirect({ links: [this.links[current]], onMultiLink: shortycut.OnMultiLink.OPEN_IN_NEW_TAB }, shortycut.queryParameters.facets.newTabs ? shortycut.RedirectMode.NEW_TAB : shortycut.RedirectMode.PRESERVE_HISTORY);
             event.preventDefault();
             return false;
         };
         Shortlist.prototype.openAll = function (event) {
-            shortycut.redirector.redirect(this.links.slice(1), shortycut.OnMultiLink.OPEN_IN_NEW_TAB, this.searchTerm, shortycut.RedirectMode.PRESERVE_HISTORY);
+            shortycut.redirector.redirect({ links: this.links.slice(1), onMultiLink: shortycut.OnMultiLink.OPEN_IN_NEW_TAB }, shortycut.RedirectMode.PRESERVE_HISTORY);
             event.preventDefault();
             return false;
         };
         Shortlist.prototype.getTargetIndex = function (key, current) {
-            if ('ArrowDown' === key || 'Down' === key || 'Enter' === key || 'Tab' === key) {
+            if (this.isArrowDown(key) || "Enter" === key || "Tab" === key) {
                 return Math.min(Math.max(current + 1, 0), this.links.length - 1);
             }
-            else if ('ArrowUp' === key || 'Up' === key) {
-                if (current < 0) {
-                    return this.links.length - 1;
-                }
-                else {
-                    return Math.max(Math.min(current - 1, this.links.length - 1), 0);
-                }
+            else if (this.isArrowUp(key)) {
+                return current < 0
+                    ? this.links.length - 1
+                    : Math.max(Math.min(current - 1, this.links.length - 1), 0);
             }
-            else if ('Home' === key || 'PageUp' === key) {
+            else if ("Home" === key || "PageUp" === key) {
                 return 0;
             }
-            else if ('End' === key || 'PageDown' === key) {
+            else if ("End" === key || "PageDown" === key) {
                 return this.links.length - 1;
             }
             return current;
+        };
+        Shortlist.prototype.isArrowDown = function (key) {
+            return "ArrowDown" === key || "Down" === key;
+        };
+        Shortlist.prototype.isArrowUp = function (key) {
+            return "ArrowUp" === key || "Up" === key;
         };
         return Shortlist;
     }());
@@ -3809,9 +3967,9 @@ var shortycut;
         else {
             console.error(exception);
             var message = "".concat(exception);
-            shortycut.pages.error.populate('Internal error', [
-                shortycut.create('p', 'An internal error occurred:'),
-                shortycut.create('p', message)
+            shortycut.pages.error.populate("Internal error", [
+                shortycut.create("p", "An internal error occurred:"),
+                shortycut.create("p", message)
             ]);
         }
         shortycut.pages.hideAllExcept(shortycut.pages.error);
@@ -3827,7 +3985,7 @@ var shortycut;
             this.htmlElements = htmlElements;
         }
         InitializationError.prototype.toHtml = function () {
-            return shortycut.create('div.description', this.htmlElements);
+            return shortycut.create("div.description", this.htmlElements);
         };
         return InitializationError;
     }());
@@ -3835,7 +3993,7 @@ var shortycut;
     var ScriptLoadingError = (function (_super) {
         __extends(ScriptLoadingError, _super);
         function ScriptLoadingError(html) {
-            return _super.call(this, shortycut.create('div:html', html)) || this;
+            return _super.call(this, shortycut.create("div:html", html)) || this;
         }
         return ScriptLoadingError;
     }(InitializationError));
@@ -3843,7 +4001,7 @@ var shortycut;
     var ParserError = (function (_super) {
         __extends(ParserError, _super);
         function ParserError(description, line) {
-            var _this = _super.call(this, shortycut.create('div', description, ':'), shortycut.create('div', shortycut.create('tt', line))) || this;
+            var _this = _super.call(this, shortycut.create("div", description, ":"), shortycut.create("div", shortycut.create("tt", line))) || this;
             _this.description = description;
             _this.line = line;
             return _this;
@@ -3988,7 +4146,7 @@ var shortycut;
         };
         HotkeySelector.prototype.isSeparator = function (char) {
             var code = char.charCodeAt(0);
-            return 0 <= code && code <= 127 && char.match(/[^a-z]/i);
+            return 0 <= code && code <= HotkeySelector.MAX_ASCII_CODE && char.match(/[^a-z]/i);
         };
         HotkeySelector.prototype.selectBestCandidates = function (candidates) {
             var currentCombination = candidates.map(function () { return 0; });
@@ -4004,7 +4162,8 @@ var shortycut;
         };
         HotkeySelector.prototype.switchToNextCombination = function (currentCombination, candidates) {
             for (var index = currentCombination.length - 1; 0 <= index; index--) {
-                if (++currentCombination[index] < candidates[index].length) {
+                currentCombination[index]++;
+                if (currentCombination[index] < candidates[index].length) {
                     return true;
                 }
                 else if (0 === index) {
@@ -4048,12 +4207,16 @@ var shortycut;
             var result = new Array();
             result.push({ text: description.substring(0, hotkeyPositions[0]), isHotkey: false });
             for (var index = 0; index < hotkeyPositions.length; index++) {
-                result.push({ text: description.substring(hotkeyPositions[index], hotkeyPositions[index] + 1), isHotkey: true });
+                result.push({
+                    text: description.substring(hotkeyPositions[index], hotkeyPositions[index] + 1),
+                    isHotkey: true
+                });
                 var nextIndex = index + 1 < hotkeyPositions.length ? hotkeyPositions[index + 1] : description.length;
                 result.push({ text: description.substring(hotkeyPositions[index] + 1, nextIndex), isHotkey: false });
             }
             return result.filter(function (item) { return item.text; });
         };
+        HotkeySelector.MAX_ASCII_CODE = 127;
         return HotkeySelector;
     }());
     shortycut.HotkeySelector = HotkeySelector;
@@ -4061,11 +4224,11 @@ var shortycut;
 var shortycut;
 (function (shortycut) {
     function sanitize(content) {
-        if ('string' !== typeof content) {
+        if ("string" !== typeof content) {
             return content;
         }
         else {
-            return content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+            return content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
         }
     }
     shortycut.sanitize = sanitize;
@@ -4077,7 +4240,7 @@ var shortycut;
         var properties = ElementProperties.of(type);
         var element = document.createElement(properties.tag);
         element.className = properties.className;
-        return applyCreateProperties.apply(void 0, __spreadArray([!element.classList.contains('html'), element], args, false));
+        return applyCreateProperties.apply(void 0, __spreadArray([!element.classList.contains("html"), element], args, false));
     }
     shortycut.create = create;
     function createImage(url) {
@@ -4085,7 +4248,7 @@ var shortycut;
         for (var _i = 1; _i < arguments.length; _i++) {
             args[_i - 1] = arguments[_i];
         }
-        var image = create.apply(void 0, __spreadArray(['img'], args, false));
+        var image = create.apply(void 0, __spreadArray(["img"], args, false));
         image.src = url;
         return image;
     }
@@ -4112,7 +4275,7 @@ var shortycut;
         };
         ElementProperties.parse = function (type) {
             var array = type.split(/(?=[.#:])/).map(function (token) { return token.trim(); }).filter(function (token) { return token; });
-            return new ElementProperties(array[0], array.filter(function (item) { return '.' === item.charAt(0); }).map(function (item) { return item.substring(1); }).join(' '), array.some(function (item) { return item === ':html'; }), array.filter(function (item) { return '#' === item.charAt(0); }).map(function (item) { return item.substring(1); })[0]);
+            return new ElementProperties(array[0], array.filter(function (item) { return "." === item.charAt(0); }).map(function (item) { return item.substring(1); }).join(" "), array.some(function (item) { return item === ":html"; }), array.filter(function (item) { return "#" === item.charAt(0); }).map(function (item) { return item.substring(1); })[0]);
         };
         return ElementProperties;
     }());
@@ -4123,7 +4286,7 @@ var shortycut;
         }
         for (var _a = 0, args_1 = args; _a < args_1.length; _a++) {
             var arg = args_1[_a];
-            if ('function' === typeof arg) {
+            if ("function" === typeof arg) {
                 var result = arg(element);
                 if (Array.isArray(result)) {
                     element = applyCreateProperties.apply(void 0, __spreadArray([mustSanitize, element], result, false));
@@ -4132,7 +4295,7 @@ var shortycut;
                     element = applyCreateProperties(mustSanitize, element, result);
                 }
             }
-            else if ('string' === typeof arg) {
+            else if ("string" === typeof arg) {
                 element.innerHTML += mustSanitize ? arg : sanitize(arg);
             }
             else if (Array.isArray(arg)) {
@@ -4166,7 +4329,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return '1.3.1'.replace(/^##.*/, '');
+        return "1.4".replace(/^##.*/, "");
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {
@@ -4175,23 +4338,23 @@ var shortycut;
         }
         catch (exception) {
         }
-        var valueMatches = 'success' === window['shortycutBrowserTest'];
-        delete window['shortycutBrowserTest'];
+        var valueMatches = "success" === window.shortycutBrowserTest;
+        delete window.shortycutBrowserTest;
         return valueMatches;
     }
     shortycut.supportsBacktickSyntax = supportsBacktickSyntax;
     function isDemoMode() {
-        var demoKeywords = ['tm', 'tz', 'tp', 'tt', 'tr', 'e', 'news'];
+        var demoKeywords = ["tm", "tz", "tp", "tt", "tr", "e", "news"];
         var matchedKeywords = demoKeywords.filter(function (keyword) { return shortycut.shortcuts.get(keyword); });
-        return shortycut.shortcuts.size == demoKeywords.length && matchedKeywords.length === demoKeywords.length;
+        return shortycut.shortcuts.size === demoKeywords.length && matchedKeywords.length === demoKeywords.length;
     }
     shortycut.isDemoMode = isDemoMode;
     function assertNotNull(value) {
         if (undefined === value) {
-            throw new Error('Value is undefined');
+            throw new Error("Value is undefined");
         }
         else if (null === value) {
-            throw new Error('Value is null');
+            throw new Error("Value is null");
         }
         else {
             return value;
@@ -4199,11 +4362,11 @@ var shortycut;
     }
     shortycut.assertNotNull = assertNotNull;
     function getWindowLocationPath() {
-        var url = window.location.href.replace(/[#?].*/, '');
-        var index = url.lastIndexOf('/');
+        var url = window.location.href.replace(/[#?].*/, "");
+        var index = url.lastIndexOf("/");
         var lastPathSegment = url.substring(index + 1);
         if (lastPathSegment) {
-            if (0 <= lastPathSegment.indexOf('.')) {
+            if (0 <= lastPathSegment.indexOf(".")) {
                 return url.substring(0, index + 1);
             }
             else {
@@ -4215,6 +4378,14 @@ var shortycut;
         }
     }
     shortycut.getWindowLocationPath = getWindowLocationPath;
+    function forEachProperty(object, callback) {
+        Object.keys(object).forEach(function (key) { return callback(key, getProperty(object, key)); });
+    }
+    shortycut.forEachProperty = forEachProperty;
+    function getProperty(object, key) {
+        return object && "object" === typeof object ? object[key] : undefined;
+    }
+    shortycut.getProperty = getProperty;
 })(shortycut || (shortycut = {}));
 var shortycut;
 (function (shortycut) {
@@ -4223,7 +4394,7 @@ var shortycut;
     }
     shortycut.adjustCase = adjustCase;
     function replaceAll(source, search, replacement, caseSensitive) {
-        var result = '';
+        var result = "";
         if (!caseSensitive) {
             search = search.toLocaleLowerCase();
         }
@@ -4251,7 +4422,7 @@ var shortycut;
     }
     shortycut.endsWith = endsWith;
     function isUrl(text) {
-        for (var _i = 0, _a = ['http://', 'https://', 'ftp://', 'file://']; _i < _a.length; _i++) {
+        for (var _i = 0, _a = ["http://", "https://", "ftp://", "file://"]; _i < _a.length; _i++) {
             var protocol = _a[_i];
             if (startsWith(text, protocol)) {
                 return true;

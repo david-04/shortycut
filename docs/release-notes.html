@@ -141,6 +141,13 @@
             <div class="section">
               
                 <h1 id="release-notes"><img alt="" src="img/arrow.svg" /> Release notes</h1>
+<h2 id="version-14-2022-11-04">Version 1.4 | 2022-11-04</h2>
+<ul>
+<li>Introduced <a href="dynamic-links.html#dynamic-bookmarks">dynamic bookmarks</a></li>
+<li>Added the ability to dynamically <a href="dynamic-links.html#dynamic-multi-links">generate a variable number of links</a></li>
+<li>Updated and documented the TypeScript typings</li>
+<li>Performed technical maintenance (stricter linting and refactoring)</li>
+</ul>
 <h2 id="version-131-2022-09-23">Version 1.3.1 | 2022-09-23</h2>
 <ul>
 <li>Tweaked the homepage's suggestion filter (avoiding unnecessary full-text searches)</li>
@@ -153,39 +160,28 @@
 </ul>
 <h2 id="version-122-2021-08-07">Version 1.2.2 | 2021-08-07</h2>
 <ul>
-<li>Fixed an issue that caused domains to be listed under <a href="favicons.html#missing-favicons">missing favicons</a>
-  even if the favicon had already been downloaded</li>
+<li>Fixed an issue that caused domains to be listed under <a href="favicons.html#missing-favicons">missing favicons</a> even if the favicon had already been downloaded</li>
 <li>Added a TypeScript declaration file (<code>shortycut.d.ts</code>) for the ShortyCut API to the data (template) folder</li>
 </ul>
 <h2 id="version-121-2021-08-01">Version 1.2.1 | 2021-08-01</h2>
 <ul>
 <li>Added a CORS header to the <a href="web-server.html">web server</a> to allow resources to be accessed from all origins</li>
-<li>Fixed an issue that prevented <a href="favicons.html#missing-favicons">domains without favicons</a>
-  from being displayed in the list view when using a <a href="configuration.html#homepagefaviconsfetchservice">fetch service</a></li>
+<li>Fixed an issue that prevented <a href="favicons.html#missing-favicons">domains without favicons</a> from being displayed in the list view when using a <a href="configuration.html#homepagefaviconsfetchservice">fetch service</a></li>
 </ul>
 <h2 id="version-12-2020-10-09">Version 1.2 | 2020-10-09</h2>
 <ul>
-<li>Improved the <a href="favicons.html">favicon</a> loading speed by preloading all images on startup
-  and caching their known locations in the browser's local storage</li>
-<li>Added favicons to the interactive selection list
-  displayed when accessing <a href="multi-link-shortcuts.html">keywords with multiple links</a></li>
+<li>Improved the <a href="favicons.html">favicon</a> loading speed by preloading all images on startup and caching their known locations in the browser's local storage</li>
+<li>Added favicons to the interactive selection list displayed when accessing <a href="multi-link-shortcuts.html">keywords with multiple links</a></li>
 </ul>
 <h2 id="version-11-2020-09-26">Version 1.1 | 2020-09-26</h2>
 <ul>
-<li>Added the ability to <a href="loading-separate-files.html">load additional JavaScript files</a>,
-  so that large shortcut collections can be spread across multiple files</li>
-<li>Added support for <a href="dynamic-links.html">dynamic links</a>,
-  which allow keywords to redirect to different pages based on the search term</li>
-<li>Improved the way how <a href="hotkeys.html">hotkeys</a> are selected,
-  favoring letters that are uppercase or appear at the beginning of words</li>
-<li>Improved the homepage's ability to lock itself to a <a href="homepage.html">pinned browser tab</a>
-  by opening links to the manual in new tabs</li>
-<li>Improved the accessibility of the menu through the keyboard
-  when using a browser extension like Vimium</li>
-<li>Fixed an issue that could cause <a href="post-links.html">POST links</a> to fail or send wrong data
-  if the search term contained special characters like <code>&amp;</code> or <code>%</code></li>
-<li>Fixed an issue with the homepage's <a href="homepage.html">no-focus mode</a>
-  where control keys like <code>Alt</code> and <code>Ctrl</code> would still put the focus on the input field</li>
+<li>Added the ability to <a href="loading-separate-files.html">load additional JavaScript files</a>, so that large shortcut collections can be spread across multiple files</li>
+<li>Added support for <a href="dynamic-links.html">dynamic links</a>, which allow keywords to redirect to different pages based on the search term</li>
+<li>Improved the way how <a href="hotkeys.html">hotkeys</a> are selected, favoring letters that are uppercase or appear at the beginning of words</li>
+<li>Improved the homepage's ability to lock itself to a <a href="homepage.html">pinned browser tab</a> by opening links to the manual in new tabs</li>
+<li>Improved the accessibility of the menu through the keyboard when using a browser extension like Vimium</li>
+<li>Fixed an issue that could cause <a href="post-links.html">POST links</a> to fail or send wrong data if the search term contained special characters like <code>&amp;</code> or <code>%</code></li>
+<li>Fixed an issue with the homepage's <a href="homepage.html">no-focus mode</a> where control keys like <code>Alt</code> and <code>Ctrl</code> would still put the focus on the input field</li>
 </ul>
 <h2 id="version-10-2020-08-16">Version 1.0 | 2020-08-16</h2>
 <ul>

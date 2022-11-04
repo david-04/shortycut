@@ -141,21 +141,13 @@
             <div class="section">
               
                 <h1 id="web-server"><img alt="" src="img/arrow.svg" /> Web server</h1>
-<p>ShortyCut can be installed as the browser's default search engine when accessed through a web server.
-Once set up, keywords can be entered directly in the browser's address bar:</p>
+<p>ShortyCut can be installed as the browser's default search engine when accessed through a web server. Once set up, keywords can be entered directly in the browser's address bar:</p>
 <p><img alt="" src="img/web-server-address-bar.png" /></p>
-<p>This method requires a web server to run on the local machine
-or ShortyCut to be uploaded to a web hosting service.</p>
+<p>This method requires a web server to run on the local machine or ShortyCut to be uploaded to a web hosting service.</p>
 <h2 id="chromium-based-browsers"><img alt="" src="img/arrow.svg" /> Chromium-based browsers</h2>
-<p>It's not necessary to run a web server when using a Chromium-based browser.
-Instead, create a keyword query as the default search engine.
-See "<a href="keyword-query.html#chrome-and-other-chromium-based-browsers">Keyword query</a>" for details.
-For all other browsers follow the instructions below.</p>
+<p>It's not necessary to run a web server when using a Chromium-based browser. Instead, create a keyword query as the default search engine. See "<a href="keyword-query.html#chrome-and-other-chromium-based-browsers">Keyword query</a>" for details. For all other browsers follow the instructions below.</p>
 <h2 id="starting-the-built-in-web-server"><img alt="" src="img/arrow.svg" /> Starting the built-in web server</h2>
-<p>ShortyCut comes bundled with a small web server.
-It requires a Java runtime environment from Oracle (e.g. <a href="https://openjdk.java.net/">OpenJDK</a>) to be installed.
-The web server is located in the <code>resources</code> folder.
-On Windows, it can be started by double-clicking on <code>web-server.bat</code>.</p>
+<p>ShortyCut comes bundled with a small web server. It requires a Java runtime environment from Oracle (e.g. <a href="https://openjdk.java.net/">OpenJDK</a>) to be installed. The web server is located in the <code>resources</code> folder. On Windows, it can be started by double-clicking on <code>web-server.bat</code>.</p>
 <pre><code class="language-text">shortycut
   +-- data
   +-- resources
@@ -163,52 +155,32 @@ On Windows, it can be started by double-clicking on <code>web-server.bat</code>.
   |     +-- web-server.jar
   +-- index.html
 </code></pre>
-<p>It requires the environment variable <code>JAVA_HOME</code> or <code>PATH</code> to point to the folder where Java is installed.
-One of them should be set automatically when installing Java.
-On all other operating systems, the web server needs to be started manually via command line:</p>
+<p>It requires the environment variable <code>JAVA_HOME</code> or <code>PATH</code> to point to the folder where Java is installed. One of them should be set automatically when installing Java. On all other operating systems, the web server needs to be started manually via the command line:</p>
 <pre><code class="language-text">javaw -jar web-server.jar
 </code></pre>
-<p>The web server must be running whenever keywords are entered in the browser's address bar.
-It's best to create a start-up task to automatically restart the web server after each reboot.</p>
+<p>The web server must be running whenever keywords are entered in the browser's address bar. It's best to create a start-up task to automatically restart the web server after each reboot.</p>
 <h2 id="using-a-web-hosting-service"><img alt="" src="img/arrow.svg" /> Using a web hosting service</h2>
-<p>Rather than running a local web server, ShortyCut can also be uploaded to a web hosting service.
-However, it needs to be re-uploaded over and over again, whenever shortcuts are added, removed, or modified.
-Before uploading it for the first time, open <code>search.xml</code> from the <code>data</code> folder in a text editor
-and update the following two lines:</p>
+<p>Rather than running a local web server, ShortyCut can also be uploaded to a web hosting service. However, it needs to be re-uploaded over and over again, whenever shortcuts are added, removed, or modified. Before uploading it for the first time, open <code>search.xml</code> from the <code>data</code> folder in a text editor and update the following two lines:</p>
 <pre><code class="language-xml">&lt;Image width=&quot;16&quot; height=&quot;16&quot; type=&quot;image/x-icon&quot;&gt;http://localhost:4171/resources/favicon.ico&lt;/Image&gt;
 &lt;Url type=&quot;text/html&quot; template=&quot;http://localhost:4171/index.html?q={searchTerms}&quot; /&gt;
 </code></pre>
-<p>Replace <code>http://localhost:4171/</code> with the domain and path where ShortyCut will eventually be accessed
-(e.g. <code>https://www.my-website.com/shortycut/</code>).
-Then upload the whole ShortyCut folder to the web hosting server.</p>
+<p>Replace <code>http://localhost:4171/</code> with the domain and path where ShortyCut will eventually be accessed (e.g. <code>https://www.my-website.com/shortycut/</code>). Then upload the whole ShortyCut folder to the web hosting server.</p>
 <h2 id="add-search-engine-to-browser"><img alt="" src="img/arrow.svg" /> Add search engine to browser</h2>
-<p>To add ShortyCut as a search engine, open it through the web server.
-When using a web hosting service, use the domain and path where the uploaded files can be accessed
-(e.g. https://www.my-website.com/shortycut/).
-When running the built-in web server locally, go to:</p>
+<p>To add ShortyCut as a search engine, open it through the web server. When using a web hosting service, use the domain and path where the uploaded files can be accessed (e.g. https://www.my-website.com/shortycut/). When running the built-in web server locally, go to:</p>
 <p><a href="http://localhost:4171/">http://localhost:4171/</a></p>
-<p>If accessed through a web server (and not loaded directly from the disk drive),
-ShortyCut is detected automatically by the browser and can be added to the search engines:</p>
+<p>If accessed through a web server (and not loaded directly from the disk drive), ShortyCut is detected automatically by the browser and can be added to the search engines:</p>
 <p><img alt="" src="img/web-server-discover.png" /></p>
-<p>Once it has been added, keywords can be entered in the browser's search field.
-To be able to enter them in the address bar as well,
-select ShortyCut as the default search engine in the browser settings:</p>
+<p>Once it has been added, keywords can be entered in the browser's search field. To be able to enter them in the address bar as well, select ShortyCut as the default search engine in the browser settings:</p>
 <p><img alt="" src="img/web-server-default-search-engine.png" /></p>
 <p>After that, keywords can be entered directly in the browser's address bar:</p>
 <p><img alt="" src="img/web-server-address-bar.png" /></p>
-<p>Using ShortyCut as the default search engine will replace the address bar's default behavior.
-It will especially block suggestions that are usually displayed as you type.</p>
+<p>Using ShortyCut as the default search engine will replace the address bar's default behavior. It will especially block suggestions that are usually displayed as you type.</p>
 <h2 id="using-encrypted-connections"><img alt="" src="img/arrow.svg" /> Using encrypted connections</h2>
-<p>Some browsers only detect and accept search engines which are accessed via encrypted <code>https</code>.
-When using such a browser in combination with the built-in web server, open ShortyCut via this link:</p>
+<p>Some browsers only detect and accept search engines that are accessed via encrypted <code>https</code>. When using such a browser in combination with the built-in web server, open ShortyCut via this link:</p>
 <p><a href="https://localhost:4172/">https://localhost:4172/</a></p>
-<p>The built-in web server uses a self-signed certificate for the encryption.
-This will cause browser warnings.
-Confirm that the page should be trusted and opened nevertheless.</p>
+<p>The built-in web server uses a self-signed certificate for the encryption. This will cause browser warnings. Confirm that the page should be trusted and opened nevertheless.</p>
 <h2 id="configuring-the-built-in-web-server"><img alt="" src="img/arrow.svg" /> Configuring the built-in web server</h2>
-<p>The built-in web server has a few settings that can be tweaked.
-They are configured in <code>web-server.properties</code> located in the <code>data</code> folder.
-The file contains comments explaining the different settings.</p>
+<p>The built-in web server has a few settings that can be tweaked. They are configured in <code>web-server.properties</code> located in the <code>data</code> folder. The file contains comments explaining the different settings.</p>
               
             </div>
           </div>

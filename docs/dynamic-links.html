@@ -141,54 +141,37 @@
             <div class="section">
               
                 <h1 id="dynamic-links"><img alt="" src="img/arrow.svg" /> Dynamic links</h1>
-<p>ShortyCut allows to dynamically open different links based on the current search term.
-This is an advanced technique that requires JavaScript code to be written.
-It helps to reduce the overall number of keywords by reusing preexisting ones for similar queries.</p>
+<p>ShortyCut can dynamically open different pages based on the current search term. This is an advanced technique that requires JavaScript code to be written. It helps to reduce the overall number of keywords by reusing pre-existing ones for similar queries.</p>
 <h2 id="use-case"><img alt="" src="img/arrow.svg" /> Use case</h2>
-<p>Sometimes there are different ways of how information can be accessed and searched.
-The MkDocs' issues on GitHub, for example, can be accessed in various ways...</p>
+<p>Sometimes there are different ways how information can be accessed and searched. For example, the MkDocs' issues on GitHub can be accessed in various ways...</p>
 <ul>
-<li>Listing all issues<br>
+<li>List all issues<br>
   <a href="https://github.com/mkdocs/mkdocs/issues">https://github.com/mkdocs/mkdocs/issues</a></li>
-<li>Performing a full-text search<br>
+<li>Perform a full-text search<br>
   <a href="https://github.com/mkdocs/mkdocs/issues?q=style">https://github.com/mkdocs/mkdocs/issues?q=style</a></li>
-<li>Opening one specific issue<br>
+<li>Open one specific issue<br>
   <a href="https://github.com/mkdocs/mkdocs/issues/2163">https://github.com/mkdocs/mkdocs/issues/2163</a></li>
 </ul>
-<p>Creating separate keywords allows to quickly navigate to the most suitable page on a case-by-case basis:</p>
+<p>With separate keywords, the most suitable page can be quickly opened on a case-by-case basis:</p>
 <pre><code class="language-javascript">shortycut.addShortcuts(`
-
     [mkdli] MkDocs » List issues    https://github.com/mkdocs/mkdocs/issues
     [mkdsi] MkDocs » Search issues  https://github.com/mkdocs/mkdocs/issues?q=%s
     [mkdgi] MkDocs » Goto issue     https://github.com/mkdocs/mkdocs/issues/%s
 `);
 </code></pre>
-<p>This provides great flexibility but also increases the number of keywords.
-From a usability point of view, it would be better to have only one keyword for all links:</p>
+<p>This provides great flexibility but also increases the number of keywords. From a usability point of view, it would be better to have only one keyword for all links:</p>
 <pre><code class="language-javascript">shortycut.addShortcuts(`
-
     [mkdi]  MkDocs » Issues         https://github.com/mkdocs/mkdocs/issues
     [mkdi]  MkDocs » Search issues  https://github.com/mkdocs/mkdocs/issues?q=%s
     [mkdi]  MkDocs » Goto issue     https://github.com/mkdocs/mkdocs/issues/%s
 `);
 </code></pre>
-<p>ShortyCut distinguishes between bookmarks and queries.
-Bookmarks are static links like the issue listing - they always open the same page.
-Queries, on the other hand, contain the <code>%s</code> placeholder and require a search term.
-Both types can share the same keyword.
-If entered on its own, ShortyCut would use the bookmark.
-If the keyword is accompanied by a search term, the query would be used instead.</p>
-<p>In the above example, using only <code>mkdi</code> would open the issue listing, because that's the only bookmark for the keyword.
-But if a search term was entered as well, two queries (search issues and goto issue) would match.
-Depending on the configuration,
-ShortyCut would either open both links in separate tabs or display a list to manually choose from.</p>
-<p>Dynamic links avoid opening multiple tabs or having to choose from a list.
-They analyze the search term and automatically select the most suitable target page.</p>
-<h2 id="creating-dynamic-links"><img alt="" src="img/arrow.svg" /> Creating dynamic links</h2>
-<p>Dynamic links are simple JavaScript functions.
-They receive the search term as a parameter and return the applicable link as the result:</p>
+<p>ShortyCut distinguishes between bookmarks and queries. Bookmarks are static links like the issue listing - they always open the same page. Queries, on the other hand, contain the <code>%s</code> placeholder and require a search term. Both types can share the same keyword. If entered on its own, ShortyCut would use the bookmark. If the keyword is accompanied by a search term, the query would be used instead.</p>
+<p>In the above example, using only <code>mkdi</code> would open the issue listing, because that's the only bookmark for the keyword. But if a search term was entered as well, two queries (search issues and goto issue) would match. Depending on the configuration, ShortyCut would either open both links in separate tabs or display a list to manually choose from.</p>
+<p>Dynamic links avoid opening unneeded tabs or having to choose from a list. They analyze the search term and automatically select the most suitable target page.</p>
+<h2 id="dynamic-queries"><img alt="" src="img/arrow.svg" /> Dynamic queries</h2>
+<p>Dynamic queries are simple JavaScript functions. They receive the search term as a parameter and return the applicable link as the result:</p>
 <pre><code class="language-javascript">function mkDocsIssues(searchTerm) {
-
     if (searchTerm.trim().match(/^[0-9]+$/)) {
         return 'https://github.com/mkdocs/mkdocs/issues/%s';
     } else {
@@ -196,61 +179,120 @@ They receive the search term as a parameter and return the applicable link as th
     }
 }
 </code></pre>
-<p>The search term is passed in as regular text (i.e. not URL-encoded).
-Before embedding it into a link, it needs to be passed through <code>encodeURIComponent()</code>.
-However, it's easier to just return a link with the <code>%s</code> placeholder and let ShortyCut insert the search term.</p>
+<p>The search term is passed in as regular text (i.e. not URL-encoded). Before embedding it into a link, it needs to be passed through <code>encodeURIComponent()</code>. However, it's easier to just return a link with the <code>%s</code> placeholder and let ShortyCut insert the search term.</p>
 <p>The next step is to register the function:</p>
-<pre><code class="language-javascript">var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
+<pre><code class="language-javascript">var mkDocsIssuesUrl = shortycut.toQueryUrl(mkDocsIssues);
 </code></pre>
 <p>This generates a virtual link, which can be used like any other link when defining shortcuts:</p>
 <pre><code class="language-javascript">shortycut.addShortcuts(`
-
     [mkdi]  MkDocs » Issues  https://github.com/mkdocs/mkdocs/issues
     [mkdi]  MkDocs » Issues  ${ mkDocsIssuesUrl }
 `);
 </code></pre>
-<p>Interpolation with <code>${</code> and <code>}</code> only works for backtick (multi-line) strings.
-When using the legacy syntax for older browsers, the variable must be appended instead:</p>
+<p>Interpolation with <code>${</code> and <code>}</code> only works for backtick/multi-line strings. When using the legacy syntax for older browsers, the variable must be appended instead:</p>
 <pre><code class="language-javascript">shortycut.addShortcuts([
-
     '[mkdi]  MkDocs » Issues    https://github.com/mkdocs/mkdocs/issues',
     '[mkdi]  MkDocs » Issues' + mkDocsIssuesUrl
 ]);
 </code></pre>
-<p>With these shortcuts in place, there's only keyword to remember.
-Depending on the search term (if any), it opens the right page straight away.</p>
+<p>With these shortcuts in place, there's only one keyword to remember. It opens the right page, depending on the search term.</p>
+<h2 id="dynamic-bookmarks"><img alt="" src="img/arrow.svg" /> Dynamic bookmarks</h2>
+<p>Dynamic bookmarks are similar to dynamic queries. But rather than incorporating a search term, they generate links based on other factors. For example, picking the right news website might be based on the time of the day:</p>
+<pre><code class="language-js">function news() {
+    var hour = new Date().getHours();
+    if (hour &lt;= 8) {
+        return 'https://news.com.au/';
+    } else if (hour &lt;= 16) {
+        return 'https://www.news.co.uk/';
+    } else {
+        return 'https://www.washingtonpost.com/';
+    }
+}
+</code></pre>
+<p>Dynamic bookmark functions are registered and used just like dynamic queries:</p>
+<pre><code class="language-js">var mkDocsIssuesUrl = shortycut.toBookmarkUrl(news);
+shortycut.addShortcuts('[n] News' + mkDocsIssuesUrl);
+</code></pre>
+<p>Depending on the time of day, the shortcut opens a news website from Australia, the UK, or the US.</p>
+<h2 id="dynamic-multi-links"><img alt="" src="img/arrow.svg" /> Dynamic multi-links</h2>
+<p>Dynamic links can return more than one URL at a time. For example, the MkDocs issues and pull requests on GitHub have numeric IDs that can be used as search criteria. The dynamic query can identify if the search term is a number, but it can't decide if the number refers to an issue or a pull request.  But it can create two separate URLs and return them as an array:</p>
+<pre><code class="language-js">function searchMkDocsRepository(searchTerm) {
+    if (searchTerm.match(/^[0-9]+$/)) {
+        return [
+            'https://github.com/mkdocs/mkdocs/issues/%s',
+            'https://github.com/mkdocs/mkdocs/pulls/%s'
+        ];
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/search?q=%s';
+    }
+}
+</code></pre>
+<p>Using the shortcut with a number as the search term causes ShortyCut to open both links in new tabs. Closing the wrong page might be easier than having separate keywords and having to enter two search terms (one after the other).</p>
+<p>Dynamic link functions can also return multiple links that should be displayed as a list to choose from (see <a href="multi-link-shortcuts.html">Multi-link shortcuts</a> for an example). This is done by returning an array of objects that contain the URL and a description as separate properties:</p>
+<pre><code class="language-js">function searchMkDocsRepository(searchTerm) {
+    if (searchTerm.match(/^[0-9]+$/)) {
+        return [
+            {
+                url: 'https://github.com/mkdocs/mkdocs/issues/%s',
+                description: 'Issue with ID ' + searchTerm
+            },
+            {
+                url: 'https://github.com/mkdocs/mkdocs/pulls/%s',
+                description: 'Pull request with ID ' + searchTerm
+            }
+        ];
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/search?q=%s';
+    }
+}
+</code></pre>
+<p>If the dynamic link function shares the same keyword with other links, all of them need to be configured to show as a list. It's usually best to reserve a dedicated keyword for dynamic link functions that return multiple URLs with descriptions.</p>
 <h2 id="favicons"><img alt="" src="img/arrow.svg" /> Favicons</h2>
-<p>ShortyCut shows favicons on its homepage, if the configuration property
-<a href="configuration.html#homepagesuggestionsshowfavicons">showFavicons</a> is set to <code>true</code>:</p>
+<p>ShortyCut shows favicons on its homepage, if the configuration property <a href="configuration.html#homepagesuggestionsshowfavicons">showFavicons</a> is set to <code>true</code>:</p>
 <p><img alt="" src="img/favicons-suggestions.png" /></p>
-<p>For dynamic links, ShortyCut selects the favicon based on a sample URL,
-which it retrieves by passing the following search terms to the dynamic link function:</p>
+<p>For dynamic links, ShortyCut selects the favicon based on a sample URL, which it retrieves by passing the following search terms to the dynamic link function:</p>
 <ul>
 <li><code>undefined</code></li>
 <li><code>null</code></li>
 <li><code>''</code> (empty string)</li>
 <li><code>'1'</code> (as a string)</li>
 </ul>
-<p>Exceptions are discarded silently and the first valid URL returned is used to determine the favicon.
-Although usually not needed, a preferred domain can be nominated by returning a corresponding link
-when the search term is <code>null</code> or <code>undefined</code>:</p>
+<p>Exceptions are discarded silently and the first valid URL returned is used to determine the favicon. Although usually not needed, a preferred domain can be nominated by returning a corresponding link when the search term is <code>null</code> or <code>undefined</code>:</p>
 <pre><code class="language-javascript">function mkDocsIssues(searchTerm) {
-
-    if (undefined === searchTerm) {
+    if (null === searchTerm) {
         return 'https://www.mkdocs.org/';
-    }
-
-    if (searchTerm.trim().match(/^[0-9]+$/)) {
-        return 'https://github.com/mkdocs/mkdocs/issues/%s';
     } else {
-        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+        if (searchTerm.trim().match(/^[0-9]+$/)) {
+            return 'https://github.com/mkdocs/mkdocs/issues/%s';
+        } else {
+            return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+        }
     }
 }
 </code></pre>
-<p>This dynamic link redirects all queries to one of two GitHub pages,
-but uses the favicon of MkDoc's homepage (rather than the one from GitHub).</p>
-<p>There is no need to map the search term <code>null</code> or <code>undefined</code> to a dedicated URL,
-unless the favicons of links returned by the function anyway (GitHub in the example above) are unsuitable.</p>
+<p>This dynamic link redirects all queries to one of two GitHub pages but uses the favicon of MkDoc's homepage (rather than the one from GitHub).</p>
+<p>There is no need to map the search term <code>null</code> or <code>undefined</code> to a dedicated URL unless the favicons of links returned by the function anyway (GitHub in the example above) are unsuitable.</p>
+<p>Favicons for dynamic bookmarks are retrieved the same way as for dynamic queries. Although dynamic bookmark functions don't require a search term, the function can still declare and inspect a parameter. ShortyCut only passes it (as <code>null</code>, <code>''</code> or <code>'1'</code>) when scanning for favicons:</p>
+<pre><code class="language-js">function news(parameter) {
+    if (null === parameter) {
+        return [
+            'https://news.com.au/',
+            'https://www.news.co.uk/',
+            'https://www.washingtonpost.com/'
+        ];
+    } else {
+        var hour = new Date().getHours();
+        if (hour &lt;= 8) {
+            return 'https://news.com.au/';
+        } else if (hour &lt;= 16) {
+            return 'https://www.news.co.uk/';
+        } else {
+            return 'https://www.washingtonpost.com/';
+        }
+    }
+}
+</code></pre>
+<p>It is recommended that a dynamic link function returns all domains that it might redirect to. ShortyCut's homepage only uses the first link from the array. The other ones might still be used when displaying a list to choose from - rather than automatically opening all links in new tabs. Returning all possible domains allows ShortyCut to preload and cache the relevant favicons.</p>
               
             </div>
           </div>

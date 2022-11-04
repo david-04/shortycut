@@ -141,7 +141,8 @@
             <div class="section">
               
                 <h1 id="api"><img alt="" src="img/arrow.svg" /> API</h1>
-<p>ShortyCut provides functions that can be used to interact with it through JavaScript code.</p>
+<p>ShortyCut provides functions that can be used to interact with it through JavaScript code. It also ships with typings for TypeScript. </p>
+<p>The typings were previously contained in the <code>data-template</code> folder but have now been moved to the <code>resources</code> folder. Please delete <code>shortycut.d.ts</code> from your <code>data</code> folder and instead point your <code>tsconfig.json</code> to the <code>resources</code> folder. This will ensure that every update also re-applies the latest typings.</p>
 <h2 id="addshortcuts"><img alt="" src="img/arrow.svg" /> addShortcuts()</h2>
 <p>Add shortcut definitions, for example as a multi-line string with one shortcut per line:</p>
 <pre><code class="language-javascript">shortycut.addShortcuts(`
@@ -149,8 +150,7 @@
     [ebay]    Search eBay  https://www.ebay.com.au/sch/i.html?_nkw=%s
 `);
 </code></pre>
-<p>A few older browsers (like Internet Explorer) don't support the multi-line syntax.
-When using such a browser, the shortcuts need to be passed as an array of strings instead:</p>
+<p>A few older browsers (like Internet Explorer) don't support the multi-line syntax. When using such a browser, the shortcuts need to be passed as an array of strings instead:</p>
 <pre><code class="language-javascript">shortycut.addShortcuts([
     '[sunnies] Sunglasses   https://www.ebay.com.au/sch/i.html?_nkw=sunglasses',
     '[ebay]    Search eBay  https://www.ebay.com.au/sch/i.html?_nkw=%s'
@@ -167,24 +167,16 @@ When using such a browser, the shortcuts need to be passed as an array of string
     }
 });
 </code></pre>
-<p>The supported options are described in "<a href="configuration.html">Configuration</a>".
-It is not necessary to pass all of them and the function can be called multiple times.
-When modifying the same settings, subsequent calls override previous ones.</p>
+<p>The supported options are described in "<a href="configuration.html">Configuration</a>". It is not necessary to pass all of them and the function can be called multiple times. When modifying the same settings, subsequent calls override previous ones.</p>
 <h2 id="loadjavascript"><img alt="" src="img/arrow.svg" /> loadJavaScript()</h2>
-<p>Load additional JavaScript files.
-This function can be called repeatedly and accepts multiple files.
-All files - including separate calls to <code>loadJavaScript()</code> - are loaded in parallel, i.e. the order is unpredictable.
-This can be changed by using <code>andThen()</code> to model dependencies:</p>
+<p>Load additional JavaScript files. This function can be called repeatedly and accepts multiple files. All files - including separate calls to <code>loadJavaScript()</code> - are loaded in parallel, i.e. the order is unpredictable. This can be changed by using <code>andThen()</code> to model dependencies:</p>
 <pre><code>shortycut.loadJavaScript('shared-shortcuts.js', 'tools.js')
                 .andThen('additional-tools.js')
                 .andThen('shortcuts-01.js', 'shortcuts-02.js');
 </code></pre>
-<p>Files are loaded from (or relative to) ShortyCut's <code>data</code> folder,
-unless a complete URL (including a protocol like <code>https://</code> or <code>file://</code>) is passed.
-See "<a href="loading-separate-files.html">Loading separate files</a>" for further details.</p>
-<h2 id="tourl"><img alt="" src="img/arrow.svg" /> toUrl()</h2>
-<p>Register a function that generates dynamic links based on the current search term.
-The call to <code>toUrl()</code> returns a virtual link that can be used like any other URL when defining shortcuts:</p>
+<p>Files are loaded from (or relative to) ShortyCut's <code>data</code> folder unless a complete URL (including a protocol like <code>https://</code> or <code>file://</code>) is passed. See "<a href="loading-separate-files.html">Loading separate files</a>" for further details.</p>
+<h2 id="tobookmarkurl"><img alt="" src="img/arrow.svg" /> toBookmarkUrl()</h2>
+<p>Register a function that generates dynamic links (without requiring a search term). The call to <code>toBookmarkUrl()</code> returns a virtual link (as a <code>string</code>) that can be used like any other URL when defining shortcuts:</p>
 <pre><code class="language-javascript">function mkDocsIssues(searchTerm) {
     if (searchTerm.trim().match(/^[0-9]+$/)) {
         return 'https://github.com/mkdocs/mkdocs/issues/%s';
@@ -192,13 +184,25 @@ The call to <code>toUrl()</code> returns a virtual link that can be used like an
         return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
     }
 }
-
 var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
-
 shortycut.addShortcuts('[mkdi] MkDocs Issues ' + mkDocsIssuesUrl`);
 </code></pre>
-<p>When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.
-See "<a href="dynamic-links.html">Dynamic links</a>" for details.</p>
+<p>When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.</p>
+<p>Dynamic bookmark functions can also return multiple links to show as a list or to open in new tabs. See "<a href="dynamic-links.html#dynamic-bookmarks">Dynamic links</a>" for details.</p>
+<h2 id="toqueryurl"><img alt="" src="img/arrow.svg" /> toQueryUrl()</h2>
+<p>Register a function that generates dynamic links based on the current search term. The call to <code>toQueryUrl()</code> returns a virtual link (as a <code>string</code>) that can be used like any other URL when defining shortcuts:</p>
+<pre><code class="language-javascript">function mkDocsIssues(searchTerm) {
+    if (searchTerm.trim().match(/^[0-9]+$/)) {
+        return 'https://github.com/mkdocs/mkdocs/issues/%s';
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/issues?q=%s';
+    }
+}
+var mkDocsIssuesUrl = shortycut.toUrl(mkDocsIssues);
+shortycut.addShortcuts('[mkdi] MkDocs Issues ' + mkDocsIssuesUrl`);
+</code></pre>
+<p>When the keyword is used, ShortyCut calls the respective function to obtain the applicable link.</p>
+<p>Dynamic query functions can also return multiple links to show as a list or to open in new tabs. See "<a href="dynamic-links.html#dynamic-queries">Dynamic links</a>" for details.</p>
               
             </div>
           </div>
