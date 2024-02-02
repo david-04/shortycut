@@ -1,10 +1,6 @@
 .PHONY : autorun tsc watch docs mkd build release clean
 
-VERSION=$(shell \
-	grep "^##.*Version [0-9]\+.[0-9]\+" ./src/docs/release-notes.md \
-		| head -1 \
-		| sed 's/^.*Version\s*//;s/\s.*//' \
-)
+VERSION=$(shell grep -E "^## \[Version [0-9.]+\]" src/docs/release-notes.md | head -1 | sed 's/^.*Version\s*//;s/\].*//')
 SHORTYCUT_ZIP=shortycut-$(VERSION).zip
 
 #-----------------------------------------------------------------------------------------------------------------------
