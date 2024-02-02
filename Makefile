@@ -77,7 +77,7 @@ build/$(SHORTYCUT_ZIP) : docs \
 src/html/resources/docs/index.html : $(wildcard src/docs/* src/docs/*/* src/docs/*/*/*)
 	echo src/html/resources/docs
 	rm -rf src/html/resources/docs
-	-python -m mkdocs build -f src/mkdocs.yml -c 2>&1 \
+	-mkdocs build -f src/mkdocs.yml -c 2>&1 \
 		| grep -vE "(Cleaning site directory|Building documentation to directory|Documentation built in)"
 	@$(foreach file, \
 	           $(patsubst src/docs/%.md, src/html/resources/docs/%.html, $(wildcard src/docs/*.md)) \
@@ -92,7 +92,7 @@ src/html/resources/docs/index.html : $(wildcard src/docs/* src/docs/*/* src/docs
  					> $(file).tmp; \
 			   mv -f $(file).tmp $(file);)
 	rm $(patsubst %, src/html/resources/docs/%, sitemap.xml*)
-	rm -r src/html/resources/docs/fonts
+	rm -r src/html/resources/docs/css/fonts
 
 #-----------------------------------------------------------------------------------------------------------------------
 # build/resources/*
