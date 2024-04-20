@@ -1,5 +1,9 @@
 # ![](img/arrow.svg) Release notes
 
+## [Version 1.4.2](https://github.com/david-04/shortycut/releases/tag/v1.4.2) | 2024-04-20
+
+- Tweak CSS colors to work with the latest [Dark Reader](https://darkreader.org) release
+
 ## [Version 1.4.1](https://github.com/david-04/shortycut/releases/tag/v1.4.1) | 2024-02-03
 
 - Re-generated documentation with latest MkDocs version (upgrading jQuery from 2 to 3)

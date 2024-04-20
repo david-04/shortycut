@@ -4329,7 +4329,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return "1.4.1".replace(/^##.*/, "");
+        return "1.4.2".replace(/^##.*/, "");
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {
