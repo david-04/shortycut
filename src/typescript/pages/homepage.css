@@ -93,8 +93,7 @@
 }
 
 #home .suggestions .row:nth-child(odd) .row-content {
-    background-color: #e5e5e5;
-    color: black;
+    background-color: #99999926;
 }
 
 #home .suggestions .row:last-child {
@@ -149,6 +148,7 @@
 
 #home .suggestions .matched-substring {
     background-color: #ffff7b;
+    color: black;
 }
 
 #home .suggestions .row:nth-child(odd):not(.selected):not(.segment) .more-indicator-text {
