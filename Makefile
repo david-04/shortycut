@@ -8,13 +8,12 @@ SHORTYCUT_ZIP=shortycut-$(VERSION).zip
 #-----------------------------------------------------------------------------------------------------------------------
 
 help :
-	echo
-	echo "    tsc ....... compile TypeScript"
-	echo "    watch ..... watch and re-compile TypeScript"
-	echo "    docs ...... create documentation in src/html/resources"
-	echo "    mkd ....... start the MkDocs server in watch mode"
-	echo "    build ..... create $(SHORTYCUT_ZIP)"
-	echo "    release ... update the GitHub Pages documentation"
+	$(info $() $() tsc ....... compile TypeScript)
+	$(info $() $() watch ..... watch and re-compile TypeScript)
+	$(info $() $() docs ...... create documentation in src/html/resources)
+	$(info $() $() mkd ....... start the MkDocs server in watch mode)
+	$(info $() $() build ..... create $(SHORTYCUT_ZIP))
+	$(info $() $() release ... update the GitHub Pages documentation)
 
 tsc : src/html/resources/shortycut.js;
 
