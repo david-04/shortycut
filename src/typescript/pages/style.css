@@ -38,11 +38,11 @@ body {
     line-height: 1.3em;
 }
 
-.utility-page > * {
+.utility-page>* {
     width: 100%;
 }
 
-.utility-page > div:not(:last-child) {
+.utility-page>div:not(:last-child) {
     margin-bottom: 2em;
 }
 
@@ -54,6 +54,8 @@ body {
     padding: 0.3em;
     font-weight: normal;
     margin-bottom: 1.2em;
+    border-top: 1px solid #aaaaaa;
+    border-bottom: 1px solid #aaaaaa;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */

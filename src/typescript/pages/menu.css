@@ -13,13 +13,13 @@
     top: 0;
     right: 0;
     padding: 1.5em 1.5em 0 0;
-    opacity: 0.5;
+    opacity: 0.80;
 }
 
 #menu .burger-icon div {
     width: 25px;
     height: 4px;
-    background-color: #555;
+    background-color: #888;
     margin-bottom: 4px;
     border-radius: 3px;
 }
@@ -39,7 +39,7 @@
     top: 1.3em;
     width: 1.6em;
     height: 1.44em;
-    opacity: 0.5;
+    opacity: 0.80;
     display: none;
 }
 
@@ -52,7 +52,7 @@
     height: 1.44em;
     width: 0.2em;
     border-radius: 0.16em;
-    background-color: #444444;
+    background-color: #888;
 }
 
 #menu .close-icon:before {
@@ -83,7 +83,7 @@
 #menu .items a {
     display: block;
     text-decoration: none;
-    color: inherit;
+    color: black;
     outline: none;
     width: 100%;
     padding: 0.4em;
