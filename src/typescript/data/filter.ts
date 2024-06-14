@@ -282,7 +282,7 @@ namespace shortycut {
         private static initializeDictionary() {
             return new DictionaryItem(
                 0, shortcuts.values.sort(
-                    comparing(s => (s.bookmarks?.current ?? assertNotNull(s.queries).current)[0].segments.description)
+                    comparing(s => (s.bookmarks?.current[0].segments.description ?? s.queries?.current[0].segments.description ?? ""))
                 )
             );
         }

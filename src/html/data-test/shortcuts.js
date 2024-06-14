@@ -23,7 +23,7 @@ function dynamicQueryTabs(_searchTerm) {
 }
 
 function dynamicQueryMenu(_searchTerm) {
-    return [1, 1 + 1].map(index => ({description: `Query ${index}`, url: url(`Dynamic query - Menu[${index}] - %s`)}));
+    return [1, 1 + 1].map(index => ({ description: `Query ${index}`, url: url(`Dynamic query - Menu[${index}] - %s`) }));
 }
 
 function dynamicBookmarkSingle() {
@@ -35,7 +35,7 @@ function dynamicBookmarkTabs() {
 }
 
 function dynamicBookmarkMenu() {
-    return [1, 1 + 1].map(index => ({description: `Bookmark ${index}`, url: url(`Dynamic bookmark - Menu[${index}]`)}));
+    return [1, 1 + 1].map(index => ({ description: `Bookmark ${index}`, url: url(`Dynamic bookmark - Menu[${index}]`) }));
 }
 
 function dynamicBookmarkBroken() {
