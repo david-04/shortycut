@@ -1691,7 +1691,7 @@ var shortycut;
             configurable: true
         });
         Filter.initializeDictionary = function () {
-            return new DictionaryItem(0, shortycut.shortcuts.values.sort(shortycut.comparing(function (s) { var _a, _b; return ((_b = (_a = s.bookmarks) === null || _a === void 0 ? void 0 : _a.current) !== null && _b !== void 0 ? _b : shortycut.assertNotNull(s.queries).current)[0].segments.description; })));
+            return new DictionaryItem(0, shortycut.shortcuts.values.sort(shortycut.comparing(function (s) { var _a, _b, _c, _d; return ((_d = (_b = (_a = s.bookmarks) === null || _a === void 0 ? void 0 : _a.current[0].segments.description) !== null && _b !== void 0 ? _b : (_c = s.queries) === null || _c === void 0 ? void 0 : _c.current[0].segments.description) !== null && _d !== void 0 ? _d : ""); })));
         };
         Object.defineProperty(Filter.prototype, "allLinks", {
             get: function () {
@@ -4329,7 +4329,7 @@ var shortycut;
     }
     shortycut.comparing = comparing;
     function getVersionNumber() {
-        return "1.4.2".replace(/^##.*/, "");
+        return "1.4.3".replace(/^##.*/, "");
     }
     shortycut.getVersionNumber = getVersionNumber;
     function supportsBacktickSyntax() {
