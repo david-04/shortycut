@@ -84,7 +84,7 @@ namespace shortycut {
                 const result = analyzeUrls(dynamicLinkFunction(searchTerm as unknown as string));
                 result.valid.forEach(url => valid.push(url));
                 result.invalid.forEach(url => invalid.push(url));
-            } catch (_ignored) { }
+            } catch { }
         }
 
         if (invalid.length) {

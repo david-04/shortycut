@@ -86,8 +86,6 @@ namespace shortycut {
     export function runAndIgnoreErrors(callback: () => void) {
         try {
             callback();
-        } catch (exception) {
-            // ignored
-        }
+        } catch { }
     }
 }

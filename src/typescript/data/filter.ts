@@ -99,7 +99,7 @@ namespace shortycut {
             let count = 0;
             for (const shortcut of shortcuts) {
                 for (const match of shortcut.getSegmentMatches(this.level)) {
-                    const nonPartialMatch = matches.values.filter(item => item.match.keyword === match.keyword)[0];
+                    const nonPartialMatch = matches.values.find(item => item.match.keyword === match.keyword);
                     if (nonPartialMatch) {
                         nonPartialMatch.match.hidesMoreChildren = true;
                         continue;

@@ -36,14 +36,14 @@ namespace shortycut {
         return !!pattern
             && !!line
             && pattern.length <= line.length
-            && line.substring(0, pattern.length) === pattern;
+            && line.startsWith(pattern);
     }
 
     export function endsWith(line?: string, pattern?: string): boolean {
         return !!pattern
             && !!line
             && pattern.length <= line.length
-            && line.substring(line.length - pattern.length, line.length) === pattern;
+            && line.endsWith(pattern);
     }
 
     //------------------------------------------------------------------------------------------------------------------

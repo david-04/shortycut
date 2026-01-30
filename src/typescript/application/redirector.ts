@@ -19,7 +19,7 @@ namespace shortycut {
 
             const shortcut = shortcuts.get(queryParameters.keyword) || undefined;
             const { setup, redirect } = queryParameters;
-            const isHomepageKeyword = config.homepage.keywords.some(keyword => keyword === queryParameters.keyword);
+            const isHomepageKeyword = config.homepage.keywords.includes(queryParameters.keyword);
 
             if (setup) {
                 document.title = "ShortyCut";
@@ -98,14 +98,12 @@ namespace shortycut {
             } else if (1 < finalizedLinks.links.length && finalizedLinks.onMultiLink === OnMultiLink.SHOW_MENU) {
                 this.showRedirectPage = false;
                 setTimeout(() => router.goto(pages.shortlist.populate(finalizedLinks)), 0);
+            } else if (this.alwaysOpenNewTabs) {
+                urls.forEach(link => globalThis.open(link.permalink));
+                router.goBackToAndResetHomepage();
             } else {
-                if (this.alwaysOpenNewTabs) {
-                    urls.forEach(link => window.open(link.permalink));
-                    router.goBackToAndResetHomepage();
-                } else {
-                    urls.slice(1).forEach(link => window.open(link.permalink));
-                    this.openLink(htmlDescription, urls[0], mode);
-                }
+                urls.slice(1).forEach(link => globalThis.open(link.permalink));
+                this.openLink(htmlDescription, urls[0], mode);
             }
         }
 
@@ -143,11 +141,11 @@ namespace shortycut {
         public openUrl(url: string, mode: RedirectMode) {
 
             if (RedirectMode.PRESERVE_HISTORY === mode && !this.alwaysOpenNewTabs) {
-                window.location.href = url;
+                globalThis.location.href = url;
             } else if (RedirectMode.ERASE_HISTORY === mode && !this.alwaysOpenNewTabs) {
-                window.location.replace(url);
+                globalThis.location.replace(url);
             } else {
-                window.open(url);
+                globalThis.open(url);
                 if (this.alwaysOpenNewTabs) {
                     router.goBackToAndResetHomepage();
                 }

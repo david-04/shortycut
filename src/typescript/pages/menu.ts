@@ -135,9 +135,9 @@ namespace shortycut {
             this.closeMenu();
             const url = "https://github.com/david-04/shortycut";
             if (queryParameters.facets.newTabs) {
-                window.open(url);
+                globalThis.open(url);
             } else {
-                window.location.href = url;
+                globalThis.location.href = url;
             }
             return this.cancelEvent(event);
         }
@@ -146,9 +146,9 @@ namespace shortycut {
             this.closeMenu();
             const url = getWindowLocationPath() + "resources/docs/index.html";
             if (queryParameters.facets.newTabs) {
-                window.open(url);
+                globalThis.open(url);
             } else {
-                window.location.href = url;
+                globalThis.location.href = url;
             }
             return this.cancelEvent(event);
         }

@@ -36,9 +36,7 @@ namespace shortycut {
     export function supportsBacktickSyntax() {
         try {
             eval('window["shortycutBrowserTest"] = `success`');
-        } catch (exception) {
-            // ignored
-        }
+        } catch { }
         const valueMatches = "success" === window.shortycutBrowserTest;
         delete window.shortycutBrowserTest;
         return valueMatches;
@@ -73,7 +71,7 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function getWindowLocationPath() {
-        const url = window.location.href.replace(/[#?].*/, "");
+        const url = globalThis.location.href.replace(/[#?].*/, "");
         const index = url.lastIndexOf("/");
         const lastPathSegment = url.substring(index + 1);
         if (lastPathSegment) {

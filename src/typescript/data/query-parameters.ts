@@ -26,7 +26,7 @@ namespace shortycut {
 
             this.queryParameters = this.getQueryParameters();
 
-            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, "").replace(/\+/g, " ");
+            this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, "").replaceAll("+", " ");
             this.keyword = adjustCase(this.fullQuery).replace(/\s.*/, "");
             this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, "");
             const redirect = this.queryParameters.get(QueryParameters.REDIRECT);
@@ -36,7 +36,7 @@ namespace shortycut {
                 .getOrDefault(QueryParameters.FACETS, "")
                 .split(",")
                 .map(facet => facet.trim().toLowerCase())
-                .filter(facet => facet)
+                .filter(Boolean)
                 .forEach(facet => this.applyFacet(facet));
         }
 
@@ -60,10 +60,10 @@ namespace shortycut {
 
         private getQueryParameters() {
             const result = new Hashtable<string>();
-            if (!window.location.search) {
+            if (!globalThis.location.search) {
                 return result;
             }
-            for (const parameter of window.location.search.trim().replace(/^\?/, "").trim().split("&")) {
+            for (const parameter of globalThis.location.search.trim().replace(/^\?/, "").trim().split("&")) {
                 const index = parameter.indexOf("=");
                 if (0 < index) {
                     const key = this.urlDecode(parameter.substring(0, index));
@@ -81,7 +81,7 @@ namespace shortycut {
         private urlDecode(value: string) {
             try {
                 return decodeURIComponent(value).trim();
-            } catch (error) {
+            } catch {
                 throw new Exception("URL syntax error",
                     create("p", "A query parameter passed in the URL is not url-encoded:"),
                     create("p", value)

@@ -52,18 +52,16 @@ namespace shortycut {
                 shortcuts.delete(config.defaultSearchEngine.keyword);
             }
 
-            if (!defaultSearchEngine) {
-                defaultSearchEngine = new Shortcut(
-                    "config.defaultSearchEngine.keyword",
-                    [],
-                    OnMultiLink.SHOW_MENU,
-                    [
-                        "https://duckduckgo.com/?q=",
-                        config.shortcutFormat.url.searchTermPlaceholder,
-                        "&kah=us-en%2Chk-tzh&kav=1&kam=google-maps&kak=-1&kax=-1&kaq=-1&kap=-1&kao=-1&kau=-1"
-                    ].join("")
-                );
-            }
+            defaultSearchEngine ??= new Shortcut(
+                "config.defaultSearchEngine.keyword",
+                [],
+                OnMultiLink.SHOW_MENU,
+                [
+                    "https://duckduckgo.com/?q=",
+                    config.shortcutFormat.url.searchTermPlaceholder,
+                    "&kah=us-en%2Chk-tzh&kav=1&kam=google-maps&kak=-1&kax=-1&kaq=-1&kap=-1&kao=-1&kau=-1"
+                ].join("")
+            );
         }
 
         private handleParserError(exception: unknown) {
@@ -157,7 +155,7 @@ namespace shortycut {
             const index = this.KNOWN_PROTOCOLS
                 .map(protocol => lineLowerCase.indexOf(protocol))
                 .filter(matchIndex => 0 <= matchIndex)
-                .reduce((a, b) => a < b ? a : b, line.length);
+                .reduce((a, b) => Math.min(a, b), line.length);
             if (index < line.length) {
                 return { isStandardProtocol: true, url: line.substring(index) };
             } else {
@@ -295,7 +293,7 @@ namespace shortycut {
             for (const originalKeyword of keywords.split(config.shortcutFormat.keyword.separator || /\s+/)) {
                 const keyword = originalKeyword.trim();
                 if (keyword) {
-                    if (keyword.match(/\s/)) {
+                    if (/\s/.test(keyword)) {
                         throw new ParserError(`The keyword "${keyword}" contains whitespace`, context.line);
                     } else {
                         result.push(adjustCase(keyword));
@@ -361,12 +359,12 @@ namespace shortycut {
                 for (let index = 1; index < sections.length; index = index + (repeat ? 0 : 1)) {
                     const keywordChar = adjustCase(keyword.charAt(index - 1));
                     const sectionChar = adjustCase(sections[index].charAt(0));
-                    if (keywordChar !== sectionChar) {
+                    if (keywordChar === sectionChar) {
+                        repeat = false;
+                    } else {
                         sections[index - 1] += sections[index];
                         sections.splice(index, 1);
                         repeat = true;
-                    } else {
-                        repeat = false;
                     }
                 }
                 return new Segment(keyword, keyword.length + 1 === sections.length ? sections : [sections.join("")]);

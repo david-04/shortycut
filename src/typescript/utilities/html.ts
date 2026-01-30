@@ -5,11 +5,9 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     export function sanitize(content: string): string {
-        if ("string" !== typeof content) {
-            return content;
-        } else {
-            return content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-        }
+        return "string" === typeof content
+            ? content.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll('"', "&quot;")
+            : content;
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -55,12 +53,12 @@ namespace shortycut {
         }
 
         private static parse(type: string) {
-            const array = type.split(/(?=[.#:])/).map(token => token.trim()).filter(token => token);
+            const array = type.split(/(?=[.#:])/).map(token => token.trim()).filter(Boolean);
             return new ElementProperties(
                 array[0],
-                array.filter(item => "." === item.charAt(0)).map(item => item.substring(1)).join(" "),
-                array.some(item => item === ":html"),
-                array.filter(item => "#" === item.charAt(0)).map(item => item.substring(1))[0]
+                array.filter(item => item.startsWith(".")).map(item => item.substring(1)).join(" "),
+                array.includes(":html"),
+                array.filter(item => item.startsWith("#")).map(item => item.substring(1))[0]
             );
         }
     }

@@ -34,23 +34,23 @@ namespace shortycut {
                     this.dom.header.style.display = "none";
                 } else {
                     this.setupComplete = true;
-                    redirector.openUrl(window.location.href.replace(/\?.*/, ""), RedirectMode.PRESERVE_HISTORY);
+                    redirector.openUrl(globalThis.location.href.replace(/\?.*/, ""), RedirectMode.PRESERVE_HISTORY);
                 }
             }
 
             let indexPath = "shortycut";
-            if (0 === window.location.href.search(/^(file:\/{2}|[a-z]:|\/)/i)) {
+            if (0 === globalThis.location.href.search(/^(file:\/{2}|[a-z]:|\/)/i)) {
                 indexPath = getWindowLocationPath()
                     .replace(/^file:\/+/, "")
                     .replace(/[?#].*/, "")
                     .replace(/\/$/, "");
                 if (":" === indexPath.charAt(1)) {
-                    indexPath = indexPath.replace(/\//g, "\\");
+                    indexPath = indexPath.replaceAll("/", "\\");
                 }
             }
             this.dom.rootPath.innerHTML = sanitize(indexPath);
 
-            this.dom.pre.innerHTML = this.dom.pre.innerHTML.replace(/\n[ \t]+/g, "\n");
+            this.dom.pre.innerHTML = this.dom.pre.innerHTML.replaceAll(/\n[ \t]+/g, "\n");
 
             this.dom.syntaxWarning.style.display = supportsBacktickSyntax() ? "none" : "block";
 

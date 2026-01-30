@@ -169,7 +169,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         public static constructFinalizedPermalink(finalizedUrl: string, finalizedPostFields?: FinalizedPostFields) {
-            const baseUrl = window.location.href.replace(/[#?].*/g, "");
+            const baseUrl = globalThis.location.href.replaceAll(/[#?].*/g, "");
             const json: FinalizedUrlBase = { url: finalizedUrl, postFields: finalizedPostFields };
             const redirect = encodeURIComponent(JSON.stringify(json));
             return `${baseUrl}?${QueryParameters.REDIRECT}=${redirect}`;
@@ -193,7 +193,7 @@ namespace shortycut {
             if (!this._filterSummary) {
                 this._filterSummary = `${this.keyword} ${this.segments.description}`
                     .toLocaleLowerCase()
-                    .replace(/\s/g, "");
+                    .replaceAll(/\s/g, "");
             }
             return this._filterSummary;
         }
@@ -222,7 +222,7 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private static constructFinalizedPostFields(postFields: string | undefined, searchTerm: string) {
-            return postFields?.split("&").filter(field => field)
+            return postFields?.split("&").filter(Boolean)
                 .map(field => this.constructFinalizedPostField(field, searchTerm));
         }
 
@@ -241,7 +241,7 @@ namespace shortycut {
                 const key = decodeURIComponent(this.insertSearchTerm(parameter.substring(0, index), searchTerm));
                 const value = decodeURIComponent(this.insertSearchTerm(parameter.substring(index + 1), searchTerm));
                 return { key, value };
-            } catch (exception) {
+            } catch {
                 throw new Exception(
                     "Shortcut definition error", `Post parameter ${sanitize(parameter)} is not URL encoded`
                 );

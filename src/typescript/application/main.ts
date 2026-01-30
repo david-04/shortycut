@@ -8,13 +8,13 @@ namespace shortycut {
 
     export function initialize() {
 
-        window.addEventListener("error", exception => startupCache.exceptions.push(exception));
+        globalThis.addEventListener("error", exception => startupCache.exceptions.push(exception));
 
-        if (document && document.title !== undefined) {
+        if (document?.title !== undefined) {
             document.title = "...";
         }
 
-        window.addEventListener("DOMContentLoaded", () => {
+        globalThis.addEventListener("DOMContentLoaded", () => {
             document.title = "...";
             ["icon", "shortcut icon"].forEach(rel => addLink(rel, "image/x-icon", "resources/favicon.ico", ""));
             addLink("search", "application/opensearchdescription+xml", "data/search.xml", "ShortyCut");
@@ -51,14 +51,14 @@ namespace shortycut {
         if ("undefined" !== typeof __SHORTYCUT_BODY_INNER_HTML) {
             document.body.innerHTML = __SHORTYCUT_BODY_INNER_HTML;
         }
-        const self = window.location.href.replace(/[?#].*/, "");
-        document.body.innerHTML = document.body.innerHTML.replace(/self:\/\//g, self);
+        const self = globalThis.location.href.replace(/[?#].*/, "");
+        document.body.innerHTML = document.body.innerHTML.replaceAll("self://", self);
 
         initializeVariables();
         applyAndValidateConfig();
 
         if (!startupCache.config.length && !queryParameters.setup) {
-            window.location.href = `${window.location.href.replace(/[#?].*/, "")}?${QueryParameters.SETUP}=welcome`;
+            globalThis.location.href = `${globalThis.location.href.replace(/[#?].*/, "")}?${QueryParameters.SETUP}=welcome`;
             return;
         }
 
@@ -68,13 +68,12 @@ namespace shortycut {
     function onParseShortcutsComplete(result: unknown) {
         if (result instanceof Exception) {
             throw result;
-        } else {
-            if (queryParameters.facets.newTabs) {
-                addBlankTargetToAllLinksOnPage();
-            }
-            faviconManager = new FaviconManager();
-            redirector.processQuery();
         }
+        if (queryParameters.facets.newTabs) {
+            addBlankTargetToAllLinksOnPage();
+        }
+        faviconManager = new FaviconManager();
+        redirector.processQuery();
     }
 
     function addBlankTargetToAllLinksOnPage() {

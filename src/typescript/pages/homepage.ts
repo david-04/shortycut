@@ -31,7 +31,7 @@ namespace shortycut {
 
         private static readonly MAX_SUGGESTIONS = 12;
         private readonly filter = new Filter(Homepage.MAX_SUGGESTIONS);
-        private suggestions = new Array<Suggestion>();
+        private readonly suggestions = new Array<Suggestion>();
         private selectedIndex = -1;
         private originalInput = "";
         private previousInput?: string;
@@ -111,13 +111,13 @@ namespace shortycut {
             this.addEventHandlers();
             this.dom.home.style.display = "flex";
             this.dom.filter.focus();
-            this.updateFaviconManagerParameters(true);
+            this.updateFaviconManagerParametersWhenHomepageIsVisible();
         }
 
         public hide() {
             this.removeEventHandlers();
             this.dom.home.style.display = "none";
-            this.updateFaviconManagerParameters(false);
+            this.updateFaviconManagerParametersWhenHomepageIsNotVisible();
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -129,13 +129,13 @@ namespace shortycut {
                 this.dom.filter.addEventListener(event, this.onFilterChanged)
             );
             ["focus", "blur"].forEach(event =>
-                [window, document, document.body, this.dom.filter].forEach(element =>
+                [globalThis, document, document.body, this.dom.filter].forEach(element =>
                     element.addEventListener(event, this.onFocusEvent)
                 )
             );
             if (queryParameters.facets.noFocus) {
                 ["mousedown", "keydown", "blur"].forEach(event =>
-                    window.addEventListener(event, this.cancelClearFilter)
+                    globalThis.addEventListener(event, this.cancelClearFilter)
                 );
                 this.dom.filter.addEventListener("blur", this.scheduleClearFilter);
             }
@@ -147,13 +147,13 @@ namespace shortycut {
                 this.dom.filter.removeEventListener(event, this.onFilterChanged)
             );
             ["focus", "blur"].forEach(event =>
-                [window, document, document.body, this.dom.filter].forEach(element =>
+                [globalThis, document, document.body, this.dom.filter].forEach(element =>
                     element.removeEventListener(event, this.onFocusEvent)
                 )
             );
             if (queryParameters.facets.noFocus) {
                 ["mousedown", "keydown", "blur"].forEach(event =>
-                    window.removeEventListener(event, this.cancelClearFilter)
+                    globalThis.removeEventListener(event, this.cancelClearFilter)
                 );
                 this.dom.filter.removeEventListener("blur", this.scheduleClearFilter);
             }
@@ -260,11 +260,11 @@ namespace shortycut {
                 clearTimeout(this.clearFilterJob);
                 this.clearFilterJob = undefined;
             }
-            this.lastCancelClearFilterEvent = new Date().getTime();
+            this.lastCancelClearFilterEvent = Date.now();
         }
 
         private scheduleClearFilter() {
-            if (Homepage.DEBOUNCE_MS <= new Date().getTime() - this.lastCancelClearFilterEvent) {
+            if (Homepage.DEBOUNCE_MS <= Date.now() - this.lastCancelClearFilterEvent) {
                 this.clearFilterJob = setTimeout(this.clearFilter, Homepage.DEBOUNCE_POLLING_MS);
             }
         }
@@ -287,7 +287,7 @@ namespace shortycut {
             this.suggestions.length = 0;
 
             const input = this.dom.filter.value;
-            const splitInput = input.split(/\s+/).map(word => word.trim()).filter(word => word);
+            const splitInput = input.split(/\s+/).map(word => word.trim()).filter(Boolean);
             const keyword = adjustCase(splitInput[0] ?? "");
             const postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
 
@@ -302,7 +302,7 @@ namespace shortycut {
         private collectSuggestions(
             keyword: string, splitInput: string[], postKeywordInput: string, shortcut?: Shortcut
         ) {
-            if (shortcut && shortcut.queries && postKeywordInput) {
+            if (shortcut?.queries && postKeywordInput) {
                 this.suggestions.push(this.createSuggestion(shortcut, "match", "query"));
             } else if (!postKeywordInput) {
                 this.suggestions.push(...this.filter.keywordSearch(keyword, postKeywordInput));
@@ -379,7 +379,7 @@ namespace shortycut {
 
         private displaySuggestions() {
 
-            this.updateFaviconManagerParameters(true);
+            this.updateFaviconManagerParametersWhenHomepageIsVisible();
             this.dom.rows = this.suggestions.map((suggestion, index) =>
                 create(`div.row.${suggestion.type}.${suggestion.shortcutType}`, [
                     create("div.cursor", create("img.icon", element =>
@@ -440,8 +440,7 @@ namespace shortycut {
             const hasMatches = !!this.suggestions.filter(suggestion => suggestion.type !== "search-result").length;
 
             if (!hasInput || canUseSearchEngine || focusOnSuggestion || hasMatches) {
-                this.dom.filter.classList.remove("error");
-                this.dom.filter.classList.remove("warning");
+                this.dom.filter.classList.remove("error", "warning");
             } else if (hasFullTextSearchSuggestions) {
                 this.dom.filter.classList.remove("error");
                 this.dom.filter.classList.add("warning");
@@ -605,19 +604,17 @@ namespace shortycut {
         // Update the favicon manager's list of currently displayed icons
         //--------------------------------------------------------------------------------------------------------------
 
-        private updateFaviconManagerParameters(homepageIsVisible: boolean) {
-
-            if (homepageIsVisible) {
-                faviconManager.setCurrentlyDisplayedLinks(
-                    this.suggestions.map(suggestion => suggestion.shortcut.all[0].link.faviconUrls[0])
-                        .filter(url => url)
-                );
-                if (config.favicons.preloadOnStart) {
-                    faviconManager.startPreload();
-                }
-            } else {
-                faviconManager.removeCurrentlyDisplayedLinks();
+        private updateFaviconManagerParametersWhenHomepageIsVisible() {
+            faviconManager.setCurrentlyDisplayedLinks(
+                this.suggestions.map(suggestion => suggestion.shortcut.all[0].link.faviconUrls[0]).filter(Boolean)
+            );
+            if (config.favicons.preloadOnStart) {
+                faviconManager.startPreload();
             }
+        }
+
+        private updateFaviconManagerParametersWhenHomepageIsNotVisible() {
+            faviconManager.removeCurrentlyDisplayedLinks();
         }
     }
 }

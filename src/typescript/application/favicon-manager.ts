@@ -183,13 +183,13 @@ namespace shortycut {
         ) {
 
             if (type.isFetchService) {
-                const urlWithoutPort = this.url.replace(/%s/g, this.domain.name.replace(/:\d+$/, ""));
+                const urlWithoutPort = this.url.replaceAll("%s", this.domain.name.replace(/:\d+$/, ""));
                 this.files = [new FaviconFile(this, urlWithoutPort, urlWithoutPort)];
             } else {
-                const basename = type.isWebsite ? "favicon" : this.domain.name.replace(/:/g, "!");
+                const basename = type.isWebsite ? "favicon" : this.domain.name.replaceAll(":", "!");
                 this.files = FaviconOrigin.EXTENSIONS
                     .map(extension => `${basename}.${extension}`)
-                    .map(filename => new FaviconFile(this, filename, this.url.replace(/%s/g, filename)));
+                    .map(filename => new FaviconFile(this, filename, this.url.replaceAll("%s", filename)));
             }
         }
 
@@ -225,20 +225,20 @@ namespace shortycut {
 
             if (this.domain.registry.readCache) {
                 const filename = this.domain.registry.cache.get(this.domain.name, this.name);
-                if (filename && this.files.filter(file => file.name === filename)[0]?.job.startLoad()) {
+                if (filename && this.files.find(file => file.name === filename)?.job.startLoad()) {
                     return true;
                 }
             }
 
             if (includeNonCached) {
-                for (const file of this.files.filter(currentFile => currentFile.name.match(/ico$/i))) {
+                for (const file of this.files.filter(currentFile => /ico$/i.test(currentFile.name))) {
                     if (file.job.startLoad()) {
                         return true;
                     }
                 }
             }
 
-            return includeAllExtensions && this.files.filter(file => file.job.isNew)[0]?.job.startLoad();
+            return includeAllExtensions && this.files.find(file => file.job.isNew)?.job.startLoad();
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -305,11 +305,11 @@ namespace shortycut {
             }
 
             config.favicons.localFolders.forEach(origin => {
-                if (!origin.match(/^[a-z]+:\/\//i)) {
-                    origin = `${window.location.href.replace(/\/[^/]+$/, "")}/${origin}`;
+                if (!/^[a-z]+:\/\//i.test(origin)) {
+                    origin = `${globalThis.location.href.replace(/\/[^/]+$/, "")}/${origin}`;
                 }
                 origin = origin.replace(/\/$/, "");
-                const type = origin.match(/^file:/) ? FaviconOriginType.CACHE_OFFLINE : FaviconOriginType.CACHE_ONLINE;
+                const type = origin.startsWith("file://") ? FaviconOriginType.CACHE_OFFLINE : FaviconOriginType.CACHE_ONLINE;
                 this.origins.put(origin, new FaviconOrigin(this, origin, type, `${origin}/%s`));
             });
 
@@ -558,7 +558,11 @@ namespace shortycut {
                         if ("file" !== protocol) {
                             const protocols = this.domains.computeIfAbsent(domain, () => new Array<string>());
                             if (!protocols.filter(currentProtocol => currentProtocol === protocol).length) {
-                                "https" === protocol ? protocols.unshift(protocol) : protocols.push(protocol);
+                                if ("https" === protocol) {
+                                    protocols.unshift(protocol);
+                                } else {
+                                    protocols.push(protocol);
+                                }
                             }
                         }
                     });
@@ -569,7 +573,7 @@ namespace shortycut {
 
         public static extractProtocolAndDomain(url: string) {
             return {
-                protocol: assertNotNull(url.match(/^([a-z]+:\/\/)?/i))[0]
+                protocol: assertNotNull(new RegExp(/^([a-z]+:\/\/)?/i).exec(url))[0]
                     .replace(/:.*/, "")
                     .toLocaleLowerCase() || "http",
                 domain: url.toLocaleLowerCase().replace(/^([a-z]+:\/\/+)?/i, "").replace(/\/.*/, "").toLowerCase()
@@ -653,7 +657,7 @@ namespace shortycut {
                     domain = domain.parentDomain;
                 }
                 if (domain.resolvedOrigin?.resolvedFile?.job.url && domain.resolvedOrigin.type.isWebsite) {
-                    const name = domain.displayName.replace(/:/g, "!");
+                    const name = domain.displayName.replaceAll(":", "!");
                     const extension = domain.resolvedOrigin?.resolvedFile.name.replace(/^.*\./, "") ?? "ico";
                     files.put(`${name}.${extension}`, domain.resolvedOrigin.resolvedFile.job.url);
                 }
@@ -667,7 +671,7 @@ namespace shortycut {
         public getOfflineDomains() {
 
             const files = new Hashtable<string>();
-            const prefix = window.location.href.replace(/\/[^/]+$/, "") + "/";
+            const prefix = globalThis.location.href.replace(/\/[^/]+$/, "") + "/";
 
             this.registry.domains.values.filter(domain => domain.isPrimary && domain.isResolved).forEach(domain => {
                 while (!domain.resolvedOrigin && domain.parentDomain) {

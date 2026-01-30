@@ -77,7 +77,7 @@ namespace shortycut {
             script.addEventListener("load", () => this.onLoad(file));
             script.addEventListener("error", () => this.onError(file));
             script.type = "text/javascript";
-            script.src = file.url.match(/^[a-z]+:\/\/.*/i) ? file.url : `data/${file.url}`;
+            script.src = /^[a-z]+:\/\/.*/i.test(file.url) ? file.url : `data/${file.url}`;
             document.getElementsByTagName("head")[0].appendChild(script);
         }
 

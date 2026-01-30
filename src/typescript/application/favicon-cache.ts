@@ -68,10 +68,10 @@ namespace shortycut {
 
             try {
                 const storage = config.favicons.rememberUrls ? localStorage : sessionStorage;
-                if (this.canWriteToStorage()) {
+                if (FaviconCache.canWriteToStorage(storage)) {
                     this.storage = storage;
                 }
-            } catch (_ignored) { }
+            } catch { }
 
             this.recalculateToday();
             runAndIgnoreErrors(() => this.loadCache());
@@ -84,11 +84,9 @@ namespace shortycut {
         public get(domain: string, origin: string) {
 
             const cacheEntry = this.cache.get(domain)?.get(origin);
-            if (cacheEntry) {
-                if (cacheEntry.lastAccessed !== this.today) {
-                    cacheEntry.lastAccessed = this.today;
-                    this.scheduleSaveCache();
-                }
+            if (cacheEntry && cacheEntry.lastAccessed !== this.today) {
+                cacheEntry.lastAccessed = this.today;
+                this.scheduleSaveCache();
             }
             return cacheEntry?.fileName;
         }
@@ -106,7 +104,7 @@ namespace shortycut {
 
         private recalculateToday() {
 
-            const epochMs = new Date().getTime();
+            const epochMs = Date.now();
             const msPerDay = FaviconCache.MS_PER_DAY;
             this.today = Math.ceil(epochMs / msPerDay);
             setTimeout(this.recalculateToday, this.today * msPerDay - epochMs + FaviconCache.MS_PER_FIVE_MINUTES);
@@ -166,10 +164,9 @@ namespace shortycut {
             return this.cache.map((domain: string, origins: Hashtable<FaviconCacheEntry>) => {
                 const columns = [domain];
                 origins.forEach((origin: string, entry: FaviconCacheEntry) => {
-                    columns.push(origin);
-                    columns.push(entry.fileName);
-                    columns.push(`${entry.lastAccessed}`);
+                    columns.push(origin, entry.fileName, `${entry.lastAccessed}`);
                 });
+
                 return columns.join(FaviconCache.COLUMN_SEPARATOR);
             }).join(FaviconCache.LINE_SEPARATOR);
         }
@@ -194,7 +191,7 @@ namespace shortycut {
                             row[offset],
                             new FaviconCacheEntry(
                                 row[offset + FaviconCache.FILENAME_OFFSET],
-                                parseInt(row[offset + FaviconCache.TIMESTAMP_OFFSET])
+                                Number.parseInt(row[offset + FaviconCache.TIMESTAMP_OFFSET])
                             )
                         );
                     }
@@ -212,7 +209,7 @@ namespace shortycut {
         private deleteStorage() {
             if (this.storage) {
                 for (let index = 0; ; index++) {
-                    const key = this.getStorageKey(index);
+                    const key = FaviconCache.getStorageKey(index);
                     if (!this.storage.getItem(key)) {
                         break;
                     }
@@ -231,7 +228,7 @@ namespace shortycut {
             while (data) {
                 try {
                     while (data) {
-                        this.storage.setItem(this.getStorageKey(index), data.substring(0, size));
+                        this.storage.setItem(FaviconCache.getStorageKey(index), data.substring(0, size));
                         data = data.substring(size);
                         size = Math.min(size, data.length);
                         index++;
@@ -248,8 +245,8 @@ namespace shortycut {
         private readStorage() {
             let result = "";
             if (this.storage) {
-                for (let index = 0, segment = this.storage.getItem(this.getStorageKey(index));
-                    segment; segment = this.storage.getItem(this.getStorageKey(index - 1))) {
+                for (let index = 0, segment = this.storage.getItem(FaviconCache.getStorageKey(index));
+                    segment; segment = this.storage.getItem(FaviconCache.getStorageKey(index - 1))) {
                     result += segment;
                     index++;
                 }
@@ -258,22 +255,22 @@ namespace shortycut {
         }
 
 
-        private canWriteToStorage() {
+        private static canWriteToStorage(storage: Storage) {
 
             const key = this.getStorageKey(-1);
             const value = "0.8802878642890799";
             let canWrite = false;
             runAndIgnoreErrors(() => {
-                if (this.storage) {
-                    this.storage.setItem(key, value);
-                    canWrite = value === this.storage.getItem(key);
+                if (storage) {
+                    storage.setItem(key, value);
+                    canWrite = value === storage.getItem(key);
                 }
             });
-            runAndIgnoreErrors(() => this.storage ? this.storage.removeItem(key) : void (0));
+            runAndIgnoreErrors(() => storage ? storage.removeItem(key) : undefined);
             return canWrite;
         }
 
-        private getStorageKey(index: number) {
+        private static getStorageKey(index: number) {
             return "shortycut.favicon-cache" + (index ? `.${index}` : "");
         }
     }

@@ -164,7 +164,7 @@ namespace shortycut {
 
             validateBeforeConfigMerge(key, target, targetValue, patchValue);
 
-            if (patchValue && "object" === typeof patchValue && !(patchValue instanceof Array)) {
+            if (patchValue && "object" === typeof patchValue && !(Array.isArray(patchValue))) {
                 mergeConfig(targetValue as object, patchValue, patchRoot);
             } else {
                 if ("string" === typeof patchValue) {
@@ -183,7 +183,7 @@ namespace shortycut {
     function validateBeforeConfigMerge(key: string, target: object, targetValue: unknown, patchValue: unknown) {
         return [
             [
-                !Object.prototype.hasOwnProperty.call(target, key),
+                !Object.hasOwn(target, key),
                 "is not supported"
             ],
             [
@@ -191,7 +191,7 @@ namespace shortycut {
                 "must be a nested object"
             ],
             [
-                targetValue instanceof Array && (!patchValue || !(patchValue instanceof Array)),
+                Array.isArray(targetValue) && (!patchValue || !(Array.isArray(patchValue))),
                 "must be an array"
             ],
             [
@@ -229,8 +229,7 @@ namespace shortycut {
                 ["searchTermPlaceholder"]
             ],
             [
-                !onMultiLink.default
-                || !onMultiLink.default.match(/^(replacePreviousDefinition|openInNewTab|showMenu)$/),
+                !onMultiLink?.default.match(/^(replacePreviousDefinition|openInNewTab|showMenu)$/),
                 'default must be "replacePreviousDefinition", "openInNewTab" or "showMenu"',
                 ["default"]
             ],
@@ -270,24 +269,24 @@ namespace shortycut {
     //------------------------------------------------------------------------------------------------------------------
 
     function isObject(value: unknown): boolean {
-        const isObject = null !== value && undefined !== value && "object" === typeof value;
+        const isObject = null != value && "object" === typeof value;
         return isObject
-            && !(value instanceof Array)
-            && !(value instanceof Function)
+            && !Array.isArray(value)
+            && "function" !== typeof value
             && !(value instanceof RegExp);
     }
 
     function isStringy(value: unknown): boolean {
-        return null === value || undefined === value || "string" === typeof value;
+        return null == value || "string" === typeof value;
     }
 
     function toArray(value: unknown) {
         if (Array.isArray(value)) {
             return value;
-        } else if (!value) {
-            return [];
-        } else {
+        } else if (value) {
             return [value];
+        } else {
+            return [];
         }
     }
 
@@ -332,7 +331,7 @@ namespace shortycut {
         for (const key in object) {
             if (object[key]) {
                 if (object[key] instanceof RegExp) {
-                    object[key] = `/${(object[key] as RegExp).source}/`;
+                    object[key] = `/${(object[key]).source}/`;
                 } else if ("function" === typeof object[key]) {
                     object[key] = `${object[key]}`;
                 } else if ("object" === typeof object[key]) {

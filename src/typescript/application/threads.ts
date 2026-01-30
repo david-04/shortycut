@@ -1,6 +1,6 @@
 namespace shortycut {
 
-    type ParserCallback = (result: Shortcuts | unknown) => void;
+    type ParserCallback = (result: unknown) => void;
 
     const SHORTCUTS_PER_BATCH = 2_000;
 

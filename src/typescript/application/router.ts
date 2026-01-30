@@ -14,8 +14,8 @@ namespace shortycut {
             this.goHome = this.goHome.bind(this);
             this.onHashChange = this.onHashChange.bind(this);
             this.onKeyDown = this.onKeyDown.bind(this);
-            window.addEventListener("hashchange", this.onHashChange);
-            document.addEventListener("keydown", this.onKeyDown);
+            globalThis.addEventListener("hashchange", this.onHashChange);
+            globalThis.addEventListener("keydown", this.onKeyDown);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ namespace shortycut {
             if (1 === this.history.length) {
                 this.showIndex(0);
             } else {
-                window.location.hash = `${this.history.length - 1}`;
+                globalThis.location.hash = `${this.history.length - 1}`;
                 this.onHashChange();
             }
         }
@@ -39,7 +39,7 @@ namespace shortycut {
 
         public goBackOrHome() {
             if (1 < this.history.length && 0 < this.getCurrentHistoryIndex()) {
-                window.history.go(-1);
+                globalThis.history.go(-1);
             } else if (this.history[this.getCurrentHistoryIndex()] !== pages.home) {
                 this.goto(pages.home);
             }
@@ -62,8 +62,8 @@ namespace shortycut {
         }
 
         private getCurrentHistoryIndex() {
-            const index = parseInt(window.location.hash.replace("#", ""));
-            return Math.min(Math.max(isNaN(index) ? 0 : index, 0), this.history.length - 1);
+            const index = Number.parseInt(globalThis.location.hash.replace("#", ""));
+            return Math.min(Math.max(Number.isNaN(index) ? 0 : index, 0), this.history.length - 1);
         }
 
         private showIndex(index: number) {

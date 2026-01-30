@@ -92,7 +92,7 @@ namespace shortycut {
             try {
                 this.dom.urlEncoding.decoded.value = decodeURIComponent(this.dom.urlEncoding.encoded.value);
                 this.dom.urlEncoding.encoded.classList.remove("invalid");
-            } catch (exception) {
+            } catch {
                 this.dom.urlEncoding.decoded.value = "";
                 this.dom.urlEncoding.encoded.classList.add("invalid");
             }
@@ -114,7 +114,7 @@ namespace shortycut {
                     );
                 }
                 this.dom.harParser.input.classList.remove("invalid");
-            } catch (exception) {
+            } catch {
                 this.dom.harParser.input.classList.add("invalid");
             }
         }

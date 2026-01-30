@@ -33,12 +33,12 @@ namespace shortycut {
             this.dom.facets.noFocus.checked = queryParameters.facets.noFocus;
             this.updateHomepageLink();
 
-            const baseUrl = window.location.href.replace(/[#?].*/, "");
+            const baseUrl = globalThis.location.href.replace(/[#?].*/, "");
             this.dom.form.action = baseUrl;
             this.dom.keyword.innerHTML = `${sanitize(baseUrl)}?q=%s`;
             this.dom.keyword.href = `${baseUrl}?q=%s`;
 
-            if (window.location.href.match(/^http.*/)) {
+            if (globalThis.location.href.startsWith("http://")) {
                 this.dom.searchEngine.style.display = "block";
             } else {
                 this.dom.webServerRequired.style.display = "block";
@@ -50,9 +50,9 @@ namespace shortycut {
 
             this.dom.popUp.addEventListener("click", () => {
                 for (let index = 0; index <= 1; index++) {
-                    const popUp = window.open("");
+                    const popUp = globalThis.open("");
                     if (popUp?.document) {
-                        popUp.document.write([
+                        popUp.document.body.innerHTML = ([
                             "This window was opened by ShortyCut.",
                             "Pop-ups are not being blocked.",
                             "You can close this windows."
@@ -103,7 +103,7 @@ namespace shortycut {
                 .map(facet => "noFocus" === facet ? "no-focus" : facet)
                 .map(facet => "newTabs" === facet ? "new-tabs" : facet);
 
-            let url = window.location.href.replace(/[#?].*/, "");
+            let url = globalThis.location.href.replace(/[#?].*/, "");
             if (facets.length) {
                 url += `?facets=${facets.join(",")}`;
             }

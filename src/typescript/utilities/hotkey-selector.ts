@@ -88,8 +88,8 @@ namespace shortycut {
         //--------------------------------------------------------------------------------------------------------------
 
         private isSeparator(char: string) {
-            const code = char.charCodeAt(0);
-            return 0 <= code && code <= HotkeySelector.MAX_ASCII_CODE && char.match(/[^a-z]/i);
+            const code = char.codePointAt(0);
+            return undefined !== code && 0 <= code && code <= HotkeySelector.MAX_ASCII_CODE && /[^a-z]/i.test(char);
         }
 
         //--------------------------------------------------------------------------------------------------------------
