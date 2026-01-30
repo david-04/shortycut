@@ -1,0 +1,8 @@
+{
+    "name": "shortycut",
+    "version": "0.0.0",
+    "private": true,
+    "license": "UNLICENSED",
+    "type": "module",
+    "swpm": "pnpm"
+}

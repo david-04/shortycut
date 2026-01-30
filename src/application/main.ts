@@ -1,0 +1,87 @@
+import { applyAndValidateConfig } from "../data/config";
+import { QueryParameters } from "../data/query-parameters";
+import { state } from "../data/state";
+import { initializeVariables, startupCache } from "../data/variables";
+import { HTML_BODY } from "../generated/html-body";
+import { displayError, Exception, handleExceptions } from "../utilities/error";
+import { FaviconManager } from "./favicon-manager";
+import { JavaScriptLoader } from "./script-loader";
+import { parseShortcuts } from "./threads";
+
+//----------------------------------------------------------------------------------------------------------------------
+// Register event listeners
+//----------------------------------------------------------------------------------------------------------------------
+
+export function initialize() {
+    globalThis.addEventListener("error", exception => startupCache.exceptions.push(exception));
+
+    if (document?.title !== undefined) {
+        document.title = "...";
+    }
+
+    globalThis.addEventListener("DOMContentLoaded", () => {
+        document.title = "...";
+        ["icon", "shortcut icon"].forEach(rel => addLink(rel, "image/x-icon", "resources/favicon.ico", ""));
+        addLink("search", "application/opensearchdescription+xml", "data/search.xml", "ShortyCut");
+    });
+
+    state.javaScriptLoader = new JavaScriptLoader();
+
+    window.addEventListener("load", () =>
+        handleExceptions(displayError, () => state.javaScriptLoader.onComplete(startApplication))
+    );
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Add a <link> to the <head>
+//----------------------------------------------------------------------------------------------------------------------
+
+function addLink(rel: string, type: string, href: string, title: string) {
+    const link = document.createElement("link");
+    link.rel = rel;
+    link.type = type;
+    link.href = href;
+    link.title = title;
+    document.head.appendChild(link);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Apply the configuration and parse the shortcuts
+//----------------------------------------------------------------------------------------------------------------------
+
+function startApplication() {
+    document.body.innerHTML = HTML_BODY;
+    const self = globalThis.location.href.replace(/[?#].*/, "");
+    document.body.innerHTML = document.body.innerHTML.replaceAll("self://", self);
+
+    initializeVariables();
+    applyAndValidateConfig();
+
+    if (!startupCache.config.length && !state.queryParameters.setup) {
+        globalThis.location.href = `${globalThis.location.href.replace(/[#?].*/, "")}?${QueryParameters.SETUP}=welcome`;
+        return;
+    }
+
+    parseShortcuts(result => handleExceptions(displayError, () => onParseShortcutsComplete(result)));
+}
+
+function onParseShortcutsComplete(result: unknown) {
+    if (result instanceof Exception) {
+        throw result;
+    }
+    if (state.queryParameters.facets.newTabs) {
+        addBlankTargetToAllLinksOnPage();
+    }
+    state.faviconManager = new FaviconManager();
+    state.redirector.processQuery();
+}
+
+function addBlankTargetToAllLinksOnPage() {
+    const links = document.getElementsByTagName("a");
+    for (let index = 0; index < links.length; index++) {
+        const link = links.item(index);
+        if (link) {
+            link.target = "_blank";
+        }
+    }
+}

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>ShortyCut</title>
+    <link href="./resources/shortycut.css" rel="stylesheet" type="text/css" />
+    <script src="./resources/shortycut.js"></script>
+    <script src="./data/settings.js"></script>
+    <script src="./data/shortcuts.js"></script>
+</head>
+
+<body>
+
+    <!-- =========================================================================================================== -->
+    <!-- Home page                                                                                                   -->
+    <!-- =========================================================================================================== -->
+
+    <div id="home" style="display:none">
+        <div class="row selected filter-row">
+            <div class="cursor">
+                <img src="resources/arrow.svg" class="icon">
+            </div>
+            <div class="row-content">
+                <input type="text" placeholder="" class="input" />
+            </div>
+        </div>
+        <div class="suggestions">
+        </div>
+        <div class="notification">
+            <div class="welcome" style="display:none">
+                <p>
+                    This is ShortyCut's homepage. Enter a keyword above, for example:
+                </p>
+                <p class="example">
+                    <span class="key">t</span> ... to explore keywords starting with a &quot;t&quot;
+                </p>
+                <p class="example">
+                    <span class="key">e sunglasses</span> ... to search for sunglasses on eBay
+                </p>
+                <p class="example">
+                    <span class="key">news</span> ... to try out multi-link keywords
+                    <br>
+                    <br>
+                </p>
+                <p class='new-tabs'>
+                    To keep ShortyCut permanently open in this tab,
+                    <a href="self://?facets=new-tabs">click here to open all links in new tabs</a>.
+                </p>
+                <p>
+                    Then add your own links to <span class="key">shortcut.js</span> in the <span class="key">data</span>
+                    folder. See the <a href="resources/docs/shortcut-syntax.html">manual</a> for details.
+                </p>
+            </div>
+            <div class="application-errors" style="display:none">
+            </div>
+            <div class="no-shortcuts-no-error" style="display:none">
+                <div class="header">Failed to load shortcuts</div>
+                <div class="description spacing">
+                    No shortcuts have been defined in shortcut.js.
+                </div>
+            </div>
+            <div class="error-with-backtick-support" style="display:none">
+                <div class="header">Failed to load shortcuts</div>
+                <div class="description spacing">
+                    JavaScript errors have occurred while trying to load the shortcuts.
+                    <br>Make sure to avoid
+                    <a href="resources/docs/file-format.html">unsupported symbols</a> in shortcuts.js.
+                </div>
+            </div>
+            <div class="error-without-backtick-support" style="display:none">
+                <div class="header">Failed to load shortcuts</div>
+                <div class="description spacing">
+                    JavaScript errors have occurred while trying to load the shortcuts.
+                    <br>It also appears that your browser does not support the backtick syntax.
+                    <br>Make sure to use the <a href="resources/docs/file-format.html#legacy-format">legacy format</a>
+                    and avoid any unsupported symbols.
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- Menu                                                                                                        -->
+    <!-- =========================================================================================================== -->
+
+    <div id="menu" style="display:none">
+        <a class="burger-icon">
+            <div></div>
+            <div></div>
+            <div></div>
+        </a>
+        <a class="close-icon">
+        </a>
+        <div class="items">
+        </div>
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- Error message                                                                                               -->
+    <!-- =========================================================================================================== -->
+
+    <div id="error" style="display:none">
+        <div class="title">
+        </div>
+        <div class="message">
+        </div>
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- List with multiple links associated with the same keyword                                                   -->
+    <!-- =========================================================================================================== -->
+
+    <div id="shortlist" style="display:none">
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- Redirect                                                                                                    -->
+    <!-- =========================================================================================================== -->
+
+    <div id="redirect" style="display:none">
+        <div class="icon">
+            <img src="resources/arrow.svg">
+        </div>
+        <div class="text">
+            <div class="title"></div>
+            <div class="url"></div>
+        </div>
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- Setup page                                                                                                  -->
+    <!-- =========================================================================================================== -->
+
+    <div id="setup" style="display:none">
+        <div>
+            <div class="error" style="display:none">
+                That didn't work. Please double-check the folder name and try again.
+            </div>
+            <h1>
+                <img src="resources/arrow.svg">
+                <span class="title">Welcome</span>
+            </h1>
+        </div>
+        <div class="instructions">
+            <p>
+                It looks like you've just installed ShortyCut.
+                To complete the setup, rename the <span class="filename">data-template</span> folder to
+                <span class="filename">data</span> (i.e. remove <span class="filename">-template</span>
+                from the folder's name):
+            </p>
+            <pre><span class="root-path">shortycut</span>
+                +-- data-template<span class="highlight"><span class="arrow">&#x25C0;</span> Rename this folder from: data-template</span>
+                +-- resources    <span class="arrow">&nbsp;</span>                      <span class="highlight">to: data</span>
+                +-- index.html</pre>
+            <div class="syntax-warning" style="display:none">
+                <p>
+                    The <span class="filename">data</span> folder contains a file named
+                    <span class="filename">shortcuts.js</span> which uses ShortyCut's standard format.
+                </p>
+                <p class="important">
+                    It looks like this format is not supported by your browser.
+                </p>
+                <p>
+                    Please follow the instructions in the <a href="resources/docs/file-format.html">manual</a>
+                    to use the legacy format instead.
+                </p>
+            </div>
+            <p>
+                <a href="self://?setup=validate" class="button">Done</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- Link tools                                                                                                  -->
+    <!-- =========================================================================================================== -->
+
+    <div id="link-tools" style="display:none" class="utility-page">
+        <div class="url-encoding">
+            <h1>URL-Encoding</h1>
+            <p>
+                Link parameters (like filters and settings) need to be URL-encoded.
+                <br>Enter text into any of the fields below to encode or decode it.
+            </p>
+            <p>
+                Plain text
+                <br><input class="decoded" />
+            </p>
+            <p>
+                URL-encoded
+                <br><input class="encoded" />
+            </p>
+        </div>
+        <div class="har-parser">
+            <h1>Extract POST links</h1>
+            <p>
+                Web pages using the POST method don't contain settings and filters in their address.
+                <br>Using an HTTP Archive (HAR file) is the easiest way to extract their ShortyCut link.
+                <br>Refer to the <a href="./resources/docs/post-links.html#extracting-post-links">documentation</a>
+                on how to obtain the HAR file.
+                <br>Paste the HAR file into the field below to extract all POST pages.
+            </p>
+            <p>
+                <textarea class="input" placeholder="Paste the HAR file in here"></textarea>
+            </p>
+            <div class="output">
+
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- Favicon tools                                                                                               -->
+    <!-- =========================================================================================================== -->
+
+    <div id="favicon-tools" style="display:none" class="utility-page">
+        <div class="config-warning" style="display:none">
+            Favicons are disabled. To enable them, set the config property
+            <a href="resources/docs/configuration.html#shortcutformathomepagesuggestionsshowfavicons">showFavicons</a>
+            to true.
+        </div>
+        <h1>Favicons</h1>
+        <div>
+            ShortyCut's homepage displays website's favicons as part of suggestions.
+            <br>It's recommended to download them for quicker access.
+            See the <a href="resources/docs/favicons.html">manual</a> for details.
+        </div>
+        <div class="pending" style="display:none">
+            <h1>Analysis in progress...</h1>
+            Scanning the below websites for favicons. Please wait...
+            <br>
+            <br>
+            <div class="listing"></div>
+        </div>
+        <div class="online" style="display:none">
+            <h1>Ready for download</h1>
+            The following icons are available for download.
+            See the <a href="resources/docs/favicons.html#downloadable-favicons">manual</a> for details.
+            <br>If you're familiar with the command line, you can batch-download all at once:
+            <br>
+            <br><a href="" class="curl">Click here to show &quot;curl&quot; commands<br></a>
+            <textarea class="curl" wrap="off" readonly style="display:none"></textarea>
+            <br>Otherwise right-click on each icon and save the image file.
+            <br>Then rename it to the filename displayed next to the icon:
+            <br>
+            <br>
+            <div class="listing"></div>
+        </div>
+        <div class="missing" style="display:none">
+            <h1>Missing favicons</h1>
+            The following websites have no standard favicon.
+            <br>Consider downloading suitable icons from elsewhere.
+            <br>See the <a href="resources/docs/favicons.html#missing-favicons">manual</a> for details.
+            <br>
+            <br>
+            <div class="listing"></div>
+        </div>
+        <div class="offline" style="display:none">
+            <h1>Already downloaded</h1>
+            The following icons have already been downloaded:
+            <br>
+            <br>
+            <div class="listing"></div>
+        </div>
+    </div>
+
+    <!-- =========================================================================================================== -->
+    <!-- Browser integration                                                                                         -->
+    <!-- =========================================================================================================== -->
+
+    <div id="browser-integration" style="display:none" class="utility-page">
+        <h1>Browser integration</h1>
+        <div>
+            This page contains links and tools for integrating ShortyCut with your browser.
+            See the <a href="resources/docs/browser-integration.html">manual</a>
+            for a description of all methods.
+        </div>
+        <h1>Homepage</h1>
+        <div>
+            ShortyCut has settings to tweak the behavior of its homepage
+            when used as the browser's start page or as a pinned tab.
+            Activate them as required by ticking the checkboxes below:
+            <br>
+            <br>
+            <table border="0" cellpadding="0">
+                <tr>
+                    <td>
+                        <input type="checkbox" class="new-tabs" />
+                    </td>
+                    <td>
+                        &nbsp;
+                    </td>
+                    <td>
+                        <b>Open all links in new tabs</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                    </td>
+                    <td>
+                        Lock ShortyCut's homepage to the browser tab and never navigate away.
+                        As the tab sticks around, it can be reused for entering more keywords later.
+                        <br>&nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="checkbox" class="no-focus" />
+                    </td>
+                    <td>
+                        &nbsp;
+                    </td>
+                    <td>
+                        <b>Don't focus on the input field</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                    </td>
+                    <td>
+                        Tick this checkbox when using an add-on like Vimium,
+                        which allows to operate the browser via keyboard shortcuts.
+                        <br>&nbsp;
+                    </td>
+                </tr>
+            </table>
+            Set your browser's start page or the pinned tab to the following address:
+            <br>
+            <br><a class="homepage"></a>
+        </div>
+        <h1>Keyword query</h1>
+        <div>
+            If supported by your browser, you can create a keyword query.
+            See the <a href="resources/docs/keyword-query.html">manual</a> for details how it works.
+            In Firefox, the keyword query can be created via the context menu:
+            <br>
+            <br>
+            <form class="form"><input name="q" readonly
+                    value="Right-click here and select &quot;Add a keyword for this search...&quot;"></form>
+            <br>In other browsers, manually create the keyword with the following address:
+            <br>
+            <br><a onclick="return false" class="keyword"></a>
+        </div>
+        <h1>Search engine</h1>
+        <div class="web-server-required" style="display:none">
+            To add ShortyCut as a search engine, it must be access through a web server.
+            Follow the instructions in the <a href="resources/docs/web-server.html">manual</a> to set it up.
+            Once the web server is up and running, access ShortyCut through this link:
+            <br>
+            <br><a href="http://localhost:4171/index.html">http://localhost:4171/index.html</a>
+            <br>
+            <br>For browsers which require an encrypted connection, use this link instead:
+            <br>
+            <br><a href="https://localhost:4172/index.html">https://localhost:4172/index.html</a>
+            <br>
+            <br>This will produce a security warning. Confirm it to open ShortyCut.
+        </div>
+        <div class="search-engine" style="display:none">
+            ShortyCut should be discovered as a search engine automatically.
+            <br>Please check your browser's th search box.
+            <br>If ShortyCut doesn't show up, try clicking on the following link:
+            <br>
+            <br><a class="open-search"></a>
+        </div>
+        <h1>Pop-up blocker</h1>
+        <div>
+            ShortyCut allows multiple links / bookmarks to have the same keyword.
+            <br>Depending on the configuration, it can open all of them in separate tabs.
+            <br>To use this feature, you need to disable the browser's pop-up blocker.
+            <br>Test if the blocker is currently active by clicking on this button:
+            <br>
+            <br><input type="button" class="pop-up" value="Open 2 pop-up windows" />
+            <br>
+            <br>If pop-ups are blocked, it's usually indicated in the browser's address bar.
+            <br>You should be able to allow pop-ups for ShortyCut there as well.
+
+        </div>
+    </div>
+
+</body>
+
+</html>
