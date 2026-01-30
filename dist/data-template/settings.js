@@ -4,44 +4,44 @@
 
 shortycut.configure({
     shortcutFormat: {
-        comment: '//',
+        comment: "//",
         keyword: {
             caseSensitive: false,
-            openingDelimiter: '[',
-            separator: '|',
-            closingDelimiter: ']'
+            openingDelimiter: "[",
+            separator: "|",
+            closingDelimiter: "]",
         },
         enableGrouping: false,
-        hotkeyMarker: '',
+        hotkeyMarker: "",
         url: {
-            searchTermPlaceholder: '%s',
-            postIndicator: '?POST?',
+            searchTermPlaceholder: "%s",
+            postIndicator: "?POST?",
             multiLinkIndicator: {
-                replacePrevious: '=',
-                openInNewTab: '^',
-                showMenu: '?',
-                searchBucket: '#',
-                default: 'showMenu'
-            }
-        }
+                replacePrevious: "=",
+                openInNewTab: "^",
+                showMenu: "?",
+                searchBucket: "#",
+                default: "showMenu",
+            },
+        },
     },
     homepage: {
-        keywords: ['?', 'help', 'home', 'homepage', 'sc', 'shortycut'],
+        keywords: ["?", "help", "home", "homepage", "sc", "shortycut"],
         suggestions: {
             showKeywords: true,
             showHotkeys: true,
-            showFavicons: true
-        }
+            showFavicons: true,
+        },
     },
     defaultSearchEngine: {
-        keyword: 'defaultsearchengine',
+        keyword: "defaultsearchengine",
         useInAddressBar: true,
-        useOnHomepage: true
+        useOnHomepage: true,
     },
     favicons: {
         preloadOnStart: true,
         rememberUrls: true,
-        fetchService: 'https://www.google.com/s2/favicons?sz=32&domain=%s',
-        localFolders: ['data/favicons']
-    }
+        fetchService: "https://www.google.com/s2/favicons?sz=32&domain=%s",
+        localFolders: ["data/favicons"],
+    },
 });

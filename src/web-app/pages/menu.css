@@ -13,7 +13,7 @@
     top: 0;
     right: 0;
     padding: 1.5em 1.5em 0 0;
-    opacity: 0.80;
+    opacity: 0.8;
 }
 
 #menu .burger-icon div {
@@ -39,7 +39,7 @@
     top: 1.3em;
     width: 1.6em;
     height: 1.44em;
-    opacity: 0.80;
+    opacity: 0.8;
     display: none;
 }
 
@@ -48,7 +48,7 @@
     position: absolute;
     top: 0;
     right: 0.84em;
-    content: ' ';
+    content: " ";
     height: 1.44em;
     width: 0.2em;
     border-radius: 0.16em;

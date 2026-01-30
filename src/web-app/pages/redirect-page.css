@@ -11,7 +11,7 @@
     top: 30%;
 }
 
-#redirect>div {
+#redirect > div {
     max-width: 100%;
 }
 
@@ -25,8 +25,8 @@
 }
 
 #redirect .icon img {
-    width: 2.0em;
-    height: 2.0em;
+    width: 2em;
+    height: 2em;
     margin-top: 0.1em;
     animation: icon 0.5s linear 0s infinite alternate;
 }

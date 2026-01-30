@@ -14,7 +14,7 @@
     padding-left: 2.5em;
 }
 
-#setup>div:first-child {
+#setup > div:first-child {
     display: flex;
     height: 10em;
     width: 100%;

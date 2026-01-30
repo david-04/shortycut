@@ -32,11 +32,11 @@ h2[id] {
 
 /* remove icon before "ShortyCut" title above the TOC */
 .wy-side-nav-search .icon-home::before {
-    content: '';
+    content: "";
 }
 
 /* hide the search bar */
-.wy-side-nav-search div[role=search] {
+.wy-side-nav-search div[role="search"] {
     display: none;
 }
 
@@ -68,7 +68,7 @@ h2[id] {
 /* Hide the index.md from the menu                                                                                    */
 /* ------------------------------------------------------------------------------------------------------------------ */
 
-.wy-menu.wy-menu-vertical>ul:first-child {
+.wy-menu.wy-menu-vertical > ul:first-child {
     display: none;
 }
 
@@ -89,4 +89,13 @@ h3 img {
     height: 0.65em;
     width: 0.65em;
     margin-top: -0.1em;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* Hide bread crumbs */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+footer,
+[role="navigation"]:has(+ .document) {
+    display: none;
 }

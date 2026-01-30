@@ -38,11 +38,11 @@ body {
     line-height: 1.3em;
 }
 
-.utility-page>* {
+.utility-page > * {
     width: 100%;
 }
 
-.utility-page>div:not(:last-child) {
+.utility-page > div:not(:last-child) {
     margin-bottom: 2em;
 }
 

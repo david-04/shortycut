@@ -1,7 +1,8 @@
 import { state } from "../data/state";
 import { pages } from "../data/variables";
+import { VERSION } from "../generated/version";
 import { create } from "../utilities/html";
-import { getVersionNumber, getWindowLocationPath } from "../utilities/misc";
+import { getWindowLocationPath } from "../utilities/misc";
 import "./menu.css";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -45,7 +46,7 @@ export class Menu {
         this.dom.items.innerHTML = "";
 
         const menuItems: Array<[string, ((event: MouseEvent) => boolean) | (() => boolean)]> = [
-            [`ShortyCut ${getVersionNumber()}`, this.onShortyCut],
+            [`ShortyCut ${VERSION}`, this.onShortyCut],
             ["Documentation", this.onDocumentation],
             ["Link tools", this.onLinkTools],
             ["Browser integration", this.onBrowserIntegration],

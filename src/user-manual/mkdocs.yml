@@ -5,9 +5,9 @@ site_name: ShortyCut
 nav:
   - Home: index.md
   - Introduction:
-    - Keywords: keywords.md
-    - ShortyCut: shortycut.md
-    - Installation: installation.md
+      - Keywords: keywords.md
+      - ShortyCut: shortycut.md
+      - Installation: installation.md
   - Defining shortcuts:
       - File format: file-format.md
       - Shortcut syntax: shortcut-syntax.md
@@ -20,16 +20,16 @@ nav:
       - Default search engine: default-search-engine.md
       - Loading separate files: loading-separate-files.md
   - Browser integration:
-    - Overview: browser-integration.md
-    - Homepage: homepage.md
-    - Keyword query: keyword-query.md
-    - Web server: web-server.md
+      - Overview: browser-integration.md
+      - Homepage: homepage.md
+      - Keyword query: keyword-query.md
+      - Web server: web-server.md
   - Miscellaneous:
-    - Configuration: configuration.md
-    - Favicons: favicons.md
-    - API: api.md
-    - License: license.md
-    - Release notes: release-notes.md
+      - Configuration: configuration.md
+      - Favicons: favicons.md
+      - API: api.md
+      - License: generated/license.md
+      - Release notes: generated/release-notes.md
 
 theme:
   name: readthedocs
@@ -37,9 +37,9 @@ theme:
   titles_only: true
   highlightjs: false
 
-docs_dir:  docs
+docs_dir: .
 
-site_dir: html/resources/docs
+site_dir: ../../build/mkdocs
 
 extra_css:
   - css/custom.css

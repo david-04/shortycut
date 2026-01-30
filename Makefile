@@ -4,43 +4,96 @@ include .launchpad/Makefile.header # see .launchpad/Makefile.documentation
 autorun : $(LP_PREREQUISITE_BUNDLE);
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Configuration
+#-----------------------------------------------------------------------------------------------------------------------
+
+VERSION=$(shell grep -E '^## \[[0-9.]+' CHANGELOG.md | head -1 | sed -E 's|^[^[]*\[||;s|\].*||')
+YEAR=$(shell grep -E '^## \[[0-9.]+' CHANGELOG.md | head -1 | sed 's|.*\x28||;s|-.*||')
+# SHORTYCUT_ZIP=shortycut-$(VERSION).zip
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Generated files
+#-----------------------------------------------------------------------------------------------------------------------
+
+GENERATED_FILES=\
+	LICENSE \
+	src/user-manual/generated/license.md \
+	src/user-manual/generated/release-notes.md \
+	src/web-app/generated/html-body.ts \
+	src/web-app/generated/version.ts
+
+LICENSE : CHANGELOG.md
+	echo "Updating $@..." && sed -i -E 's/[0-9]{4}-[0-9]{4}/2022-$(YEAR)/' $@
+
+src/user-manual/generated/license.md : LICENSE
+	echo Updating $@...  && echo "# ![](../img/arrow.svg) License\n" > $@ && cat LICENSE >> $@
+
+src/user-manual/generated/release-notes.md : CHANGELOG.md
+	echo "Updating $@..." && sed -E 's/^## \[/## [Version /g;s/^# Change Log/# ![](..\/img\/arrow.svg) Release notes/' $^ > $@
+
+src/web-app/generated/html-body.ts : dist/index.html
+	   echo "Generating $@..." \
+	&& echo 'export const HTML_BODY = `' > $@ \
+	&& awk '/<\/body/ { isBody = 0 } isBody { print } /<body/ { isBody = 1 }' $^ >> $@ \
+	&& echo '`;' >> $@
+
+src/web-app/generated/version.ts : CHANGELOG.md
+	echo "Generating $@..." && echo 'export const VERSION = "$(VERSION)";' > $@
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Format
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.format.exclude, archive build docs releases)
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Compile
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.tsc.add-extra-prerequisites, $(GENERATED_FILES))
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add, src/shortycut.ts, dist/resources/shortycut.js, sourcemap)
+$(call lp.bundle.add, src/web-app/shortycut.ts, dist/resources/shortycut.js, sourcemap)
 
-# VERSION=$(shell grep -E "^## \[Version [0-9.]+\]" src/docs/release-notes.md | head -1 | sed 's/^.*Version\s*//;s/\].*//')
-# SHORTYCUT_ZIP=shortycut-$(VERSION).zip
+#-----------------------------------------------------------------------------------------------------------------------
+# Documentation
+#-----------------------------------------------------------------------------------------------------------------------
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # Targets
-# #-----------------------------------------------------------------------------------------------------------------------
+$(call lp.help.add-phony-target , docs, ............... compile the documentation)
+$(call lp.help.add-phony-target , mkdocs, ............. start the MkDocs development server)
+
+mkd mkdocs : $(GENERATED_FILES)
+	echo Starting MkDocs development server... && mkdocs serve -f src/user-manual/mkdocs.yml
+
+doc docs build/mkdocs/index.html : $(wildcard src/user-manual/* src/user-manual/*/* src/user-manual/*/*/*)
+	echo "Building the user manual..." && mkdocs build -f src/user-manual/mkdocs.yml -c 2>&1
+
+#-----------------------------------------------------------------------------------------------------------------------
+# web-server
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.help.add-phony-target , web-server, ......... compile the web server)
+
+ws web-server webserver build/web-server/web-server.jar :  $(wildcard src/web-server/*.java) \
+                                                           $(wildcard src/web-server/*.MF) \
+                                                           $(wildcard src/web-server/*.jks)
+	   echo Building the web server... \
+	&& rm -rf build/web-server/javac \
+	&& mkdir -p build/web-server/javac \
+	&& javac8 -sourcepath src/web-server -d build/web-server/javac $(wildcard src/web-server/*.java) \
+	&& cp src/web-server/keystore.jks src/web-server/MANIFEST.MF build/web-server/javac/ \
+	&& cd build/web-server/javac \
+	&& jar -cfm ../web-server.jar MANIFEST.MF *.class *.jks \
 
 
-# $(call lp.help.add-phony-target, docs, ............... create documentation in src/html/resources)
-# $(call lp.help.add-phony-target, mkd, ................ start the MkDocs server in watch mode)
-# $(call lp.help.add-phony-target, build, .............. create $(SHORTYCUT_ZIP))
-# $(call lp.help.add-phony-target, release, ............ update the GitHub Pages documentation)
+#-----------------------------------------------------------------------------------------------------------------------
+# Release
+#-----------------------------------------------------------------------------------------------------------------------
 
-# tsc : src/html/resources/shortycut.js;
-
-# watch :
-# 	tsc --watch -p src/typescript/tsconfig.json
-
-# docs : src/html/resources/docs/index.html;
-
-# mkd :
-# 	python -m mkdocs serve -f src/mkdocs.yml 2>&1 \
-# 		| grep -vE '(^\[|Browser Connected|Running task:|Ignore.*worker.js)'
-
-
-# release : build/$(SHORTYCUT_ZIP);
-
-$(call lp.clean.files, src/html/resources/docs src/html/resources/shortycut.js*)
-
-# #-----------------------------------------------------------------------------------------------------------------------
-# # build/shortycut.zip
-# #-----------------------------------------------------------------------------------------------------------------------
+release : $(LP_PREREQUISITE_BUNDLE) docs;
 
 # build/$(SHORTYCUT_ZIP) : docs \
 # 						 copyDocsToBuildDirectory \
@@ -64,136 +117,25 @@ $(call lp.clean.files, src/html/resources/docs src/html/resources/shortycut.js*)
 # 	rm -rf build/shortycut/data
 # 	cd build; zip -r -9 -q $(SHORTYCUT_ZIP) shortycut
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # src/html/resources/docs
-# #-----------------------------------------------------------------------------------------------------------------------
 
-# src/html/resources/docs/index.html : $(wildcard src/docs/* src/docs/*/* src/docs/*/*/*)
-# 	echo src/html/resources/docs
-# 	rm -rf src/html/resources/docs
-# 	-mkdocs build -f src/mkdocs.yml -c 2>&1 \
-# 		| grep -vE "(Cleaning site directory|Building documentation to directory|Documentation built in)"
-# 	@$(foreach file, \
-# 	           $(patsubst src/docs/%.md, src/html/resources/docs/%.html, $(wildcard src/docs/*.md)) \
-# 			   $(patsubst %, src/html/resources/docs/%.html, 404 search), \
-# 			   echo $(file); \
-# 			   cat $(file) \
-# 					| grep -vE '<link.*href=".*fonts.googleapis.com' \
-# 					| sed 's|<a href="." class="icon icon-home">|<a href="index.html" class="icon icon-home">|g' \
-# 					| sed 's|<span class="icon icon-circle-arrow-right"></span>| \&#x25BA;|g' \
-# 					| sed 's|<span class="icon icon-circle-arrow-left"></span>|\&#x25C4; |g' \
-# 					| sed 's|>Docs<|>ShortyCut<|g' \
-#  					> $(file).tmp; \
-# 			   mv -f $(file).tmp $(file);)
-# 	rm $(patsubst %, src/html/resources/docs/%, sitemap.xml*)
-# 	rm -r src/html/resources/docs/css/fonts
+#-----------------------------------------------------------------------------------------------------------------------
+# Clean
+#-----------------------------------------------------------------------------------------------------------------------
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # build/resources/*
-# #-----------------------------------------------------------------------------------------------------------------------
+$(call lp.clean.files, )
+$(call lp.clean.bundles) # delete bundles
 
 
-# build/shortycut/resources/shortycut.js : src/html/resources/bootstrap.js \
-# 										 src/html/resources/shortycut.js \
-# 										 src/html/index.html
-# 	cat src/html/resources/shortycut.js \
-# 		| grep -v '^//#.*shortycut.js.map' \
-# 		| sed "s/##VERSION_NUMBER##/${VERSION}/" \
-# 		>> $@
-
-src/generated/html-body.ts : dist/index.html
-	   echo "Generating $@..." \
-	&& echo 'export const HTML_BODY = `' > $@ \
-	&& awk '/<\/body/ { isBody = 0 } isBody { print } /<body/ { isBody = 1 }' $^ >> $@ \
-	&& echo '`;' >> $@
-
-# #-----------------------------------------------------------------------------------------------------------------------
-# # build/resources/docs
-# #-----------------------------------------------------------------------------------------------------------------------
-
-# DOCS_SOURCES=$(wildcard src/docs/*) \
-#              $(wildcard src/docs/*/*) \
-#              $(wildcard src/docs/*/*/*) \
-# 		     $(wildcard src/html/resources/docs/*) \
-# 			 $(wildcard src/html/resources/docs/*/*) \
-# 			 $(wildcard src/html/resources/docs/*/*/*) \
-
-# DOCS_TARGETS=build/shortycut/resources/docs/ \
-# 			 $(wildcard build/shortycut/resources/docs/*) \
-# 			 $(wildcard build/shortycut/resources/docs/*/*) \
-# 			 $(wildcard build/shortycut/resources/docs/*/*/*) \
-
-# copyDocsToBuildDirectory : $(DOCS_TARGETS);
-
-# $(DOCS_TARGETS) : $(DOCS_SOURCES)
-# 	echo build/shortycut/resources/docs
-# 	mkdir -p build/shortycut/resources/docs
-# 	rm -rf build/shortycut/resources/docs
-# 	cp -r src/html/resources/docs build/shortycut/resources/
-
-# #-----------------------------------------------------------------------------------------------------------------------
-# # build/data-template/*
-# #-----------------------------------------------------------------------------------------------------------------------
-
-# build/shortycut/data-template/% : src/html/data-template/%
-# 	echo $@
-# 	mkdir -p build/shortycut/data-template
-# 	cp src/html/data-template/$* $@
-
-# build/shortycut/data-template/favicons :
-# 	mkdir -p build/shortycut/data-template/favicons
 
 # #-----------------------------------------------------------------------------------------------------------------------
 # # build/resources/web-server.*
 # #-----------------------------------------------------------------------------------------------------------------------
 
-# build/shortycut/resources/web-server.jar : $(wildcard src/web-server/*.java) \
-#                                            $(wildcard src/web-server/*.MF) \
-#                                            $(wildcard src/web-server/*.jks)
-# 	echo $@
-# 	mkdir -p build/shortycut/resources
-# 	rm -f src/web-server/*.class
-# 	cd src/web-server; javac8 *.java
-# 	cd src/web-server; jar -cfm web-server.jar MANIFEST.MF *.class *.jks
-# 	rm -f src/web-server/*.class
-# 	mv src/web-server/web-server.jar $@
 
 # build/shortycut/resources/web-server.bat : src/web-server/web-server.bat
 # 	echo $@
 # 	mkdir -p build/shortycut/resources
 # 	cp $^ $@
-
-# #-----------------------------------------------------------------------------------------------------------------------
-# # build/index.html
-# #-----------------------------------------------------------------------------------------------------------------------
-
-# build/shortycut/index.html :  src/html/index.html
-# 	echo $@
-# 	mkdir -p build/shortycut
-# 	cat $^ \
-# 		| grep -vE '^\s*<(link|script)' \
-# 		| tr '\n' '\a' \
-# 		| sed 's|<\s*body[^>]*>.*<\s*/\s*body[^>]*>|<body>\a</body>|g' \
-# 		| sed 's|</head|    <link href="resources/shortycut.css" rel="stylesheet" type="text/css" />\a</head|' \
-# 		| sed 's|</head|    <script src="resources/shortycut.js"></script>\a</head|' \
-# 		| sed 's|</head|    <script src="data/settings.js"></script>\a</head|' \
-# 		| sed 's|</head|    <script src="data/shortcuts.js"></script>\a</head|' \
-# 		| tr '\a' '\n' \
-# 		> $@
-
-# #-----------------------------------------------------------------------------------------------------------------------
-# # build/LICENSE
-# #-----------------------------------------------------------------------------------------------------------------------
-
-# build/shortycut/LICENSE : src/docs/license.md
-# 	echo $@
-# 	mkdir -p build/shortycut
-# 	cat $^ \
-# 		| grep -vE '^(#|```)' \
-# 		| tr '\n' '\a' \
-# 		| sed "s/^\a//g;" \
-# 		| tr '\a' '\n' \
-# 		> $@
 
 # #-----------------------------------------------------------------------------------------------------------------------
 # # docs/demo

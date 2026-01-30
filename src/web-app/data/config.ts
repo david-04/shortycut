@@ -130,7 +130,9 @@ export function applyAndValidateConfig() {
     }
     validateConfig();
     if (!state.config.shortcutFormat.keyword.caseSensitive) {
-        state.config.shortcutFormat.url.searchTermPlaceholder = adjustCase(state.config.shortcutFormat.url.searchTermPlaceholder);
+        state.config.shortcutFormat.url.searchTermPlaceholder = adjustCase(
+            state.config.shortcutFormat.url.searchTermPlaceholder
+        );
         state.config.shortcutFormat.url.postIndicator = adjustCase(state.config.shortcutFormat.url.postIndicator);
         state.config.defaultSearchEngine.keyword = adjustCase(state.config.defaultSearchEngine.keyword);
         state.config.homepage.keywords = state.config.homepage.keywords
@@ -197,12 +199,14 @@ function validateConfig(): void {
 
     const rules = [
         [
-            state.config.shortcutFormat.keyword.openingDelimiter && !state.config.shortcutFormat.keyword.closingDelimiter,
+            state.config.shortcutFormat.keyword.openingDelimiter &&
+                !state.config.shortcutFormat.keyword.closingDelimiter,
             "When using an openingDelimiter, the closingDelimiter must be set as well",
             ["openingDelimiter", "closingDelimiter"],
         ],
         [
-            !state.config.shortcutFormat.keyword.openingDelimiter && state.config.shortcutFormat.keyword.closingDelimiter,
+            !state.config.shortcutFormat.keyword.openingDelimiter &&
+                state.config.shortcutFormat.keyword.closingDelimiter,
             "The closingDelimiter can only be used if the openingDelimiter is set as well",
             ["openingDelimiter", "closingDelimiter"],
         ],

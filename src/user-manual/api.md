@@ -1,6 +1,6 @@
 # ![](img/arrow.svg) API
 
-ShortyCut provides functions that can be used to interact with it through JavaScript code. It also ships with typings for TypeScript. 
+ShortyCut provides functions that can be used to interact with it through JavaScript code. It also ships with typings for TypeScript.
 
 The typings were previously contained in the `data-template` folder but have now been moved to the `resources` folder. Please delete `shortycut.d.ts` from your `data` folder and instead point your `tsconfig.json` to the `resources` folder. This will ensure that every update also re-applies the latest typings.
 

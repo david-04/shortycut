@@ -77,8 +77,8 @@
         "verbatimModuleSyntax": false
     },
     "include": [
-        "../src/**/*.ts",
-        "../src/**/*.tsx"
+        "../src/web-app/**/*.ts",
+        "../src/web-app/**/*.tsx"
     ],
     "ts-node": {
         "esm": true
