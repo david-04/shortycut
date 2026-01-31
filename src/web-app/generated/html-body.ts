@@ -368,4 +368,3 @@ export const HTML_BODY = `
     </div>
 
 `;
-

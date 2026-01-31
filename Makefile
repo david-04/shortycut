@@ -25,10 +25,10 @@ src/web-app/generated/html-body.ts : dist/index.html
 	   echo "Generating $@..." \
 	&& echo 'export const HTML_BODY = `' > "$@" \
 	&& awk '/<\/body/ { isBody = 0 } isBody { print } /<body/ { isBody = 1 }' "$^" >> "$@" \
-	&& echo -e '`;\n' >> $@
+	&& echo '`;' >> $@
 
 src/web-app/generated/version.ts : CHANGELOG.md
-	echo "Generating $@..." && echo -e 'export const VERSION = "$(VERSION)";\n' > $@
+	echo "Generating $@..." && echo 'export const VERSION = "$(VERSION)";' > $@
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle
@@ -52,10 +52,10 @@ build/mkdocs/index.html : $(wildcard $(foreach GLOB, * */* */*/* */*/*/* */*/*/*
 	echo "Building the user manual..." && mkdocs build -f src/user-manual/mkdocs.yml -c -q
 
 src/user-manual/generated/license.md : LICENSE
-	echo Updating $@...  && echo "# ![](../img/arrow.svg) License\n" > $@ && cat LICENSE >> $@
+	echo Updating $@...  && echo -e "# ![](../img/arrow.svg) License\n" > $@ && cat LICENSE >> $@
 
 src/user-manual/generated/release-notes.md : CHANGELOG.md
-	echo "Updating $@..." && sed -E 's/^## \[/## [Version /g;s/^# /# ![](..\/img\/arrow.svg) Release notes/' $^ > $@
+	echo "Updating $@..." && sed -E 's/^## \[/## [Version /g;s/^# .*/# ![](..\/img\/arrow.svg) Release notes/' $^ > $@
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Web server
@@ -79,8 +79,7 @@ build/web-server/web-server.jar : $(wildcard $(foreach GLOB, * */* */*/* */*/*/*
 $(call lp.help.add-phony-target, release, ............ create release (build/$(SHORTYCUT_ZIP) and docs))
 $(call lp.help.add-phony-target, unrelease, .......... git-reset ./docs)
 
-release : clean
-	$(MAKE) build/$(SHORTYCUT_ZIP) docs/index.html;
+release : build/$(SHORTYCUT_ZIP) docs/index.html;
 
 build/$(SHORTYCUT_ZIP) : $(LP_PREREQUISITE_BUNDLE) build/mkdocs/index.html build/web-server/web-server.jar LICENSE \
                          $(wildcard $(foreach GLOB, * */* */*/* */*/*/* */*/*/*/*, dist/$(GLOB)))

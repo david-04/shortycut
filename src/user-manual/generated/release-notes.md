@@ -1,5 +1,10 @@
 # ![](../img/arrow.svg) Release notes
 
+## [Version 1.4.4](https://github.com/david-04/shortycut/releases/tag/v1.4.4) (2026-02-01)
+
+- Fixed an issue that prevented the caching of local favicons in the local storage
+- Performed technical maintenance (migrate to launchpad, switch to ECMAScript modules, fixed linting issues)
+
 ## [Version 1.4.3](https://github.com/david-04/shortycut/releases/tag/v1.4.3) (2024-06-14)
 
 - Fixed unhandled initialization exception when a search bucket has no main (non-search) shortcut
