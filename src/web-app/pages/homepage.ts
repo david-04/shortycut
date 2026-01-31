@@ -7,6 +7,7 @@ import { create, sanitize } from "../utilities/html";
 import { assertNotNull, isDemoMode, supportsBacktickSyntax } from "../utilities/misc";
 import { adjustCase, isUrl } from "../utilities/string";
 import "./homepage.css";
+import "./style.css";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Index page with a listing of all shortcuts

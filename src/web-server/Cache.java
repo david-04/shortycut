@@ -5,14 +5,14 @@ import java.util.Optional;
 
 public class Cache {
 
-    private final Map<String, LoadedFile> cache = new HashMap<>();
+    private final Map<String, LoadedFile> map = new HashMap<>();
 
     //------------------------------------------------------------------------------------------------------------------
     // Retrieve a cached file
     //------------------------------------------------------------------------------------------------------------------
 
     Optional<LoadedFile> get(String path) {
-        return Optional.ofNullable(cache.get(path)).filter(LoadedFile::isUpToDate);
+        return Optional.ofNullable(map.get(path)).filter(LoadedFile::isUpToDate);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ public class Cache {
     //------------------------------------------------------------------------------------------------------------------
 
     void put(String path, LoadedFile loadedFile) {
-        cache.put(path, loadedFile);
+        map.put(path, loadedFile);
     }
 
     //------------------------------------------------------------------------------------------------------------------

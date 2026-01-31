@@ -176,6 +176,6 @@ shortycut.addShortcuts(shortcuts.replace(/http:\/\/\s+/gi, TARGET_URL));
 // Load additional files
 //----------------------------------------------------------------------------------------------------------------------
 
-shortycut.loadJavaScript("../data-test/shortcuts-01.js").andThen("../data-test/shortcuts-02.js");
-shortycut.loadJavaScript("../data-test/shortcuts-01.js").andThen("../data-test/shortcuts-03.js");
-shortycut.loadJavaScript("../data-test/shortcuts-03.js").andThen("../data-test/shortcuts-02.js");
+shortycut.loadJavaScript("../data/shortcuts-01.js").andThen("../data/shortcuts-02.js");
+shortycut.loadJavaScript("../data/shortcuts-01.js").andThen("../data/shortcuts-03.js");
+shortycut.loadJavaScript("../data/shortcuts-03.js").andThen("../data/shortcuts-02.js");

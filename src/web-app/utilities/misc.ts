@@ -91,3 +91,11 @@ export function forEachProperty<T>(object: { [index: string]: T }, callback: (ke
 export function getProperty<T>(object: { [index: string]: T }, key: string) {
     return object && "object" === typeof object ? object[key] : undefined;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Check if we're running in demo mode
+//----------------------------------------------------------------------------------------------------------------------
+
+export function isDemo() {
+    return (globalThis as Record<string, unknown>)["shortycut/is-demo"] === true;
+}

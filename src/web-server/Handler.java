@@ -24,7 +24,7 @@ public class Handler {
     private static final Server.Response FILE_NOT_FOUND = new Server.Response(400, "text/plain", "File not found");
 
     //------------------------------------------------------------------------------------------------------------------
-    // Initialise the handler
+    // Initialize the handler
     //------------------------------------------------------------------------------------------------------------------
 
     Handler(Config config) {
@@ -92,7 +92,6 @@ public class Handler {
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
             exception.printStackTrace(printWriter);
-            printWriter.close();
             return new Server.Response(500, "text/plain", stringWriter.toString().trim());
         } catch (Exception ignored) {
             if (null != exception.getMessage() && !exception.getMessage().isEmpty()) {

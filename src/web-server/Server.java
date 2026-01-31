@@ -42,7 +42,7 @@ public class Server implements HttpHandler {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Initialise the server
+    // Initialize the server
     //------------------------------------------------------------------------------------------------------------------
 
     Server(Config config, int port, boolean ssl, Handler handler) {
@@ -92,8 +92,8 @@ public class Server implements HttpHandler {
 
     public HttpServer createServer(int port, boolean ssl, boolean allowExternalConnections) throws Exception {
 
-        InetSocketAddress inetSocketAddress =
-                allowExternalConnections ? new InetSocketAddress(port) : new InetSocketAddress(
+        InetSocketAddress inetSocketAddress = allowExternalConnections ? new InetSocketAddress(port)
+                : new InetSocketAddress(
                         InetAddress.getLoopbackAddress(), port);
         if (ssl) {
             return configureSsl(HttpsServer.create(inetSocketAddress, 0));
@@ -110,7 +110,7 @@ public class Server implements HttpHandler {
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
 
-        // initialise the keystore
+        // initialize the keystore
         char[] password = "shortycut".toCharArray();
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(getClass().getClassLoader().getResourceAsStream("keystore.jks"), password);
@@ -143,7 +143,7 @@ public class Server implements HttpHandler {
 
             try {
 
-                // initialise the SSL context
+                // initialize the SSL context
                 SSLContext context = getSSLContext();
                 SSLEngine engine = context.createSSLEngine();
                 parameters.setNeedClientAuth(false);

@@ -9,36 +9,7 @@ autorun : $(LP_PREREQUISITE_BUNDLE);
 
 VERSION=$(shell grep -E '^## \[[0-9.]+' CHANGELOG.md | head -1 | sed -E 's|^[^[]*\[||;s|\].*||')
 YEAR=$(shell grep -E '^## \[[0-9.]+' CHANGELOG.md | head -1 | sed 's|.*\x28||;s|-.*||')
-# SHORTYCUT_ZIP=shortycut-$(VERSION).zip
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Generated files
-#-----------------------------------------------------------------------------------------------------------------------
-
-GENERATED_FILES=\
-	LICENSE \
-	src/user-manual/generated/license.md \
-	src/user-manual/generated/release-notes.md \
-	src/web-app/generated/html-body.ts \
-	src/web-app/generated/version.ts
-
-LICENSE : CHANGELOG.md
-	echo "Updating $@..." && sed -i -E 's/[0-9]{4}-[0-9]{4}/2022-$(YEAR)/' $@
-
-src/user-manual/generated/license.md : LICENSE
-	echo Updating $@...  && echo "# ![](../img/arrow.svg) License\n" > $@ && cat LICENSE >> $@
-
-src/user-manual/generated/release-notes.md : CHANGELOG.md
-	echo "Updating $@..." && sed -E 's/^## \[/## [Version /g;s/^# Change Log/# ![](..\/img\/arrow.svg) Release notes/' $^ > $@
-
-src/web-app/generated/html-body.ts : dist/index.html
-	   echo "Generating $@..." \
-	&& echo 'export const HTML_BODY = `' > $@ \
-	&& awk '/<\/body/ { isBody = 0 } isBody { print } /<body/ { isBody = 1 }' $^ >> $@ \
-	&& echo '`;' >> $@
-
-src/web-app/generated/version.ts : CHANGELOG.md
-	echo "Generating $@..." && echo 'export const VERSION = "$(VERSION)";' > $@
+SHORTYCUT_ZIP=shortycut-$(VERSION).zip
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Format
@@ -50,129 +21,102 @@ $(call lp.format.exclude, archive build docs releases)
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.tsc.add-extra-prerequisites, $(GENERATED_FILES))
+src/web-app/generated/html-body.ts : dist/index.html
+	   echo "Generating $@..." \
+	&& echo 'export const HTML_BODY = `' > "$@" \
+	&& awk '/<\/body/ { isBody = 0 } isBody { print } /<body/ { isBody = 1 }' "$^" >> "$@" \
+	&& echo -e '`;\n' >> $@
+
+src/web-app/generated/version.ts : CHANGELOG.md
+	echo "Generating $@..." && echo -e 'export const VERSION = "$(VERSION)";\n' > $@
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add, src/web-app/shortycut.ts, dist/resources/shortycut.js, sourcemap)
+$(call lp.bundle.add, src/web-app/shortycut.ts, dist/resources/shortycut.js)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Documentation
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.help.add-phony-target , docs, ............... compile the documentation)
-$(call lp.help.add-phony-target , mkdocs, ............. start the MkDocs development server)
+$(call lp.help.add-phony-target, docs, ............... compile the documentation (alias: doc))
+$(call lp.help.add-phony-target, mkdocs, ............. start the MkDocs development server (alias: mkd))
 
-mkd mkdocs : $(GENERATED_FILES)
+mkd mkdocs : ;
 	echo Starting MkDocs development server... && mkdocs serve -f src/user-manual/mkdocs.yml
 
-doc docs build/mkdocs/index.html : $(wildcard src/user-manual/* src/user-manual/*/* src/user-manual/*/*/*)
-	echo "Building the user manual..." && mkdocs build -f src/user-manual/mkdocs.yml -c 2>&1
+doc docs : build/mkdocs/index.html;
+
+build/mkdocs/index.html : $(wildcard $(foreach GLOB, * */* */*/* */*/*/* */*/*/*/*, src/user-manual/$(GLOB)))
+	echo "Building the user manual..." && mkdocs build -f src/user-manual/mkdocs.yml -c -q
+
+src/user-manual/generated/license.md : LICENSE
+	echo Updating $@...  && echo "# ![](../img/arrow.svg) License\n" > $@ && cat LICENSE >> $@
+
+src/user-manual/generated/release-notes.md : CHANGELOG.md
+	echo "Updating $@..." && sed -E 's/^## \[/## [Version /g;s/^# /# ![](..\/img\/arrow.svg) Release notes/' $^ > $@
 
 #-----------------------------------------------------------------------------------------------------------------------
-# web-server
+# Web server
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.help.add-phony-target , web-server, ......... compile the web server)
+$(call lp.help.add-phony-target, web-server, ......... compile the web server)
 
-ws web-server webserver build/web-server/web-server.jar :  $(wildcard src/web-server/*.java) \
-                                                           $(wildcard src/web-server/*.MF) \
-                                                           $(wildcard src/web-server/*.jks)
+ws web-server webserver : build/web-server/web-server.jar;
+
+build/web-server/web-server.jar : $(wildcard $(foreach GLOB, * */* */*/* */*/*/* */*/*/*/*, src/web-server/$(GLOB)))
 	   echo Building the web server... \
 	&& rm -rf build/web-server/javac \
 	&& mkdir -p build/web-server/javac \
 	&& javac8 -sourcepath src/web-server -d build/web-server/javac $(wildcard src/web-server/*.java) \
-	&& cp src/web-server/keystore.jks src/web-server/MANIFEST.MF build/web-server/javac/ \
-	&& cd build/web-server/javac \
-	&& jar -cfm ../web-server.jar MANIFEST.MF *.class *.jks \
-
+	&& jar -cfm build/web-server/web-server.jar src/web-server/MANIFEST.MF -C src/web-server keystore.jks -C build/web-server/javac .
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Release
 #-----------------------------------------------------------------------------------------------------------------------
 
-release : $(LP_PREREQUISITE_BUNDLE) docs;
+$(call lp.help.add-phony-target, release, ............ create release (build/$(SHORTYCUT_ZIP) and docs))
+$(call lp.help.add-phony-target, unrelease, .......... git-reset ./docs)
 
-# build/$(SHORTYCUT_ZIP) : docs \
-# 						 copyDocsToBuildDirectory \
-# 						 build/shortycut/data-template/favicons \
-# 						 build/shortycut/data-template/search.xml \
-# 						 build/shortycut/data-template/settings.js \
-# 						 build/shortycut/data-template/shortcuts.js \
-# 						 build/shortycut/data-template/web-server.properties \
-# 						 build/shortycut/resources/arrow.svg \
-# 						 build/shortycut/resources/favicon.ico \
-# 						 build/shortycut/resources/local.svg \
-# 						 build/shortycut/resources/shortycut.css \
-# 						 build/shortycut/resources/shortycut.js \
-# 						 build/shortycut/resources/shortycut.d.ts \
-# 						 build/shortycut/resources/web-server.bat \
-# 						 build/shortycut/resources/web-server.jar \
-# 						 build/shortycut/index.html \
-# 						 build/shortycut/LICENSE
-# 	echo $@
-# 	rm -f build/$(SHORTYCUT_ZIP)
-# 	rm -rf build/shortycut/data
-# 	cd build; zip -r -9 -q $(SHORTYCUT_ZIP) shortycut
+release : clean
+	$(MAKE) build/$(SHORTYCUT_ZIP) docs/index.html;
 
+build/$(SHORTYCUT_ZIP) : $(LP_PREREQUISITE_BUNDLE) build/mkdocs/index.html build/web-server/web-server.jar LICENSE \
+                         $(wildcard $(foreach GLOB, * */* */*/* */*/*/* */*/*/*/*, dist/$(GLOB)))
+	   echo "Creating $@..." \
+	&& rm -rf build/release \
+	&& mkdir -p build/release/shortycut/resources/docs \
+	&& cp -r dist/data-template build/release/shortycut/ \
+	&& cp $(foreach EXT, svg ico css js d.ts, dist/resources/*.$(EXT)) build/release/shortycut/resources/ \
+	&& awk '/<\/body/ { isBody = 0 } !isBody { print } /<body/ { isBody = 1 }' dist/index.html >> build/release/shortycut/index.html \
+	&& cp CHANGELOG.md LICENSE build/release/shortycut/resources \
+	&& cp -r build/mkdocs/* build/release/shortycut/resources/docs/ \
+	&& cp build/web-server/web-server.jar build/release/shortycut/resources/ \
+	&& cp src/web-server/web-server.bat build/release/shortycut/resources/ \
+	&& rm -rf $(SHORTYCUT_ZIP) \
+	&& cd build/release && zip -r -9 -q ../$(SHORTYCUT_ZIP) shortycut && cd ../..
+
+LICENSE : CHANGELOG.md
+	echo "Updating $@..." && sed -i -E 's/[0-9]{4}-[0-9]{4}/2022-$(YEAR)/' $@
+
+docs/index.html : build/mkdocs/index.html build/$(SHORTYCUT_ZIP) $(wildcard dist/resources/data-demo/*)
+	   echo "Updating docs..." \
+	&& rm -rf ./docs \
+	&& unzip -q build/$(SHORTYCUT_ZIP) -d docs \
+	&& mv docs/shortycut docs/demo \
+	&& rm -rf docs/demo/data-template $(foreach GLOB, docs web-server* CHANGELOG.md LICENSE, docs/demo/resources/$(GLOB)) \
+	&& cp -r dist/data-demo docs/demo/data \
+	&& cp -r build/mkdocs/* docs/ \
+
+unrelease : ;
+	echo "Reverting ./doc..." && git checkout -- docs && git clean -fdx docs
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Clean
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.clean.files, )
-$(call lp.clean.bundles) # delete bundles
-
-
-
-# #-----------------------------------------------------------------------------------------------------------------------
-# # build/resources/web-server.*
-# #-----------------------------------------------------------------------------------------------------------------------
-
-
-# build/shortycut/resources/web-server.bat : src/web-server/web-server.bat
-# 	echo $@
-# 	mkdir -p build/shortycut/resources
-# 	cp $^ $@
-
-# #-----------------------------------------------------------------------------------------------------------------------
-# # docs/demo
-# #-----------------------------------------------------------------------------------------------------------------------
-
-# release : build/$(SHORTYCUT_ZIP)
-# 	rm -rf ./docs
-# 	mkdir -p docs
-# 	echo docs/demo
-# 	cd docs; unzip -q ../$^
-# 	mv docs/shortycut/data-template docs/shortycut/data
-# 	mv docs/shortycut docs/demo
-# 	mv docs/demo/resources/docs/* docs/
-# 	rm -r $(patsubst %, docs/demo/%, resources/docs data/favicons)
-# 	rm $(patsubst %, docs/demo/%, resources/web-server.bat resources/web-server.jar)
-# 	echo docs/demo/data/settings.s
-# 	cat docs/demo/data/settings.js \
-# 		| tr '\n' '\a' \
-# 		| sed "s|localFolders\s*:\s*\[[^]]*\]|localFolders: []|g" \
-# 		| sed "s|rememberUrls\s*:[^,]*|rememberUrls: false|g" \
-# 		| tr '\a' '\n' \
-# 		> docs/demo/data/settings.js.tmp
-# 	mv -f docs/demo/data/settings.js.tmp docs/demo/data/settings.js
-# 	echo docs/demo/data/shortcuts.js
-# 	cat docs/demo/data/shortcuts.js \
-# 		| grep -E "^\\s*(//|\\[)" \
-# 		| sed "s/'/\\\\'/g" \
-# 		| sed "s/^/'/g;s/$$/',/g" \
-# 		| gawk 'BEGIN {print "shortycut.addShortcuts(["} {print} END {print "]);"}' \
-# 		> docs/demo/data/shortcuts.js.tmp
-# 	mv -f docs/demo/data/shortcuts.js.tmp docs/demo/data/shortcuts.js
-# 	echo docs/demo/resources/shortycut.js
-# 	cat docs/demo/resources/shortycut.js \
-# 		| sed "s|resources/docs|..|g" \
-# 		> docs/demo/resources/shortycut.js.tmp
-# 	mv -f docs/demo/resources/shortycut.js.tmp docs/demo/resources/shortycut.js
-
+$(call lp.clean.files, build dist/resources/shortycut.css* dist/resources/shortycut.js*)
 
 #-----------------------------------------------------------------------------------------------------------------------
 include .launchpad/Makefile.footer

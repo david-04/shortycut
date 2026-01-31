@@ -117,8 +117,6 @@ export class HotkeySelector {
     private switchToNextCombination(currentCombination: number[], candidates: HotkeyCandidates[]) {
         for (let index = currentCombination.length - 1; 0 <= index; index--) {
             currentCombination[index] = (currentCombination[index] ?? 0) + 1;
-            const x = candidates[index];
-            console.log(x);
             if ((currentCombination[index] ?? Number.MAX_VALUE) < (candidates[index]?.length ?? -1)) {
                 return true;
             } else if (0 === index) {

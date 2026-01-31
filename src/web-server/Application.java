@@ -1,14 +1,14 @@
-import java.io.File;
-
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
+
+import java.io.File;
 
 public class Application {
 
     private static final String DEFAULT_PROPERTIES_FILE = "web-server.properties";
 
     //------------------------------------------------------------------------------------------------------------------
-    // Initialise and start the server
+    // Initialize and start the server
     //------------------------------------------------------------------------------------------------------------------
 
     public static void main(String[] args) {

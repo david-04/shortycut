@@ -2,7 +2,7 @@ import { state } from "../data/state";
 import { pages } from "../data/variables";
 import { VERSION } from "../generated/version";
 import { create } from "../utilities/html";
-import { getWindowLocationPath } from "../utilities/misc";
+import { isDemo } from "../utilities/misc";
 import "./menu.css";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ export class Menu {
 
         const menuItems: Array<[string, ((event: MouseEvent) => boolean) | (() => boolean)]> = [
             [`ShortyCut ${VERSION}`, this.onShortyCut],
-            ["Documentation", this.onDocumentation],
+            ["User manual", this.onDocumentation],
             ["Link tools", this.onLinkTools],
             ["Browser integration", this.onBrowserIntegration],
             ["Favicons", this.onFavicons],
@@ -144,7 +144,7 @@ export class Menu {
 
     public onDocumentation(event: MouseEvent) {
         this.closeMenu();
-        const url = getWindowLocationPath() + "resources/docs/index.html";
+        const url = `${isDemo() ? ".." : "resources/docs"}/index.html`;
         if (state.queryParameters.facets.newTabs) {
             globalThis.open(url);
         } else {

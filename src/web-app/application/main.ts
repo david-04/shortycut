@@ -4,6 +4,7 @@ import { state } from "../data/state";
 import { initializeVariables, startupCache } from "../data/variables";
 import { HTML_BODY } from "../generated/html-body";
 import { displayError, Exception, handleExceptions } from "../utilities/error";
+import { isDemo } from "../utilities/misc";
 import { FaviconManager } from "./favicon-manager";
 import { JavaScriptLoader } from "./script-loader";
 import { parseShortcuts } from "./threads";
@@ -50,7 +51,7 @@ function addLink(rel: string, type: string, href: string, title: string) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function startApplication() {
-    document.body.innerHTML = HTML_BODY;
+    document.body.innerHTML = isDemo() ? HTML_BODY.replaceAll("resources/docs", "..") : HTML_BODY;
     const self = globalThis.location.href.replace(/[?#].*/, "");
     document.body.innerHTML = document.body.innerHTML.replaceAll("self://", self);
 

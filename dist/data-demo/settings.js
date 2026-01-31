@@ -1,3 +1,7 @@
+//----------------------------------------------------------------------------------------------------------------------
+// Use this file to customize ShortyCut. Refer to the documentation for a description of the settings.
+//----------------------------------------------------------------------------------------------------------------------
+
 shortycut.configure({
     shortcutFormat: {
         comment: "//",
@@ -7,8 +11,8 @@ shortycut.configure({
             separator: "|",
             closingDelimiter: "]",
         },
-        enableGrouping: true,
-        hotkeyMarker: "_",
+        enableGrouping: false,
+        hotkeyMarker: "",
         url: {
             searchTermPlaceholder: "%s",
             postIndicator: "?POST?",
@@ -32,12 +36,14 @@ shortycut.configure({
     defaultSearchEngine: {
         keyword: "defaultsearchengine",
         useInAddressBar: true,
-        useOnHomepage: false,
+        useOnHomepage: true,
     },
     favicons: {
         preloadOnStart: true,
-        rememberUrls: true,
+        rememberUrls: false,
         fetchService: "https://www.google.com/s2/favicons?sz=32&domain=%s",
-        localFolders: ["data/favicons"],
+        localFolders: [],
     },
 });
+
+globalThis["shortycut/is-demo"] = true;
