@@ -1,4 +1,10 @@
-import { DynamicBookmarkFunction, DynamicLinkFunction, DynamicQueryFunction, GeneratedLinks } from "../data/shortcut";
+import {
+    DynamicBookmarkFunction,
+    DynamicLinkFunction,
+    DynamicQueryFunction,
+    GeneratedLinks,
+    Link,
+} from "../data/shortcut";
 import { state } from "../data/state";
 import { dynamicLinkProtocol, startupCache } from "../data/variables";
 import { InitializationError } from "../utilities/error";
@@ -71,7 +77,7 @@ function registerDynamicLink(entryPoint: "toUrl" | "toQueryUrl" | "toBookmarkUrl
     startupCache.dynamicLinks.put(key, {
         generator: fn,
         isQuery: "toBookmarkUrl" !== entryPoint,
-        faviconUrls: getUrlsForFavicon(fn),
+        getFaviconUrls: () => getUrlsForFavicon(fn),
     });
     return key;
 }
@@ -86,7 +92,9 @@ function getUrlsForFavicon(dynamicLinkFunction: DynamicQueryFunction) {
 
     for (const searchTerm of [undefined, null, "", "1"]) {
         try {
-            const result = analyzeUrls(dynamicLinkFunction(searchTerm as unknown as string));
+            const generatedLinks = dynamicLinkFunction(searchTerm as unknown as string);
+            const normalizedLinks = Link.normalizeDynamicLinks(generatedLinks);
+            const result = analyzeUrls(normalizedLinks);
             result.valid.forEach(url => valid.push(url));
             result.invalid.forEach(url => invalid.push(url));
         } catch {}

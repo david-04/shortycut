@@ -23,7 +23,7 @@ export type DynamicLinkFunction = DynamicQueryFunction | DynamicBookmarkFunction
 
 export interface DynamicShortcut {
     generator: DynamicQueryFunction;
-    faviconUrls: readonly string[];
+    getFaviconUrls: () => readonly string[];
     isQuery: boolean;
 }
 
@@ -103,8 +103,7 @@ export class Link {
     ) {
         this.isQuery =
             "string" === typeof this.urlOrDynamicShortcut
-                ? 0 <=
-                  adjustCase(this.urlOrDynamicShortcut).indexOf(state.config.shortcutFormat.url.searchTermPlaceholder)
+                ? adjustCase(this.urlOrDynamicShortcut).includes(state.config.shortcutFormat.url.searchTermPlaceholder)
                 : this.urlOrDynamicShortcut.isQuery;
     }
 
@@ -115,14 +114,35 @@ export class Link {
     public toFinalizedLinks(searchTerm: string) {
         if ("string" === typeof this.urlOrDynamicShortcut) {
             return this.constructFinalizedLinks([this.urlOrDynamicShortcut], searchTerm);
-        } else {
-            const urlOrUrls = this.urlOrDynamicShortcut.generator(searchTerm);
-            if ("string" === typeof urlOrUrls) {
-                return this.constructFinalizedLinks([urlOrUrls], searchTerm);
-            } else {
-                return this.constructFinalizedLinks(urlOrUrls, searchTerm);
-            }
         }
+        const urlOrUrls = this.urlOrDynamicShortcut.generator(searchTerm);
+        return this.constructFinalizedLinks(Link.normalizeDynamicLinks(urlOrUrls), searchTerm);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Normalize dynamically generated URLs
+    //----------------------------------------------------------------------------------------------------------------------
+
+    public static normalizeDynamicLinks(generatedLinks: GeneratedLinks) {
+        if ("string" === typeof generatedLinks) {
+            return this.normalizeDynamicLink(generatedLinks);
+        }
+        return generatedLinks.flatMap(generatedLink => {
+            return (
+                "string" === typeof generatedLink
+                    ? this.normalizeDynamicLink(generatedLink)
+                    : [{ ...generatedLink, url: generatedLink.url.trim() }]
+            ) as ReadonlyArray<string | { description: string; url: string }>;
+        }) as Exclude<GeneratedLinks, string>;
+    }
+
+    private static normalizeDynamicLink(generatedLink: string) {
+        const commentIndicator = state.config.shortcutFormat.comment;
+        return generatedLink
+            .split(/\r?\n/)
+            .map(link => link.trim())
+            .filter(Boolean)
+            .filter(link => !commentIndicator || !link.startsWith(commentIndicator));
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -141,11 +161,10 @@ export class Link {
                     searchTerm
                 ),
             ];
-        } else {
-            return urls
-                .map(link => ("string" === typeof link ? { description: "", url: link } : link))
-                .map(link => this.constructFinalizedLink(link.description, [link.url], searchTerm));
         }
+        return urls
+            .map(link => ("string" === typeof link ? { description: "", url: link } : link))
+            .map(link => this.constructFinalizedLink(link.description, [link.url], searchTerm));
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -186,7 +205,7 @@ export class Link {
     public get faviconUrls() {
         return "string" === typeof this.urlOrDynamicShortcut
             ? [this.urlOrDynamicShortcut]
-            : this.urlOrDynamicShortcut.faviconUrls;
+            : this.urlOrDynamicShortcut.getFaviconUrls();
     }
 
     public get overridden() {

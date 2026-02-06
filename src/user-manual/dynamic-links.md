@@ -124,6 +124,24 @@ function searchMkDocsRepository(searchTerm) {
 }
 ```
 
+Multiple links can also be returned as a single multi-line string, which may contain comments as well:
+
+```ts
+
+function searchMkDocsRepository(searchTerm) {
+    if (searchTerm.match(/^[0-9]+$/)) {
+        return `
+            // returns multiple links
+            https://github.com/mkdocs/mkdocs/issues/%s
+            https://github.com/mkdocs/mkdocs/pulls/%s
+        ` ];
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/search?q=%s';
+    }
+}
+
+```
+
 Using the shortcut with a number as the search term causes ShortyCut to open both links in new tabs. Closing the wrong page might be easier than having separate keywords and having to enter two search terms (one after the other).
 
 Dynamic link functions can also return multiple links that should be displayed as a list to choose from (see [Multi-link shortcuts](multi-link-shortcuts.md) for an example). This is done by returning an array of objects that contain the URL and a description as separate properties:

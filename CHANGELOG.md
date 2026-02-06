@@ -3,6 +3,7 @@
 ## [1.4.4](https://github.com/david-04/shortycut/releases/tag/v1.4.4) (2026-02-01)
 
 - Fixed an issue that prevented the caching of local favicons in the local storage
+- Enabled dynamic link functions to return multi-line strings (in addition to arrays of strings/URLs)
 - Performed technical maintenance (migrate to launchpad, switch to ECMAScript modules, fixed linting issues)
 
 ## [1.4.3](https://github.com/david-04/shortycut/releases/tag/v1.4.3) (2024-06-14)
