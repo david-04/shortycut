@@ -11,7 +11,6 @@ import { Shortlist } from "../pages/shortlist";
 import { InitializationError } from "../utilities/error";
 import { Hashtable } from "../utilities/hashtable";
 import { HotkeySelector } from "../utilities/hotkey-selector";
-import { forEachProperty } from "../utilities/misc";
 import { DEFAULT_CONFIG } from "./config";
 import { QueryParameters } from "./query-parameters";
 import { DynamicShortcut, Shortcut } from "./shortcut";
@@ -42,7 +41,7 @@ class Pages {
     };
 
     public hideAllExcept(page: Page | null) {
-        forEachProperty(this.pages, (_key, value) => {
+        Object.values(this.pages).forEach(value => {
             if (value && value !== page && "object" === typeof value && "function" === typeof value.hide) {
                 value.hide();
             }

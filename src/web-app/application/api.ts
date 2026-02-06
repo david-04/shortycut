@@ -124,13 +124,13 @@ function analyzeUrls(result: GeneratedLinks) {
 //----------------------------------------------------------------------------------------------------------------------
 
 class JavaScriptDependencyBuilder {
-    public constructor(public readonly dependencies: JavaScriptFile[]) {}
+    public constructor(public readonly dependencies: ReadonlyArray<JavaScriptFile>) {}
 
-    public andThen(...files: readonly string[]) {
+    public andThen(...files: ReadonlyArray<string>) {
         return new JavaScriptDependencyBuilder(files.map(file => state.javaScriptLoader.add(file, this.dependencies)));
     }
 }
 
-export function loadJavaScript(...files: readonly string[]) {
+export function loadJavaScript(...files: ReadonlyArray<string>) {
     return new JavaScriptDependencyBuilder([]).andThen(...files);
 }

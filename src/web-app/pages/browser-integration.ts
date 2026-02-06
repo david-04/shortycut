@@ -1,7 +1,7 @@
 import { state } from "../data/state";
 import { Page } from "../data/variables";
 import { sanitize } from "../utilities/html";
-import { forEachProperty, getProperty, getWindowLocationPath } from "../utilities/misc";
+import { getWindowLocationPath } from "../utilities/misc";
 import "./browser-integration.css";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,20 +88,18 @@ export class BrowserIntegration implements Page {
     //------------------------------------------------------------------------------------------------------------------
 
     public addEventHandlers() {
-        forEachProperty(this.dom.facets, (_key, checkbox) =>
-            checkbox.addEventListener("click", this.updateHomepageLink)
-        );
+        Object.values(this.dom.facets).forEach(checkbox => checkbox.addEventListener("click", this.updateHomepageLink));
     }
 
     public removeEventHandlers() {
-        forEachProperty(this.dom.facets, (_key, checkbox) =>
+        Object.values(this.dom.facets).forEach(checkbox =>
             checkbox.removeEventListener("click", this.updateHomepageLink)
         );
     }
 
     private updateHomepageLink() {
-        const facets = Object.keys(this.dom.facets)
-            .filter(facet => getProperty(this.dom.facets, facet)?.checked)
+        const facets = (Object.keys(this.dom.facets) as ReadonlyArray<keyof typeof this.dom.facets>)
+            .filter(facet => this.dom.facets[facet]?.checked)
             .map(facet => ("noFocus" === facet ? "no-focus" : facet))
             .map(facet => ("newTabs" === facet ? "new-tabs" : facet));
 

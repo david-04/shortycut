@@ -416,12 +416,10 @@ export class MatchingSegment {
     public readonly fingerprint = "";
     public readonly keyword = "";
     public readonly descriptionHtml = "";
-    public readonly isPartial: boolean;
+    public readonly isPartial: boolean = false;
     public hidesMoreChildren = false;
 
     constructor(segments: Segment[], length: number) {
-        this.isPartial = false;
-
         let lengthOffset = 0;
         const segmentsToDisplay = this.countSegmentsToDisplay(segments);
 

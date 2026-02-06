@@ -1,7 +1,7 @@
 import { Exception } from "../utilities/error";
 import { create, sanitize } from "../utilities/html";
-import { forEachProperty, getProperty } from "../utilities/misc";
-import { adjustCase, startsWith, replaceAll } from "../utilities/string";
+import { getProperty } from "../utilities/misc";
+import { adjustCase, replaceAll, startsWith } from "../utilities/string";
 import { state } from "./state";
 import { startupCache } from "./variables";
 
@@ -160,23 +160,20 @@ function migrateConfig(config: any) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function mergeConfig(target: object, patch: object, patchRoot: object) {
-    forEachProperty(patch as { [index: string]: unknown }, (key, patchValue) => {
+    Object.entries(patch).forEach(([key, patchValue]) => {
         const targetValue = getProperty(target as { [index: string]: unknown }, key);
-
         validateBeforeConfigMerge(key, target, targetValue, patchValue);
-
         if (patchValue && "object" === typeof patchValue && !Array.isArray(patchValue)) {
             mergeConfig(targetValue as object, patchValue, patchRoot);
-        } else {
-            if ("string" === typeof patchValue) {
-                patchValue = patchValue.trim() || undefined;
-            }
-            if (null === patchValue) {
-                patchValue = undefined;
-            }
-            (target as { [index: string]: unknown })[key] =
-                "string" === typeof patchValue ? patchValue.trim() : patchValue;
+            return;
         }
+        if ("string" === typeof patchValue) {
+            patchValue = patchValue.trim() || undefined;
+        }
+        if (null === patchValue) {
+            patchValue = undefined;
+        }
+        (target as { [index: string]: unknown })[key] = "string" === typeof patchValue ? patchValue.trim() : patchValue;
     });
 }
 

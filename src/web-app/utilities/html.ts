@@ -1,9 +1,9 @@
+import { Hashtable } from "./hashtable";
+import { assertNotNull } from "./misc";
+
 //----------------------------------------------------------------------------------------------------------------------
 // Sanitize the given content for HTML rendering
 //----------------------------------------------------------------------------------------------------------------------
-
-import { Hashtable } from "./hashtable";
-import { assertNotNull } from "./misc";
 
 export function sanitize(content: string): string {
     return "string" === typeof content

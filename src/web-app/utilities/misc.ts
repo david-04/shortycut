@@ -13,11 +13,7 @@ export function comparator<T>(a: T, b: T) {
 }
 
 export function comparing<T, R>(fieldSelector?: (object: T) => R) {
-    if (fieldSelector) {
-        return (a: T, b: T) => comparator(fieldSelector(a), fieldSelector(b));
-    } else {
-        return comparator;
-    }
+    return fieldSelector ? (a: T, b: T) => comparator(fieldSelector(a), fieldSelector(b)) : comparator;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,22 +62,10 @@ export function getWindowLocationPath() {
     const index = url.lastIndexOf("/");
     const lastPathSegment = url.substring(index + 1);
     if (lastPathSegment) {
-        if (0 <= lastPathSegment.indexOf(".")) {
-            return url.substring(0, index + 1);
-        } else {
-            return `${url}/`;
-        }
+        return lastPathSegment.includes(".") ? url.substring(0, index + 1) : `${url}/`;
     } else {
         return url;
     }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Iterate over all property and pass the key-value pair to a callback
-//----------------------------------------------------------------------------------------------------------------------
-
-export function forEachProperty<T>(object: { [index: string]: T }, callback: (key: string, value: T) => void) {
-    Object.keys(object).forEach(key => callback(key, getProperty(object, key) as T));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

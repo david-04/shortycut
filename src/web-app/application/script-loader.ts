@@ -36,7 +36,7 @@ export class JavaScriptLoader {
     // Add a file and start loading it (if possible)
     //------------------------------------------------------------------------------------------------------------------
 
-    public add(url: string, dependencies?: JavaScriptFile[]) {
+    public add(url: string, dependencies?: ReadonlyArray<JavaScriptFile>) {
         const file = this.files.computeIfAbsent(url, requestedUrl => new JavaScriptFile(requestedUrl, []));
         dependencies?.forEach(dependency => file.dependencies.push(dependency));
         this.checkDependenciesAndLoadFiles();

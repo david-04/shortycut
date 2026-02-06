@@ -542,21 +542,19 @@ export class FaviconManager {
         state.shortcuts.values.forEach(shortcut => {
             shortcut.all
                 .map(item => item.link)
-                .map(link => link.faviconUrls)
-                .forEach(urls => {
-                    urls.forEach(url => {
-                        const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
-                        if ("file" !== protocol) {
-                            const protocols = this.domains.computeIfAbsent(domain, () => new Array<string>());
-                            if (!protocols.filter(currentProtocol => currentProtocol === protocol).length) {
-                                if ("https" === protocol) {
-                                    protocols.unshift(protocol);
-                                } else {
-                                    protocols.push(protocol);
-                                }
+                .flatMap(link => link.faviconUrls)
+                .forEach(url => {
+                    const { protocol, domain } = FaviconManager.extractProtocolAndDomain(url);
+                    if ("file" !== protocol) {
+                        const protocols = this.domains.computeIfAbsent(domain, () => new Array<string>());
+                        if (!protocols.filter(currentProtocol => currentProtocol === protocol).length) {
+                            if ("https" === protocol) {
+                                protocols.unshift(protocol);
+                            } else {
+                                protocols.push(protocol);
                             }
                         }
-                    });
+                    }
                 });
         });
         this.registry = new FaviconRegistry(this.cache, true, false, this.domains);

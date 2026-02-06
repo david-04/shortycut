@@ -475,11 +475,8 @@ export class Homepage implements Page {
                     return;
                 }
                 const keyword = this.suggestions[this.selectedIndex]?.keyword;
-                if (suggestion.type !== "segment" && suggestion.shortcutType !== "bookmark") {
-                    this.previousInput = `${keyword} `;
-                } else {
-                    this.previousInput = keyword;
-                }
+                this.previousInput =
+                    suggestion.type !== "segment" && suggestion.shortcutType !== "bookmark" ? `${keyword} ` : keyword;
                 if (this.previousInput !== undefined) {
                     this.dom.filter.value = this.previousInput;
                 }

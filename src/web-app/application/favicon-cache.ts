@@ -1,11 +1,10 @@
+import { state } from "../data/state";
+import { runAndIgnoreErrors } from "../utilities/error";
+import { Hashtable } from "../utilities/hashtable";
+
 //----------------------------------------------------------------------------------------------------------------------
 // A cached favicon entry
 //----------------------------------------------------------------------------------------------------------------------
-
-import { state } from "../data/state";
-import {} from "../data/variables";
-import { runAndIgnoreErrors } from "../utilities/error";
-import { Hashtable } from "../utilities/hashtable";
 
 export class FaviconCacheEntry {
     public constructor(
@@ -180,23 +179,21 @@ export class FaviconCache {
         const table = data.split(FaviconCache.LINE_SEPARATOR).map(line => line.split(FaviconCache.COLUMN_SEPARATOR));
         for (const row of table) {
             const [firstColumn] = row;
-            if (undefined !== firstColumn && 1 === row.length % FaviconCache.COLUMNS_PER_ENTRY) {
-                const origins = cache.computeIfAbsent(firstColumn, () => new Hashtable<FaviconCacheEntry>());
-                for (
-                    let offset = 1;
-                    offset + FaviconCache.COLUMNS_PER_ENTRY <= row.length;
-                    offset += FaviconCache.COLUMNS_PER_ENTRY
-                ) {
-                    const column1 = row[offset];
-                    const column2 = row[offset + FaviconCache.FILENAME_OFFSET];
-                    const column3 = row[offset + FaviconCache.TIMESTAMP_OFFSET];
-                    if (undefined === column1 || undefined === column2 || undefined === column3) {
-                        continue;
-                    }
+            if (!(undefined !== firstColumn && 1 === row.length % FaviconCache.COLUMNS_PER_ENTRY)) {
+                return new Hashtable<Hashtable<FaviconCacheEntry>>();
+            }
+            const origins = cache.computeIfAbsent(firstColumn, () => new Hashtable<FaviconCacheEntry>());
+            for (
+                let offset = 1;
+                offset + FaviconCache.COLUMNS_PER_ENTRY <= row.length;
+                offset += FaviconCache.COLUMNS_PER_ENTRY
+            ) {
+                const column1 = row[offset];
+                const column2 = row[offset + FaviconCache.FILENAME_OFFSET];
+                const column3 = row[offset + FaviconCache.TIMESTAMP_OFFSET];
+                if (undefined !== column1 && undefined !== column2 && undefined !== column3) {
                     origins.put(column1, new FaviconCacheEntry(column2, Number.parseInt(column3)));
                 }
-            } else {
-                return new Hashtable<Hashtable<FaviconCacheEntry>>();
             }
         }
         return cache;
