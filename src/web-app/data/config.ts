@@ -2,8 +2,8 @@ import { Exception } from "../utilities/error";
 import { create, sanitize } from "../utilities/html";
 import { getProperty } from "../utilities/misc";
 import { adjustCase, replaceAll, startsWith } from "../utilities/string";
+import { startupCache } from "./startup-cache";
 import { state } from "./state";
-import { startupCache } from "./variables";
 
 const JSON_TAB_SIZE = 4;
 
@@ -253,12 +253,12 @@ function multiLinkSymbolsOverlap(onMultiLink: OnMultiLink) {
 // Utility functions
 //----------------------------------------------------------------------------------------------------------------------
 
-function isObject(value: unknown): boolean {
+function isObject(value: unknown): value is object {
     const isObject = null != value && "object" === typeof value;
     return isObject && !Array.isArray(value) && "function" !== typeof value && !(value instanceof RegExp);
 }
 
-function isStringy(value: unknown): boolean {
+function isStringy(value: unknown): value is string {
     return null == value || "string" === typeof value;
 }
 

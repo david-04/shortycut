@@ -1,6 +1,8 @@
-import { FinalizedLinks, FinalizedUrl, FinalizedUrlBase, Link, OnMultiLink, Shortcut } from "../data/shortcut";
+import { Link } from "../data/link";
+import { pages } from "../data/page";
+import { queryParameters } from "../data/query-parameters";
+import { FinalizedLinks, FinalizedUrl, FinalizedUrlBase, OnMultiLink, Shortcut } from "../data/shortcut";
 import { state } from "../data/state";
-import { pages } from "../data/variables";
 import { Exception } from "../utilities/error";
 import { isUrl } from "../utilities/string";
 
@@ -19,9 +21,9 @@ export class Redirector {
     //------------------------------------------------------------------------------------------------------------------
 
     public processQuery() {
-        const shortcut = state.shortcuts.get(state.queryParameters.keyword) || undefined;
-        const { setup, redirect } = state.queryParameters;
-        const isHomepageKeyword = state.config.homepage.keywords.includes(state.queryParameters.keyword);
+        const shortcut = state.shortcuts.get(queryParameters.query.keyword) || undefined;
+        const { setup, redirect } = queryParameters;
+        const isHomepageKeyword = state.config.homepage.keywords.includes(queryParameters.query.keyword);
 
         if (setup) {
             document.title = "ShortyCut";
@@ -30,17 +32,17 @@ export class Redirector {
             this.processAuxiliaryRedirect(redirect);
         } else if (shortcut) {
             this.processShortcut(shortcut);
-        } else if (isUrl(state.queryParameters.fullQuery)) {
-            this.openUrl(state.queryParameters.fullQuery, RedirectMode.ERASE_HISTORY);
+        } else if (isUrl(queryParameters.query.full)) {
+            this.openUrl(queryParameters.query.full, RedirectMode.ERASE_HISTORY);
         } else if (
-            !state.queryParameters.keyword ||
+            !queryParameters.query.keyword ||
             !state.defaultSearchEngine ||
             !state.config.defaultSearchEngine.useInAddressBar ||
             isHomepageKeyword
         ) {
             this.openHomepage(isHomepageKeyword);
         } else {
-            const links = state.defaultSearchEngine.getFinalizedLinks(state.queryParameters.fullQuery);
+            const links = state.defaultSearchEngine.getFinalizedLinks(queryParameters.query.full);
             this.redirect({ ...links, onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB }, RedirectMode.ERASE_HISTORY);
         }
     }
@@ -64,14 +66,14 @@ export class Redirector {
     //------------------------------------------------------------------------------------------------------------------
 
     private openHomepage(isHomepageKeyword: boolean) {
-        this.alwaysOpenNewTabs = state.queryParameters.facets.newTabs;
+        this.alwaysOpenNewTabs = queryParameters.facets.newTabs;
         this.showRedirectPage = false;
         document.title = "ShortyCut";
         const query = isHomepageKeyword
-            ? state.queryParameters.fullQuery.replace(/^\s*[^\s]+/, "").trim()
-            : state.queryParameters.fullQuery;
+            ? queryParameters.query.full.replace(/^\s*[^\s]+/, "").trim()
+            : queryParameters.query.full;
         state.router.goto(pages.home.populate(query));
-        if (state.queryParameters.facets.noFocus) {
+        if (queryParameters.facets.noFocus) {
             pages.home.removeFocus();
         }
     }
@@ -81,8 +83,8 @@ export class Redirector {
     //------------------------------------------------------------------------------------------------------------------
 
     private processShortcut(shortcut: Shortcut) {
-        if (shortcut.queries && (state.queryParameters.searchTerm || !shortcut.bookmarks)) {
-            this.redirect(shortcut.getFinalizedQueries(state.queryParameters.searchTerm), RedirectMode.ERASE_HISTORY);
+        if (shortcut.queries && (queryParameters.query.searchTerm || !shortcut.bookmarks)) {
+            this.redirect(shortcut.getFinalizedQueries(queryParameters.query.searchTerm), RedirectMode.ERASE_HISTORY);
         } else if (shortcut.bookmarks) {
             this.redirect(shortcut.getFinalizedBookmarks(), RedirectMode.ERASE_HISTORY);
         } else {

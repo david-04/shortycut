@@ -1,5 +1,5 @@
+import { Page } from "../data/page";
 import { state } from "../data/state";
-import { Page } from "../data/variables";
 import { create, createImage, sanitize } from "../utilities/html";
 import "./favicon-tools.css";
 

@@ -1,5 +1,5 @@
-import { state } from "../data/state";
-import { Page, pages } from "../data/variables";
+import { Page, pages } from "../data/page";
+import { queryParameters } from "../data/query-parameters";
 import { Menu } from "../pages/menu";
 
 export class Router {
@@ -49,7 +49,7 @@ export class Router {
     public goBackToAndResetHomepage() {
         pages.home.populate();
         this.goBackOrHome();
-        if (state.queryParameters.facets.noFocus) {
+        if (queryParameters.facets.noFocus) {
             setTimeout(() => pages.home.removeFocus(), 1);
         }
     }

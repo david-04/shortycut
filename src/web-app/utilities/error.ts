@@ -1,4 +1,4 @@
-import { pages } from "../data/variables";
+import { pages } from "../data/page";
 import { create, sanitize } from "./html";
 
 //----------------------------------------------------------------------------------------------------------------------

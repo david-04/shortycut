@@ -2,9 +2,12 @@ import { ParserError } from "../utilities/error";
 import { Hashtable } from "../utilities/hashtable";
 import { assertNotNull, getProperty } from "../utilities/misc";
 import { adjustCase, endsWith, replaceAll, startsWith } from "../utilities/string";
-import { DynamicShortcut, OnMultiLink, Segment, Shortcut } from "./shortcut";
+import { DYNAMIC_LINK_PROTOCOL } from "./constants";
+import { Segment } from "./segments";
+import { DynamicShortcut, OnMultiLink, Shortcut } from "./shortcut";
+import { startupCache } from "./startup-cache";
 import { state } from "./state";
-import { dynamicLinkProtocol, Shortcuts, startupCache } from "./variables";
+import { Shortcuts } from "./variables";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Internal data structure for intermediate parser results
@@ -29,7 +32,7 @@ class ParserContext {
 //----------------------------------------------------------------------------------------------------------------------
 
 export class ShortcutParser {
-    private readonly KNOWN_PROTOCOLS = ["file", "ftp", "http", "https", dynamicLinkProtocol].map(p => `${p}://`);
+    private readonly KNOWN_PROTOCOLS = ["file", "ftp", "http", "https", DYNAMIC_LINK_PROTOCOL].map(p => `${p}://`);
 
     private static readonly PROTOCOL_SEPARATOR = "://";
 
@@ -123,7 +126,7 @@ export class ShortcutParser {
         context.urlOrDynamicShortcut = url;
         context.description = context.line.substring(0, context.line.length - url.length);
 
-        if (0 === context.urlOrDynamicShortcut.indexOf(dynamicLinkProtocol)) {
+        if (0 === context.urlOrDynamicShortcut.indexOf(DYNAMIC_LINK_PROTOCOL)) {
             context.urlOrDynamicShortcut = assertNotNull(startupCache.dynamicLinks.get(context.urlOrDynamicShortcut));
             if (!context.urlOrDynamicShortcut) {
                 throw new ParserError(

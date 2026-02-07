@@ -1,4 +1,4 @@
-const TARGET_URL = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, "/data-test/target.html?");
+const TARGET_URL = window.location.href.replace(/\/?[^\/]*([?#].*|)$/, "/data/target.html?");
 
 function url(description) {
     return `${TARGET_URL}${encodeURIComponent(description.trim()).replace(/%25s/g, "%s")}`;

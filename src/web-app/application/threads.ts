@@ -1,6 +1,7 @@
 import { ShortcutParser } from "../data/parser";
+import { startupCache } from "../data/startup-cache";
 import { state } from "../data/state";
-import { Shortcuts, startupCache } from "../data/variables";
+import { Shortcuts } from "../data/variables";
 import { handleExceptions } from "../utilities/error";
 
 type ParserCallback = (result: unknown) => void;

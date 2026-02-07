@@ -1,5 +1,5 @@
+import { pages } from "../data/page";
 import { state } from "../data/state";
-import { pages } from "../data/variables";
 import { Hashtable } from "../utilities/hashtable";
 import { create, createImage } from "../utilities/html";
 import { assertNotNull } from "../utilities/misc";

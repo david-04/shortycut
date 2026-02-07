@@ -1,6 +1,7 @@
 import { RedirectMode } from "../application/redirector";
+import { Page } from "../data/page";
+import { startupCache } from "../data/startup-cache";
 import { state } from "../data/state";
-import { Page, startupCache } from "../data/variables";
 import { sanitize } from "../utilities/html";
 import { getWindowLocationPath, supportsBacktickSyntax } from "../utilities/misc";
 import "./setup-instructions.css";

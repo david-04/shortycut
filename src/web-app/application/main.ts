@@ -1,7 +1,8 @@
 import { applyAndValidateConfig } from "../data/config";
-import { QueryParameters } from "../data/query-parameters";
+import { queryParameters } from "../data/query-parameters";
+import { startupCache } from "../data/startup-cache";
 import { state } from "../data/state";
-import { initializeVariables, startupCache } from "../data/variables";
+import { initializeVariables } from "../data/variables";
 import { HTML_BODY } from "../generated/html-body";
 import { displayError, Exception, handleExceptions } from "../utilities/error";
 import { isDemo } from "../utilities/misc";
@@ -58,8 +59,8 @@ function startApplication() {
     initializeVariables();
     applyAndValidateConfig();
 
-    if (!startupCache.config.length && !state.queryParameters.setup) {
-        globalThis.location.href = `${globalThis.location.href.replace(/[#?].*/, "")}?${QueryParameters.SETUP}=welcome`;
+    if (!startupCache.config.length && !queryParameters.setup) {
+        globalThis.location.href = `${globalThis.location.href.replace(/[#?].*/, "")}?${queryParameters.SETUP_KEY}=welcome`;
         return;
     }
 
@@ -70,7 +71,7 @@ function onParseShortcutsComplete(result: unknown) {
     if (result instanceof Exception) {
         throw result;
     }
-    if (state.queryParameters.facets.newTabs) {
+    if (queryParameters.facets.newTabs) {
         addBlankTargetToAllLinksOnPage();
     }
     state.faviconManager = new FaviconManager();

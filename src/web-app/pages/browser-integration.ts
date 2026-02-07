@@ -1,5 +1,5 @@
-import { state } from "../data/state";
-import { Page } from "../data/variables";
+import { Page } from "../data/page";
+import { queryParameters } from "../data/query-parameters";
 import { sanitize } from "../utilities/html";
 import { getWindowLocationPath } from "../utilities/misc";
 import "./browser-integration.css";
@@ -31,8 +31,8 @@ export class BrowserIntegration implements Page {
     public constructor() {
         this.updateHomepageLink = this.updateHomepageLink.bind(this);
 
-        this.dom.facets.newTabs.checked = state.queryParameters.facets.newTabs;
-        this.dom.facets.noFocus.checked = state.queryParameters.facets.noFocus;
+        this.dom.facets.newTabs.checked = queryParameters.facets.newTabs;
+        this.dom.facets.noFocus.checked = queryParameters.facets.noFocus;
         this.updateHomepageLink();
 
         const baseUrl = globalThis.location.href.replace(/[#?].*/, "");

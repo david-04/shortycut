@@ -2,7 +2,7 @@
 // Data structure representing a single JavaScript file
 //----------------------------------------------------------------------------------------------------------------------
 
-import { startupCache } from "../data/variables";
+import { startupCache } from "../data/startup-cache";
 import { ScriptLoadingError } from "../utilities/error";
 import { Hashtable } from "../utilities/hashtable";
 import { sanitize } from "../utilities/html";

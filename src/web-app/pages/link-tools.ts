@@ -1,5 +1,5 @@
+import { Page } from "../data/page";
 import { state } from "../data/state";
-import { Page } from "../data/variables";
 import { create, sanitize } from "../utilities/html";
 import "./link-tools.css";
 

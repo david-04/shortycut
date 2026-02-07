@@ -1,4 +1,4 @@
-import { Page } from "../data/variables";
+import { Page } from "../data/page";
 import { create, sanitize } from "../utilities/html";
 import "./redirect-page.css";
 

@@ -1,12 +1,8 @@
-import {
-    DynamicBookmarkFunction,
-    DynamicLinkFunction,
-    DynamicQueryFunction,
-    GeneratedLinks,
-    Link,
-} from "../data/shortcut";
+import { DYNAMIC_LINK_PROTOCOL } from "../data/constants";
+import { Link } from "../data/link";
+import { DynamicBookmarkFunction, DynamicLinkFunction, DynamicQueryFunction, GeneratedLinks } from "../data/shortcut";
+import { startupCache } from "../data/startup-cache";
 import { state } from "../data/state";
-import { dynamicLinkProtocol, startupCache } from "../data/variables";
 import { InitializationError } from "../utilities/error";
 import { create } from "../utilities/html";
 import { isUrl } from "../utilities/string";
@@ -73,7 +69,7 @@ function registerDynamicLink(entryPoint: "toUrl" | "toQueryUrl" | "toBookmarkUrl
         fn = () => [];
     }
 
-    const key = `${dynamicLinkProtocol}://${entryPoint}.${startupCache.dynamicLinks.size + 1}`;
+    const key = `${DYNAMIC_LINK_PROTOCOL}://${entryPoint}.${startupCache.dynamicLinks.size + 1}`;
     startupCache.dynamicLinks.put(key, {
         generator: fn,
         isQuery: "toBookmarkUrl" !== entryPoint,

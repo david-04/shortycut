@@ -1,95 +1,79 @@
-import { Exception, InitializationError } from "../utilities/error";
-import { Hashtable } from "../utilities/hashtable";
+import { InitializationError } from "../utilities/error";
 import { create } from "../utilities/html";
 import { adjustCase } from "../utilities/string";
 import { FinalizedUrlBase } from "./shortcut";
-import { startupCache } from "./variables";
+import { startupCache } from "./startup-cache";
 
-export class QueryParameters {
-    public static readonly QUERY = "q";
-    public static readonly REDIRECT = "r";
-    public static readonly SETUP = "setup";
-    public static readonly FACETS = "facets";
+//----------------------------------------------------------------------------------------------------------------------
+// Parse URL query parameters
+//----------------------------------------------------------------------------------------------------------------------
 
-    public readonly queryParameters: Hashtable<string>;
-    public readonly fullQuery: string;
-    public readonly keyword: string;
-    public readonly searchTerm: string;
-    public readonly redirect?: FinalizedUrlBase;
-    public readonly setup?: string | undefined;
-    public readonly facets = {
-        newTabs: false,
-        noFocus: false,
-    };
-
+export namespace queryParameters {
+    //
     //------------------------------------------------------------------------------------------------------------------
-    // Initialize the redirector and extract the query parameters
+    // Query parameter key names
     //------------------------------------------------------------------------------------------------------------------
 
-    constructor() {
-        this.queryParameters = this.getQueryParameters();
+    export const QUERY_KEY = "q";
+    export const REDIRECT_KEY = "r";
+    export const SETUP_KEY = "setup";
+    export const FACETS_KEY = "facets";
 
-        this.fullQuery = this.queryParameters.getOrDefault(QueryParameters.QUERY, "").replaceAll("+", " ");
-        this.keyword = adjustCase(this.fullQuery).replace(/\s.*/, "");
-        this.searchTerm = this.fullQuery.replace(/^[^\s]+\s*/, "");
-        const redirect = this.queryParameters.get(QueryParameters.REDIRECT);
-        this.redirect = redirect ? JSON.parse(redirect) : undefined;
-        this.setup = this.queryParameters.get(QueryParameters.SETUP);
-        this.queryParameters
-            .getOrDefault(QueryParameters.FACETS, "")
+    //------------------------------------------------------------------------------------------------------------------
+    // Query parameters
+    //------------------------------------------------------------------------------------------------------------------
+
+    export const urlSearchParams = new URLSearchParams(globalThis.location.search);
+
+    export const facets = getFacets(urlSearchParams);
+    export const query = getQuery(urlSearchParams);
+    export const redirect = getRedirect(urlSearchParams);
+    export const setup = urlSearchParams.get(SETUP_KEY);
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Extract facets from the URL query parameters (e.g. "new-tabs" and "no-focus")
+    //------------------------------------------------------------------------------------------------------------------
+
+    function getFacets(urlSearchParams: URLSearchParams) {
+        const facets = (urlSearchParams.get(FACETS_KEY) ?? "")
             .split(",")
             .map(facet => facet.trim().toLowerCase())
-            .filter(Boolean)
-            .forEach(facet => this.applyFacet(facet));
-    }
+            .filter(Boolean);
 
-    private applyFacet(facet: string) {
-        if ("new-tabs" === facet) {
-            this.facets.newTabs = true;
-        } else if ("no-focus" === facet) {
-            this.facets.noFocus = true;
-        } else {
-            startupCache.initializationErrors.push(
-                new InitializationError(
-                    create("div", "Facet ", create("tt", facet), " (in this page's address) is not supported")
-                )
-            );
-        }
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Parse all query parameters into a key-value object
-    //------------------------------------------------------------------------------------------------------------------
-
-    private getQueryParameters() {
-        const result = new Hashtable<string>();
-        if (!globalThis.location.search) {
-            return result;
-        }
-        for (const parameter of globalThis.location.search.trim().replace(/^\?/, "").trim().split("&")) {
-            const index = parameter.indexOf("=");
-            if (0 < index) {
-                const key = this.urlDecode(parameter.substring(0, index));
+        return facets.reduce(
+            (accumulated, current) => {
+                const key = ({ "new-tabs": "newTabs", "no-focus": "noFocus" } as const)[current];
                 if (key) {
-                    result.put(key, this.urlDecode(parameter.substring(index + 1)));
+                    return { ...accumulated, [key]: true };
                 }
-            } else {
-                result.put(this.urlDecode(parameter), "");
-            }
-        }
-
-        return result;
+                startupCache.initializationErrors.push(
+                    new InitializationError(
+                        create("div", "Facet ", create("tt", current), " (in this page's address) is not supported")
+                    )
+                );
+                return accumulated;
+            },
+            { newTabs: false, noFocus: false }
+        );
     }
 
-    private urlDecode(value: string) {
-        try {
-            return decodeURIComponent(value).trim();
-        } catch {
-            throw new Exception(
-                "URL syntax error",
-                create("p", "A query parameter passed in the URL is not url-encoded:"),
-                create("p", value)
-            );
-        }
+    //------------------------------------------------------------------------------------------------------------------
+    // Get the requested shortcut and search term
+    //------------------------------------------------------------------------------------------------------------------
+
+    function getQuery(urlSearchParams: URLSearchParams) {
+        const full = (urlSearchParams.get(QUERY_KEY) ?? "").trim();
+        const keyword = adjustCase(full).replace(/\s.*/, "");
+        const searchTerm = full.replace(/^[^\s]+\s*/, "");
+        return { full, keyword, searchTerm } as const;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Get the requested redirect URL
+    //------------------------------------------------------------------------------------------------------------------
+
+    function getRedirect(urlSearchParams: URLSearchParams) {
+        const redirect = urlSearchParams.get(REDIRECT_KEY);
+        return redirect ? (JSON.parse(redirect) as FinalizedUrlBase) : undefined;
     }
 }

@@ -1,4 +1,4 @@
-import { Page } from "../data/variables";
+import { Page } from "../data/page";
 import { Exception, HTMLContent } from "../utilities/error";
 import "./error-page.css";
 

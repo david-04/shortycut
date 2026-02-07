@@ -2,7 +2,10 @@ import { Hashtable } from "../utilities/hashtable";
 import { create, sanitize } from "../utilities/html";
 import { assertNotNull, comparing } from "../utilities/misc";
 import { replaceAll } from "../utilities/string";
-import { Link, Links, MatchingSegment, Segments, Shortcut, ShortcutType } from "./shortcut";
+import { Link } from "./link";
+import { Links } from "./links";
+import { MatchingSegment, Segments } from "./segments";
+import { Shortcut, ShortcutType } from "./shortcut";
 import { state } from "./state";
 
 export type SuggestionType = "match" | "suggestion" | "segment" | "search-result";

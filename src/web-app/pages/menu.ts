@@ -1,5 +1,6 @@
+import { pages } from "../data/page";
+import { queryParameters } from "../data/query-parameters";
 import { state } from "../data/state";
-import { pages } from "../data/variables";
 import { VERSION } from "../generated/version";
 import { create } from "../utilities/html";
 import { isDemo } from "../utilities/misc";
@@ -134,7 +135,7 @@ export class Menu {
     public onShortyCut(event: MouseEvent) {
         this.closeMenu();
         const url = "https://github.com/david-04/shortycut";
-        if (state.queryParameters.facets.newTabs) {
+        if (queryParameters.facets.newTabs) {
             globalThis.open(url);
         } else {
             globalThis.location.href = url;
@@ -145,7 +146,7 @@ export class Menu {
     public onDocumentation(event: MouseEvent) {
         this.closeMenu();
         const url = `${isDemo() ? ".." : "resources/docs"}/index.html`;
-        if (state.queryParameters.facets.newTabs) {
+        if (queryParameters.facets.newTabs) {
             globalThis.open(url);
         } else {
             globalThis.location.href = url;

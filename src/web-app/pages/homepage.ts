@@ -1,8 +1,12 @@
 import { RedirectMode } from "../application/redirector";
 import { Filter, Suggestion, SuggestionType } from "../data/filter";
-import { FinalizedLinks, Links, OnMultiLink, Segments, Shortcut, ShortcutType } from "../data/shortcut";
+import { Links } from "../data/links";
+import { Page } from "../data/page";
+import { queryParameters } from "../data/query-parameters";
+import { Segments } from "../data/segments";
+import { FinalizedLinks, OnMultiLink, Shortcut, ShortcutType } from "../data/shortcut";
+import { startupCache } from "../data/startup-cache";
 import { state } from "../data/state";
-import { Page, startupCache } from "../data/variables";
 import { create, sanitize } from "../utilities/html";
 import { assertNotNull, isDemoMode, supportsBacktickSyntax } from "../utilities/misc";
 import { adjustCase, isUrl } from "../utilities/string";
@@ -78,7 +82,7 @@ export class Homepage implements Page {
         this.dom.suggestions.innerHTML = "";
         this.selectSuggestion(-1);
         this.onFilterChanged();
-        if (state.queryParameters.facets.noFocus) {
+        if (queryParameters.facets.noFocus) {
             this.dom.headerRow.classList.add("no-focus");
         }
         return this;
@@ -107,9 +111,7 @@ export class Homepage implements Page {
                 this.dom.notification.noShortcutsNoError.style.display = "block";
             }
         } else if (isDemoMode()) {
-            this.dom.notification.welcome.newTabs.style.display = state.queryParameters.facets.newTabs
-                ? "none"
-                : "block";
+            this.dom.notification.welcome.newTabs.style.display = queryParameters.facets.newTabs ? "none" : "block";
             this.dom.notification.welcome.self.style.display = "block";
         }
     }
@@ -142,7 +144,7 @@ export class Homepage implements Page {
                 element.addEventListener(event, this.onFocusEvent)
             )
         );
-        if (state.queryParameters.facets.noFocus) {
+        if (queryParameters.facets.noFocus) {
             ["mousedown", "keydown", "blur"].forEach(event =>
                 globalThis.addEventListener(event, this.cancelClearFilter)
             );
@@ -160,7 +162,7 @@ export class Homepage implements Page {
                 element.removeEventListener(event, this.onFocusEvent)
             )
         );
-        if (state.queryParameters.facets.noFocus) {
+        if (queryParameters.facets.noFocus) {
             ["mousedown", "keydown", "blur"].forEach(event =>
                 globalThis.removeEventListener(event, this.cancelClearFilter)
             );
@@ -176,7 +178,7 @@ export class Homepage implements Page {
     private onKeyBody(event: KeyboardEvent) {
         const isRightArrow = this.treatAsRightArrow(event);
 
-        if (!state.queryParameters.facets.noFocus) {
+        if (!queryParameters.facets.noFocus) {
             this.dom.filter.focus();
         }
 
@@ -224,7 +226,7 @@ export class Homepage implements Page {
     }
 
     private onEscape(event: KeyboardEvent) {
-        if (state.queryParameters.facets.noFocus) {
+        if (queryParameters.facets.noFocus) {
             if (this.dom.filter.value) {
                 this.clearFilter();
             } else {
@@ -257,7 +259,7 @@ export class Homepage implements Page {
     }
 
     private onFocusEvent() {
-        if (!state.queryParameters.facets.noFocus) {
+        if (!queryParameters.facets.noFocus) {
             setTimeout(() => this.dom.filter.focus(), 0);
         }
     }
@@ -281,7 +283,7 @@ export class Homepage implements Page {
     //------------------------------------------------------------------------------------------------------------------
 
     private clearFilter() {
-        if (!state.queryParameters.facets.noFocus || this.dom.filter.value) {
+        if (!queryParameters.facets.noFocus || this.dom.filter.value) {
             this.dom.filter.focus();
         }
         this.dom.filter.value = "";
