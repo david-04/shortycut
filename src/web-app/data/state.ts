@@ -3,13 +3,11 @@ import { Redirector } from "../application/redirector";
 import { Router } from "../application/router";
 import { JavaScriptLoader } from "../application/script-loader";
 import { HotkeySelector } from "../utilities/hotkey-selector";
-import { Config } from "./config";
+import { DEFAULT_CONFIG } from "./config";
 import { Shortcut } from "./shortcut";
-import { Shortcuts } from "./variables";
 
 export const state = {
-    config: nullAs<Config>(),
-    shortcuts: nullAs<Shortcuts>(),
+    config: DEFAULT_CONFIG,
     defaultSearchEngine: nullAs<Shortcut | null>(),
     redirector: nullAs<Redirector>(),
     router: nullAs<Router>(),

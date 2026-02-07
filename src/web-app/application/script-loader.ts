@@ -1,11 +1,11 @@
-//----------------------------------------------------------------------------------------------------------------------
-// Data structure representing a single JavaScript file
-//----------------------------------------------------------------------------------------------------------------------
-
 import { startupCache } from "../data/startup-cache";
 import { ScriptLoadingError } from "../utilities/error";
 import { Hashtable } from "../utilities/hashtable";
 import { sanitize } from "../utilities/html";
+
+//----------------------------------------------------------------------------------------------------------------------
+// Data structure representing a single JavaScript file
+//----------------------------------------------------------------------------------------------------------------------
 
 export class JavaScriptFile {
     public readonly dependencies = new Array<JavaScriptFile>();

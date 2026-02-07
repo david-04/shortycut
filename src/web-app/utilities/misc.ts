@@ -1,4 +1,4 @@
-import { state } from "../data/state";
+import { shortcuts } from "../data/shortcuts";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Comparators for sorting arrays
@@ -35,8 +35,8 @@ export function supportsBacktickSyntax() {
 
 export function isDemoMode() {
     const demoKeywords = ["tm", "tz", "tp", "tt", "tr", "e", "news"];
-    const matchedKeywords = demoKeywords.filter(keyword => state.shortcuts.get(keyword));
-    return state.shortcuts.size === demoKeywords.length && matchedKeywords.length === demoKeywords.length;
+    const matchedKeywords = demoKeywords.filter(keyword => shortcuts.get(keyword));
+    return shortcuts.size === demoKeywords.length && matchedKeywords.length === demoKeywords.length;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

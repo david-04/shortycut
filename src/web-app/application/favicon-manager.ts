@@ -1,4 +1,5 @@
 import { pages } from "../data/page";
+import { shortcuts } from "../data/shortcuts";
 import { state } from "../data/state";
 import { Hashtable } from "../utilities/hashtable";
 import { create, createImage } from "../utilities/html";
@@ -539,7 +540,7 @@ export class FaviconManager {
     //------------------------------------------------------------------------------------------------------------------
 
     public constructor() {
-        state.shortcuts.values.forEach(shortcut => {
+        shortcuts.values.forEach(shortcut => {
             shortcut.all
                 .map(item => item.link)
                 .flatMap(link => link.faviconUrls)

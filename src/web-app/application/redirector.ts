@@ -2,6 +2,7 @@ import { Link } from "../data/link";
 import { pages } from "../data/page";
 import { queryParameters } from "../data/query-parameters";
 import { FinalizedLinks, FinalizedUrl, FinalizedUrlBase, OnMultiLink, Shortcut } from "../data/shortcut";
+import { shortcuts } from "../data/shortcuts";
 import { state } from "../data/state";
 import { Exception } from "../utilities/error";
 import { isUrl } from "../utilities/string";
@@ -21,7 +22,7 @@ export class Redirector {
     //------------------------------------------------------------------------------------------------------------------
 
     public processQuery() {
-        const shortcut = state.shortcuts.get(queryParameters.query.keyword) || undefined;
+        const shortcut = shortcuts.get(queryParameters.query.keyword) || undefined;
         const { setup, redirect } = queryParameters;
         const isHomepageKeyword = state.config.homepage.keywords.includes(queryParameters.query.keyword);
 

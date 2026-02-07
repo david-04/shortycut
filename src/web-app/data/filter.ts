@@ -6,7 +6,7 @@ import { Link } from "./link";
 import { Links } from "./links";
 import { MatchingSegment, Segments } from "./segments";
 import { Shortcut, ShortcutType } from "./shortcut";
-import { state } from "./state";
+import { shortcuts } from "./shortcuts";
 
 export type SuggestionType = "match" | "suggestion" | "segment" | "search-result";
 
@@ -288,7 +288,7 @@ export class Filter {
     private static initializeDictionary() {
         return new DictionaryItem(
             0,
-            state.shortcuts.values.sort(
+            shortcuts.values.sort(
                 comparing(
                     s =>
                         s.bookmarks?.current[0]?.segments.description ??
@@ -311,7 +311,7 @@ export class Filter {
 
     private static initializeLinks(): Array<SearchableLink> {
         const result = new Array<{ link: Link; links: Links }>();
-        state.shortcuts.values.forEach(shortcut =>
+        shortcuts.values.forEach(shortcut =>
             result.push(...shortcut.all.filter(item => this.includeOverriddenShortcuts || !item.link.overridden))
         );
         result.sort(comparing(item => item.link.segments.description));
@@ -322,7 +322,7 @@ export class Filter {
             keywordLowerCase: item.link.keyword.toLocaleLowerCase(),
             description: item.link.segments.descriptionPlaceholder,
             descriptionLowerCase: item.link.segments.descriptionPlaceholder.toLowerCase(),
-            shortcut: assertNotNull(state.shortcuts.get(item.link.keyword)),
+            shortcut: assertNotNull(shortcuts.get(item.link.keyword)),
             isSearchable: item.link.isSearchable,
         }));
     }

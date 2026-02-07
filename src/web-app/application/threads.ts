@@ -1,7 +1,6 @@
 import { ShortcutParser } from "../data/parser";
+import { shortcuts, Shortcuts } from "../data/shortcuts";
 import { startupCache } from "../data/startup-cache";
-import { state } from "../data/state";
-import { Shortcuts } from "../data/variables";
 import { handleExceptions } from "../utilities/error";
 
 type ParserCallback = (result: unknown) => void;
@@ -17,7 +16,7 @@ export function parseShortcuts(callback: ParserCallback) {
         const lines = new Array<string>();
         startupCache.shortcuts.forEach(shortcut => lines.push(...shortcut.split(/\r?\n/)));
         const parser = new ShortcutParser();
-        parseBatch(parser, lines, 0, SHORTCUTS_PER_BATCH, state.shortcuts, callback);
+        parseBatch(parser, lines, 0, SHORTCUTS_PER_BATCH, shortcuts, callback);
     });
 }
 

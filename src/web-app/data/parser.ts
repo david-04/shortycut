@@ -5,9 +5,9 @@ import { adjustCase, endsWith, replaceAll, startsWith } from "../utilities/strin
 import { DYNAMIC_LINK_PROTOCOL } from "./constants";
 import { Segment } from "./segments";
 import { DynamicShortcut, OnMultiLink, Shortcut } from "./shortcut";
+import { Shortcuts } from "./shortcuts";
 import { startupCache } from "./startup-cache";
 import { state } from "./state";
-import { Shortcuts } from "./variables";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Internal data structure for intermediate parser results

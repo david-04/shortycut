@@ -5,6 +5,7 @@ import { Page } from "../data/page";
 import { queryParameters } from "../data/query-parameters";
 import { Segments } from "../data/segments";
 import { FinalizedLinks, OnMultiLink, Shortcut, ShortcutType } from "../data/shortcut";
+import { shortcuts } from "../data/shortcuts";
 import { startupCache } from "../data/startup-cache";
 import { state } from "../data/state";
 import { create, sanitize } from "../utilities/html";
@@ -100,7 +101,7 @@ export class Homepage implements Page {
                 .map(error => error.toHtml())
                 .forEach(element => this.dom.notification.applicationErrors.appendChild(element));
             this.dom.notification.applicationErrors.style.display = "block";
-        } else if (0 === state.shortcuts.size) {
+        } else if (0 === shortcuts.size) {
             if (startupCache.exceptions.length) {
                 if (supportsBacktickSyntax()) {
                     this.dom.notification.errorWithBacktickSupport.style.display = "block";
@@ -302,7 +303,7 @@ export class Homepage implements Page {
         const postKeywordInput = input.replace(/^\s*/, "").substring(keyword.length);
 
         if (keyword) {
-            const shortcut = state.shortcuts.get(keyword);
+            const shortcut = shortcuts.get(keyword);
             this.collectSuggestions(keyword, splitInput, postKeywordInput, shortcut);
         }
 
@@ -553,7 +554,7 @@ export class Homepage implements Page {
     private redirect(mode: RedirectMode) {
         const input = this.dom.filter.value.trim();
         const keyword = adjustCase(input.replace(/\s.*/, ""));
-        const shortcut = state.shortcuts.get(keyword);
+        const shortcut = shortcuts.get(keyword);
         if (!shortcut) {
             return;
         }

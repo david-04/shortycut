@@ -34,7 +34,12 @@ src/web-app/generated/version.ts : CHANGELOG.md
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add, src/web-app/shortycut.ts, dist/resources/shortycut.js)
+$(call lp.bundle.add, src/web-app/shortycut.ts, dist/resources/shortycut.js,, \
+	echo -e '"use strict";\n(() => {' > dist/resources/shortycut.js.tmp && \
+	cat dist/resources/shortycut.js >> dist/resources/shortycut.js.tmp && \
+	echo -e '\n})();' >> dist/resources/shortycut.js.tmp && \
+	mv -f dist/resources/shortycut.js.tmp dist/resources/shortycut.js \
+)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Documentation
