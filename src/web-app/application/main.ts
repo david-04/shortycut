@@ -7,8 +7,8 @@ import { HTML_BODY } from "../generated/html-body";
 import { displayError, Exception, handleExceptions } from "../utilities/error";
 import { isDemo } from "../utilities/misc";
 import { FaviconManager } from "./favicon-manager";
+import { javaScriptLoader } from "./javascript-loader";
 import { redirector } from "./redirector";
-import { JavaScriptLoader } from "./script-loader";
 import { parseShortcuts } from "./threads";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -28,10 +28,8 @@ export function initialize() {
         addLink("search", "application/opensearchdescription+xml", "data/search.xml", "ShortyCut");
     });
 
-    state.javaScriptLoader = new JavaScriptLoader();
-
     window.addEventListener("load", () =>
-        handleExceptions(displayError, () => state.javaScriptLoader.onComplete(startApplication))
+        handleExceptions(displayError, () => javaScriptLoader.onComplete(startApplication))
     );
 }
 

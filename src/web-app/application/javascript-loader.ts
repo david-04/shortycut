@@ -114,3 +114,5 @@ export class JavaScriptLoader {
         this.checkDependenciesAndLoadFiles();
     }
 }
+
+export const javaScriptLoader = new JavaScriptLoader();

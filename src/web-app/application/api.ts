@@ -2,11 +2,10 @@ import { DYNAMIC_LINK_PROTOCOL } from "../data/constants";
 import { Link } from "../data/link";
 import { DynamicBookmarkFunction, DynamicLinkFunction, DynamicQueryFunction, GeneratedLinks } from "../data/shortcut";
 import { startupCache } from "../data/startup-cache";
-import { state } from "../data/state";
 import { InitializationError } from "../utilities/error";
 import { create } from "../utilities/html";
 import { isUrl } from "../utilities/string";
-import { JavaScriptFile } from "./script-loader";
+import { JavaScriptFile, javaScriptLoader } from "./javascript-loader";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Store configuration to be applied later
@@ -131,7 +130,7 @@ class JavaScriptDependencyBuilder {
     public constructor(public readonly dependencies: ReadonlyArray<JavaScriptFile>) {}
 
     public andThen(...files: ReadonlyArray<string>) {
-        return new JavaScriptDependencyBuilder(files.map(file => state.javaScriptLoader.add(file, this.dependencies)));
+        return new JavaScriptDependencyBuilder(files.map(file => javaScriptLoader.add(file, this.dependencies)));
     }
 }
 
