@@ -2,13 +2,13 @@ import { applyAndValidateConfig } from "../data/config";
 import { queryParameters } from "../data/query-parameters";
 import { startupCache } from "../data/startup-cache";
 import { state } from "../data/state";
-import { initializeVariables } from "../data/variables";
 import { HTML_BODY } from "../generated/html-body";
 import { displayError, Exception, handleExceptions } from "../utilities/error";
 import { isDemo } from "../utilities/misc";
 import { FaviconManager } from "./favicon-manager";
 import { javaScriptLoader } from "./javascript-loader";
 import { redirector } from "./redirector";
+import { Router } from "./router";
 import { parseShortcuts } from "./threads";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ function startApplication() {
     const self = globalThis.location.href.replace(/[?#].*/, "");
     document.body.innerHTML = document.body.innerHTML.replaceAll("self://", self);
 
-    initializeVariables();
+    state.router = new Router();
     applyAndValidateConfig();
 
     if (!startupCache.config.length && !queryParameters.setup) {

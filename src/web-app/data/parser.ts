@@ -2,12 +2,17 @@ import { ParserError } from "../utilities/error";
 import { Hashtable } from "../utilities/hashtable";
 import { assertNotNull, getProperty } from "../utilities/misc";
 import { adjustCase, endsWith, replaceAll, startsWith } from "../utilities/string";
-import { DYNAMIC_LINK_PROTOCOL } from "./constants";
 import { Segment } from "./segments";
 import { DynamicShortcut, OnMultiLink, Shortcut } from "./shortcut";
 import { Shortcuts } from "./shortcuts";
 import { startupCache } from "./startup-cache";
 import { state } from "./state";
+
+//----------------------------------------------------------------------------------------------------------------------
+// Constants
+//----------------------------------------------------------------------------------------------------------------------
+
+export const DYNAMIC_LINK_PROTOCOL = "function";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Internal data structure for intermediate parser results

@@ -1,5 +1,5 @@
-import { DYNAMIC_LINK_PROTOCOL } from "../data/constants";
 import { Link } from "../data/link";
+import { DYNAMIC_LINK_PROTOCOL } from "../data/parser";
 import { DynamicBookmarkFunction, DynamicLinkFunction, DynamicQueryFunction, GeneratedLinks } from "../data/shortcut";
 import { startupCache } from "../data/startup-cache";
 import { InitializationError } from "../utilities/error";
