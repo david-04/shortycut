@@ -1,5 +1,6 @@
 import { create, sanitize } from "../utilities/html";
 import { assertNotNull } from "../utilities/misc";
+import { selectHotkeys } from "../utilities/select-hotkeys";
 import { state } from "./state";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,8 +133,7 @@ export class MatchingSegment {
     }
 
     private autoDetectHotkeys(description: string, keyword: string, hotkeysMatched: number) {
-        return state.hotkeySelector
-            .selectHotkeys(keyword, description, hotkeysMatched)
+        return selectHotkeys(keyword, description, hotkeysMatched)
             .map(item => (item.isHotkey ? create("span.hotkey", item.text).outerHTML : sanitize(item.text)))
             .join("");
     }
