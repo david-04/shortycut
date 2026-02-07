@@ -10,6 +10,6 @@ export const startupCache = {
     exceptions: new Array<ErrorEvent>(),
     config: new Array<object>(),
     shortcuts: new Array<string>(),
-    initializationErrors: new Array<InitializationError>(),
+    initializationErrors: new Array<InitializationError | (() => InitializationError)>(),
     dynamicLinks: new Hashtable<DynamicShortcut>(),
 } as const;

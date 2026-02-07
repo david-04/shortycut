@@ -7,6 +7,7 @@ import { HTML_BODY } from "../generated/html-body";
 import { displayError, Exception, handleExceptions } from "../utilities/error";
 import { isDemo } from "../utilities/misc";
 import { FaviconManager } from "./favicon-manager";
+import { redirector } from "./redirector";
 import { JavaScriptLoader } from "./script-loader";
 import { parseShortcuts } from "./threads";
 
@@ -75,7 +76,7 @@ function onParseShortcutsComplete(result: unknown) {
         addBlankTargetToAllLinksOnPage();
     }
     state.faviconManager = new FaviconManager();
-    state.redirector.processQuery();
+    redirector.processQuery();
 }
 
 function addBlankTargetToAllLinksOnPage() {

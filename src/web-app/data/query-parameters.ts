@@ -55,9 +55,10 @@ export namespace queryParameters {
                     return { ...accumulated, [key]: true };
                 }
                 startupCache.initializationErrors.push(
-                    new InitializationError(
-                        create("div", "Facet ", create("tt", current), " (in this page's address) is not supported")
-                    )
+                    () =>
+                        new InitializationError(
+                            create("div", "Facet ", create("tt", current), " (in this page's address) is not supported")
+                        )
                 );
                 return accumulated;
             },

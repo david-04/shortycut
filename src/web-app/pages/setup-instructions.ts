@@ -1,7 +1,6 @@
-import { RedirectMode } from "../application/redirector";
+import { RedirectMode, redirector } from "../application/redirector";
 import { Page } from "../data/page";
 import { startupCache } from "../data/startup-cache";
-import { state } from "../data/state";
 import { sanitize } from "../utilities/html";
 import { getWindowLocationPath, supportsBacktickSyntax } from "../utilities/misc";
 import "./setup-instructions.css";
@@ -38,7 +37,7 @@ export class SetupInstructions implements Page {
                 this.dom.header.style.display = "none";
             } else {
                 this.setupComplete = true;
-                state.redirector.openUrl(globalThis.location.href.replace(/\?.*/, ""), RedirectMode.PRESERVE_HISTORY);
+                redirector.openUrl(globalThis.location.href.replace(/\?.*/, ""), RedirectMode.PRESERVE_HISTORY);
             }
         }
 

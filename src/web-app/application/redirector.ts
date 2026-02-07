@@ -13,38 +13,38 @@ export enum RedirectMode {
     ERASE_HISTORY,
 }
 
-export class Redirector {
-    private alwaysOpenNewTabs = false;
-    private showRedirectPage = true;
+export namespace redirector {
+    let alwaysOpenNewTabs = false;
+    let showRedirectPage = true;
 
     //------------------------------------------------------------------------------------------------------------------
     // Analyze the query and redirect as required
     //------------------------------------------------------------------------------------------------------------------
 
-    public processQuery() {
+    export function processQuery() {
         const shortcut = shortcuts.get(queryParameters.query.keyword) || undefined;
-        const { setup, redirect } = queryParameters;
+        const { setup, redirect: redirectQueryParameter } = queryParameters;
         const isHomepageKeyword = state.config.homepage.keywords.includes(queryParameters.query.keyword);
 
         if (setup) {
             document.title = "ShortyCut";
-            this.showSetupPage(setup);
-        } else if (redirect) {
-            this.processAuxiliaryRedirect(redirect);
+            showSetupPage(setup);
+        } else if (redirectQueryParameter) {
+            processAuxiliaryRedirect(redirectQueryParameter);
         } else if (shortcut) {
-            this.processShortcut(shortcut);
+            processShortcut(shortcut);
         } else if (isUrl(queryParameters.query.full)) {
-            this.openUrl(queryParameters.query.full, RedirectMode.ERASE_HISTORY);
+            openUrl(queryParameters.query.full, RedirectMode.ERASE_HISTORY);
         } else if (
             !queryParameters.query.keyword ||
             !state.defaultSearchEngine ||
             !state.config.defaultSearchEngine.useInAddressBar ||
             isHomepageKeyword
         ) {
-            this.openHomepage(isHomepageKeyword);
+            openHomepage(isHomepageKeyword);
         } else {
             const links = state.defaultSearchEngine.getFinalizedLinks(queryParameters.query.full);
-            this.redirect({ ...links, onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB }, RedirectMode.ERASE_HISTORY);
+            redirect({ ...links, onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB }, RedirectMode.ERASE_HISTORY);
         }
     }
 
@@ -52,23 +52,22 @@ export class Redirector {
     // Redirect to the URL provided in the query parameter
     //------------------------------------------------------------------------------------------------------------------
 
-    private processAuxiliaryRedirect(redirect: FinalizedUrlBase) {
-        const { url, postFields } = redirect;
+    function processAuxiliaryRedirect({ url, postFields }: FinalizedUrlBase) {
         const permalink = Link.constructFinalizedPermalink(url, postFields);
         const finalizedLinks = {
             onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB,
             links: [{ htmlDescription: "", urls: [{ url, postFields, permalink }] }],
         };
-        this.redirect(finalizedLinks, RedirectMode.ERASE_HISTORY);
+        redirect(finalizedLinks, RedirectMode.ERASE_HISTORY);
     }
 
     //------------------------------------------------------------------------------------------------------------------
     // Display the homepage
     //------------------------------------------------------------------------------------------------------------------
 
-    private openHomepage(isHomepageKeyword: boolean) {
-        this.alwaysOpenNewTabs = queryParameters.facets.newTabs;
-        this.showRedirectPage = false;
+    function openHomepage(isHomepageKeyword: boolean) {
+        alwaysOpenNewTabs = queryParameters.facets.newTabs;
+        showRedirectPage = false;
         document.title = "ShortyCut";
         const query = isHomepageKeyword
             ? queryParameters.query.full.replace(/^\s*[^\s]+/, "").trim()
@@ -83,11 +82,11 @@ export class Redirector {
     // Process a shortcut by opening the links or rendering the shortlist
     //------------------------------------------------------------------------------------------------------------------
 
-    private processShortcut(shortcut: Shortcut) {
+    function processShortcut(shortcut: Shortcut) {
         if (shortcut.queries && (queryParameters.query.searchTerm || !shortcut.bookmarks)) {
-            this.redirect(shortcut.getFinalizedQueries(queryParameters.query.searchTerm), RedirectMode.ERASE_HISTORY);
+            redirect(shortcut.getFinalizedQueries(queryParameters.query.searchTerm), RedirectMode.ERASE_HISTORY);
         } else if (shortcut.bookmarks) {
-            this.redirect(shortcut.getFinalizedBookmarks(), RedirectMode.ERASE_HISTORY);
+            redirect(shortcut.getFinalizedBookmarks(), RedirectMode.ERASE_HISTORY);
         } else {
             throw new Exception("Internal error", "Found no links to use for redirection");
         }
@@ -97,21 +96,21 @@ export class Redirector {
     // Open the selected link(s) or display the shortlist
     //------------------------------------------------------------------------------------------------------------------
 
-    public redirect(finalizedLinks: FinalizedLinks, mode: RedirectMode) {
-        const urls = this.flattenUrls(finalizedLinks);
+    export function redirect(finalizedLinks: FinalizedLinks, mode: RedirectMode) {
+        const urls = flattenUrls(finalizedLinks);
         const htmlDescription = finalizedLinks.links[0]?.htmlDescription ?? "";
         const [first, ...rest] = urls;
         if (undefined !== first && !rest.length) {
-            this.openLink(htmlDescription, first, mode);
+            openLink(htmlDescription, first, mode);
         } else if (1 < finalizedLinks.links.length && finalizedLinks.onMultiLink === OnMultiLink.SHOW_MENU) {
-            this.showRedirectPage = false;
+            showRedirectPage = false;
             setTimeout(() => state.router.goto(pages.shortlist.populate(finalizedLinks)), 0);
-        } else if (this.alwaysOpenNewTabs) {
+        } else if (alwaysOpenNewTabs) {
             urls.forEach(link => globalThis.open(link.permalink));
             state.router.goBackToAndResetHomepage();
         } else if (first) {
             urls.slice(1).forEach(link => globalThis.open(link.permalink));
-            this.openLink(htmlDescription, first, mode);
+            openLink(htmlDescription, first, mode);
         }
     }
 
@@ -119,7 +118,7 @@ export class Redirector {
     // Flatten nested URLs
     //------------------------------------------------------------------------------------------------------------------
 
-    private flattenUrls(finalizedLinks: FinalizedLinks) {
+    function flattenUrls(finalizedLinks: FinalizedLinks) {
         const finalizedUrls = new Array<FinalizedUrl>();
         finalizedLinks.links.forEach(link => link.urls.forEach(url => finalizedUrls.push(url)));
         return finalizedUrls;
@@ -129,36 +128,36 @@ export class Redirector {
     // Open a link in the current tab
     //------------------------------------------------------------------------------------------------------------------
 
-    private openLink(htmlDescription: string, url: FinalizedUrl, mode: RedirectMode) {
-        if (this.showRedirectPage) {
+    function openLink(htmlDescription: string, url: FinalizedUrl, mode: RedirectMode) {
+        if (showRedirectPage) {
             state.router.goto(pages.redirect.populate(htmlDescription, url.url));
         }
 
         if (url.postFields) {
-            if (RedirectMode.NEW_TAB === mode || this.alwaysOpenNewTabs) {
-                this.openUrl(url.permalink, mode);
+            if (RedirectMode.NEW_TAB === mode || alwaysOpenNewTabs) {
+                openUrl(url.permalink, mode);
             } else {
-                this.submitForm(url);
+                submitForm(url);
             }
         } else {
-            this.openUrl(url.url, mode);
+            openUrl(url.url, mode);
         }
     }
 
-    public openUrl(url: string, mode: RedirectMode) {
-        if (RedirectMode.PRESERVE_HISTORY === mode && !this.alwaysOpenNewTabs) {
+    export function openUrl(url: string, mode: RedirectMode) {
+        if (RedirectMode.PRESERVE_HISTORY === mode && !alwaysOpenNewTabs) {
             globalThis.location.href = url;
-        } else if (RedirectMode.ERASE_HISTORY === mode && !this.alwaysOpenNewTabs) {
+        } else if (RedirectMode.ERASE_HISTORY === mode && !alwaysOpenNewTabs) {
             globalThis.location.replace(url);
         } else {
             globalThis.open(url);
-            if (this.alwaysOpenNewTabs) {
+            if (alwaysOpenNewTabs) {
                 state.router.goBackToAndResetHomepage();
             }
         }
     }
 
-    private submitForm(link: FinalizedUrl) {
+    function submitForm(link: FinalizedUrl) {
         const form = document.createElement("form");
         form.action = link.url;
         form.method = "post";
@@ -179,7 +178,7 @@ export class Redirector {
     // Show the setup
     //------------------------------------------------------------------------------------------------------------------
 
-    public showSetupPage(mode: string) {
+    export function showSetupPage(mode: string) {
         if (pages.setup) {
             pages.setup.hide();
         }

@@ -1,4 +1,4 @@
-import { RedirectMode } from "../application/redirector";
+import { RedirectMode, redirector } from "../application/redirector";
 import { Page } from "../data/page";
 import { queryParameters } from "../data/query-parameters";
 import { FinalizedLink, FinalizedLinks, OnMultiLink } from "../data/shortcut";
@@ -144,7 +144,7 @@ export class Shortlist implements Page {
     }
 
     private openSelected(event: KeyboardEvent | MouseEvent, current: number) {
-        state.redirector.redirect(
+        redirector.redirect(
             { links: [assertNotNull(this.links[current])], onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB },
             queryParameters.facets.newTabs ? RedirectMode.NEW_TAB : RedirectMode.PRESERVE_HISTORY
         );
@@ -153,7 +153,7 @@ export class Shortlist implements Page {
     }
 
     private openAll(event: KeyboardEvent | MouseEvent) {
-        state.redirector.redirect(
+        redirector.redirect(
             { links: this.links.slice(1), onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB },
             RedirectMode.PRESERVE_HISTORY
         );

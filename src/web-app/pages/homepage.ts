@@ -1,4 +1,4 @@
-import { RedirectMode } from "../application/redirector";
+import { RedirectMode, redirector } from "../application/redirector";
 import { Filter, Suggestion, SuggestionType } from "../data/filter";
 import { Links } from "../data/links";
 import { Page } from "../data/page";
@@ -98,7 +98,7 @@ export class Homepage implements Page {
                     : "Errors occurred during initialization"
             ).outerHTML;
             startupCache.initializationErrors
-                .map(error => error.toHtml())
+                .map(error => ("function" === typeof error ? error().toHtml() : error.toHtml()))
                 .forEach(element => this.dom.notification.applicationErrors.appendChild(element));
             this.dom.notification.applicationErrors.style.display = "block";
         } else if (0 === shortcuts.size) {
@@ -515,7 +515,7 @@ export class Homepage implements Page {
     }
 
     private redirectToLinks(links: FinalizedLinks, viaRightArrow: boolean, mode: RedirectMode) {
-        state.redirector.redirect(viaRightArrow ? { ...links, onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB } : links, mode);
+        redirector.redirect(viaRightArrow ? { ...links, onMultiLink: OnMultiLink.OPEN_IN_NEW_TAB } : links, mode);
     }
 
     private applySearchResult(suggestion: Suggestion, viaRightArrow: boolean, mode: RedirectMode) {
@@ -587,11 +587,11 @@ export class Homepage implements Page {
 
     private performRedirect(input: string, searchTerm: string, mode: RedirectMode, links?: Links) {
         if (links) {
-            state.redirector.redirect(links.toFinalizedLinks(searchTerm.trim()), mode);
+            redirector.redirect(links.toFinalizedLinks(searchTerm.trim()), mode);
         } else if (isUrl(input)) {
-            state.redirector.openUrl(input, mode);
+            redirector.openUrl(input, mode);
         } else if (state.defaultSearchEngine?.queries && state.config.defaultSearchEngine.useOnHomepage) {
-            state.redirector.redirect(state.defaultSearchEngine.getFinalizedLinks(input), mode);
+            redirector.redirect(state.defaultSearchEngine.getFinalizedLinks(input), mode);
         } else if (this.suggestions.length) {
             this.selectedIndex = 0;
             this.applySuggestion(this.selectedIndex, mode, false, searchTerm);

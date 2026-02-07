@@ -1,4 +1,3 @@
-import { Redirector } from "../application/redirector";
 import { Router } from "../application/router";
 import { state } from "./state";
 
@@ -7,6 +6,5 @@ import { state } from "./state";
 //----------------------------------------------------------------------------------------------------------------------
 
 export function initializeVariables() {
-    state.redirector = new Redirector();
     state.router = new Router();
 }
