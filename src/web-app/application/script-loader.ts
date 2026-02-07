@@ -27,8 +27,9 @@ export class JavaScriptLoader {
     private onCompleteHandler?: (() => void) | undefined;
 
     private get files(): Hashtable<JavaScriptFile> {
-        const result = window.shortycutJavaScriptLoaderFiles ?? new Hashtable<JavaScriptFile>();
-        window.shortycutJavaScriptLoaderFiles ??= result;
+        const globalThisTyped = globalThis as { shortycutJavaScriptLoaderFiles?: Hashtable<JavaScriptFile> };
+        const result = globalThisTyped.shortycutJavaScriptLoaderFiles ?? new Hashtable<JavaScriptFile>();
+        globalThisTyped.shortycutJavaScriptLoaderFiles ??= result;
         return result;
     }
 

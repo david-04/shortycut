@@ -21,11 +21,12 @@ export function comparing<T, R>(fieldSelector?: (object: T) => R) {
 //----------------------------------------------------------------------------------------------------------------------
 
 export function supportsBacktickSyntax() {
+    const globalThisTyped = globalThis as { shortycutBrowserTest?: string };
     try {
-        eval('window["shortycutBrowserTest"] = `success`');
+        eval('globalThis["shortycutBrowserTest"] = `success`');
     } catch {}
-    const valueMatches = "success" === window.shortycutBrowserTest;
-    delete window.shortycutBrowserTest;
+    const valueMatches = "success" === globalThisTyped.shortycutBrowserTest;
+    delete globalThisTyped.shortycutBrowserTest;
     return valueMatches;
 }
 
