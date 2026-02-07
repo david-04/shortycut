@@ -272,48 +272,19 @@ export const HTML_BODY = `
             Activate them as required by ticking the checkboxes below:
             <br>
             <br>
-            <table border="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <input type="checkbox" class="new-tabs" />
-                    </td>
-                    <td>
-                        &nbsp;
-                    </td>
-                    <td>
-                        <b>Open all links in new tabs</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                    </td>
-                    <td>
-                        Lock ShortyCut's homepage to the browser tab and never navigate away.
-                        As the tab sticks around, it can be reused for entering more keywords later.
-                        <br>&nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="checkbox" class="no-focus" />
-                    </td>
-                    <td>
-                        &nbsp;
-                    </td>
-                    <td>
-                        <b>Don't focus on the input field</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                    </td>
-                    <td>
-                        Tick this checkbox when using an add-on like Vimium,
-                        which allows to operate the browser via keyboard shortcuts.
-                        <br>&nbsp;
-                    </td>
-                </tr>
-            </table>
+            <label><input type="checkbox" class="new-tabs" /> Always open all links in new tabs</label>
+            <br>
+            <br>
+            <label><input type="checkbox" class="no-focus" /> Don't focus on the input field (when ShortyCut
+                loads)</label>
+            <br>
+            <br>
+            Theme:
+            <label><input type="radio" name="theme" value="light"> Light</label>
+            <label><input type="radio" name="theme" value="dark"> Dark</label>
+            <label><input type="radio" name="theme" value="system" checked> Auto (follow system)</label>
+            <br>
+            <br>
             Set your browser's start page or the pinned tab to the following address:
             <br>
             <br><a class="homepage"></a>

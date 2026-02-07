@@ -16,6 +16,9 @@ export class BrowserIntegration implements Page {
             newTabs: document.querySelector("#browser-integration .new-tabs") as HTMLInputElement,
             noFocus: document.querySelector("#browser-integration .no-focus") as HTMLInputElement,
         },
+        themeRadioButtons: Array.from(
+            document.querySelectorAll("#browser-integration input[name='theme']")
+        ) as ReadonlyArray<HTMLInputElement>,
         form: document.querySelector("#browser-integration .form") as HTMLFormElement,
         keyword: document.querySelector("#browser-integration .keyword") as HTMLAnchorElement,
         webServerRequired: document.querySelector("#browser-integration .web-server-required") as HTMLElement,
@@ -33,6 +36,11 @@ export class BrowserIntegration implements Page {
 
         this.dom.facets.newTabs.checked = queryParameters.facets.newTabs;
         this.dom.facets.noFocus.checked = queryParameters.facets.noFocus;
+
+        this.dom.themeRadioButtons.forEach(radio => {
+            radio.checked = radio.value === (queryParameters.theme ?? "system");
+        });
+
         this.updateHomepageLink();
 
         const baseUrl = globalThis.location.href.replace(/[#?].*/, "");
@@ -89,12 +97,14 @@ export class BrowserIntegration implements Page {
 
     public addEventHandlers() {
         Object.values(this.dom.facets).forEach(checkbox => checkbox.addEventListener("click", this.updateHomepageLink));
+        this.dom.themeRadioButtons.forEach(radio => radio.addEventListener("change", this.updateHomepageLink));
     }
 
     public removeEventHandlers() {
         Object.values(this.dom.facets).forEach(checkbox =>
             checkbox.removeEventListener("click", this.updateHomepageLink)
         );
+        this.dom.themeRadioButtons.forEach(radio => radio.removeEventListener("change", this.updateHomepageLink));
     }
 
     private updateHomepageLink() {
@@ -103,10 +113,14 @@ export class BrowserIntegration implements Page {
             .map(facet => ("noFocus" === facet ? "no-focus" : facet))
             .map(facet => ("newTabs" === facet ? "new-tabs" : facet));
 
-        let url = globalThis.location.href.replace(/[#?].*/, "");
-        if (facets.length) {
-            url += `?facets=${facets.join(",")}`;
-        }
+        const theme = this.dom.themeRadioButtons.find(radio => radio.checked)?.value ?? "";
+        const urlSearchParams = new URLSearchParams({
+            ...(facets.length ? { facets: facets.join(",") } : {}),
+            ...(["light", "dark"].includes(theme) ? { [queryParameters.THEME_KEY]: theme } : {}),
+        })
+            .toString()
+            .replaceAll("%2C", ",");
+        const url = [globalThis.location.href.replace(/[#?].*/, ""), urlSearchParams].filter(Boolean).join("?");
         this.dom.homepage.innerHTML = sanitize(url);
         this.dom.homepage.href = url;
     }

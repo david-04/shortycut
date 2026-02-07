@@ -5,6 +5,12 @@ import { FinalizedUrlBase } from "./shortcut";
 import { startupCache } from "./startup-cache";
 
 //----------------------------------------------------------------------------------------------------------------------
+// Data types
+//----------------------------------------------------------------------------------------------------------------------
+
+export type Theme = "light" | "dark" | undefined;
+
+//----------------------------------------------------------------------------------------------------------------------
 // Parse URL query parameters
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -18,6 +24,7 @@ export namespace queryParameters {
     export const REDIRECT_KEY = "r";
     export const SETUP_KEY = "setup";
     export const FACETS_KEY = "facets";
+    export const THEME_KEY = "theme";
 
     //------------------------------------------------------------------------------------------------------------------
     // Query parameters
@@ -29,6 +36,7 @@ export namespace queryParameters {
     export const query = getQuery(urlSearchParams);
     export const redirect = getRedirect(urlSearchParams);
     export const setup = urlSearchParams.get(SETUP_KEY);
+    export const theme = (["light", "dark"] as const).find(theme => theme === urlSearchParams.get(THEME_KEY));
 
     //------------------------------------------------------------------------------------------------------------------
     // Extract facets from the URL query parameters (e.g. "new-tabs" and "no-focus")
