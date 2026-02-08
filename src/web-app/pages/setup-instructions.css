@@ -33,6 +33,13 @@
     box-shadow: 0px 0px 1em red;
     margin-bottom: 1em;
     width: 100%;
+    border-radius: 0.3em;
+}
+
+body.dark-theme #setup .error {
+    background-color: rgb(148, 0, 0);
+    border: 1px solid #ff7676;
+    box-shadow: none;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -67,15 +74,30 @@
     padding-right: 0.2em;
 }
 
+body.dark-theme #setup .instructions .filename {
+    background-color: #3a3a3a;
+    border: 1px solid #666666;
+}
+
 #setup .instructions pre {
     background-color: #f2f2f2;
     border: 1px solid #cccccc;
-    padding: 0.4em;
-    margin-top: 1.5em;
+    padding: 1em;
+    margin: 2em 0 2em 0;
+    border-radius: 0.3em;
+}
+
+body.dark-theme #setup .instructions pre {
+    background-color: #444;
+    border: 1px solid #999;
 }
 
 #setup .instructions pre .highlight {
     color: red;
+}
+
+body.dark-theme #setup .instructions pre .highlight {
+    color: yellow;
 }
 
 #setup .instructions pre .arrow {
@@ -100,6 +122,13 @@
     padding: 0.25em 0 0.25em 0;
 }
 
+body.dark-theme #setup .syntax-warning .important {
+    color: #ff8888;
+    background-color: #666633;
+    border-top: 1px solid #cc6666;
+    border-bottom: 1px solid #cc6666;
+}
+
 /* ------------------------------------------------------------------------------------------------------------------ */
 /* Button                                                                                                             */
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -109,11 +138,17 @@
     border-radius: 0.3em;
     text-decoration: none;
     outline: none;
-    padding: 0.3em;
+    padding: 0.3em 0.5em;
     padding-right: 0.5em;
     color: yellow;
     font-weight: 500;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     display: inline-block;
+}
+
+body.dark-theme #setup a.button {
+    background: #444;
+    color: yellow;
+    border: 1px solid #999;
 }

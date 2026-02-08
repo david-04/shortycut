@@ -63,3 +63,7 @@
     text-overflow: ellipsis;
     max-width: 40em;
 }
+
+body.dark-theme #redirect .url {
+    color: #aaaaaa;
+}

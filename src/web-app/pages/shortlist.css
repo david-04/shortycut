@@ -34,11 +34,15 @@
 }
 
 #shortlist a:not(:last-child) .row .text {
-    border-bottom: 1px solid #cccccc;
+    border-bottom: 1px solid #aaa;
+}
+
+body.dark-theme #shortlist a:not(:last-child) .row .text {
+    border-bottom: 1px solid #777;
 }
 
 #shortlist a:focus .row .text {
-    background: #66666628;
+    background: #80808030;
     outline: none;
 }
 
@@ -85,6 +89,10 @@
     margin-top: 0.75em;
 }
 
+body.dark-theme #shortlist .row .text .url {
+    color: #aaaaaa;
+}
+
 #shortlist .row .text .url .favicon {
     display: inline-block;
     width: 1.2em;
@@ -100,4 +108,8 @@
 
 #shortlist a:focus .row .text .key {
     background-color: white;
+}
+
+body.dark-theme #shortlist a:focus .row .text .key {
+    background-color: #3a3a3a;
 }

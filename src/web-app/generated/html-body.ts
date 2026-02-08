@@ -7,10 +7,10 @@ export const HTML_BODY = `
     <div id="home" style="display:none">
         <div class="row selected filter-row">
             <div class="cursor">
-                <img src="resources/arrow.svg" class="icon">
+                <img src="resources/arrow.svg" class="icon" alt="ShortyCut icon">
             </div>
             <div class="row-content">
-                <input type="text" placeholder="" class="input" />
+                <input type="text" placeholder="" class="input" name="user-input" />
             </div>
         </div>
         <div class="suggestions">

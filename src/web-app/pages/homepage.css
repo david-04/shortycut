@@ -60,15 +60,31 @@
     width: 100%;
     border: none;
     outline: none;
-    border-bottom: 1px solid #555555;
+    border-bottom: 1px solid #555;
+}
+
+body.dark-theme #home .input {
+    background-color: transparent;
+    color: white;
+    border-bottom: 1px solid #aaa;
 }
 
 #home .input.warning {
     background-color: #fffd75;
 }
 
+body.dark-theme #home .input.warning {
+    border-bottom: 1px solid yellow;
+    background-color: rgb(65, 65, 0);
+}
+
 #home .input.error {
     background-color: #ffbcbc;
+}
+
+body.dark-theme #home .input.error {
+    border-bottom: 1px solid rgb(255, 187, 0);
+    background-color: rgb(129, 0, 0);
 }
 
 #home .no-focus.filter-row:not(:focus-within) {
@@ -96,6 +112,10 @@
     background-color: #99999926;
 }
 
+body.dark-theme #home .suggestions .row:nth-child(odd) .row-content {
+    background-color: #44444426;
+}
+
 #home .suggestions .row:last-child {
     margin-bottom: 1em;
 }
@@ -113,12 +133,24 @@
     color: #999999;
 }
 
+body.dark-theme #home .suggestions .row:nth-child(odd):not(.selected) .keyword .matched {
+    color: #bbbbbb;
+}
+
 #home .suggestions .row:nth-child(even):not(.selected) .keyword .matched {
     color: #aaaaaa;
 }
 
+body.dark-theme #home .suggestions .row:nth-child(even):not(.selected) .keyword .matched {
+    color: #cccccc;
+}
+
 #home .suggestions .row.selected .keyword .matched {
     color: #cccccc;
+}
+
+body.dark-theme #home .suggestions .row.selected .keyword .matched {
+    color: #eeeeee;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -151,12 +183,25 @@
     color: black;
 }
 
+body.dark-theme #home .suggestions .matched-substring {
+    background-color: #444400;
+    color: rgb(255, 255, 107);
+}
+
 #home .suggestions .row:nth-child(odd):not(.selected):not(.segment) .more-indicator-text {
     color: #999999;
 }
 
+body.dark-theme #home .suggestions .row:nth-child(odd):not(.selected):not(.segment) .more-indicator-text {
+    color: #bbbbbb;
+}
+
 #home .suggestions .row:nth-child(even):not(.selected):not(.segment) .more-indicator-text {
     color: #aaaaaa;
+}
+
+body.dark-theme #home .suggestions .row:nth-child(even):not(.selected):not(.segment) .more-indicator-text {
+    color: #cccccc;
 }
 
 #home .suggestions .row:not(.selected) .more-indicator-key {
@@ -177,20 +222,22 @@
     min-width: 1em;
     text-align: center;
     padding: 0 0.1em 0 0.1em;
-    border: 0px solid #666666;
+    border: 0px solid #666;
     border-radius: 0.25em;
-    margin: 0 0.05em 0 0.05em;
+    margin: 0 0.1em;
 }
 
 #home .suggestions .description .key,
-#home .suggestions .row:not(.selected) .description .hotkey {
+#home .suggestions .row .description .hotkey {
     background-color: white;
     color: black;
-    border: 1px solid #666666;
+    border: 1px solid #666;
+    padding: 0 0.1em;
 }
 
-#home .suggestions .row.selected .description .hotkey {
-    border: 1px solid #aaaaaa;
+body.dark-theme #home .suggestions .description .key,
+body.dark-theme #home .suggestions .row .description .hotkey {
+    border: 1px solid black;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -203,12 +250,26 @@
     color: white;
 }
 
+body.dark-theme #home > .row.selected + .suggestions > .row:nth-child(odd).match .row-content,
+body.dark-theme #home .suggestions > .row.selected .row-content {
+    background: #555555 !important;
+    color: #ffffff;
+}
+
 #home .suggestions .selected .keyword .matched {
     color: #dddddd;
 }
 
+body.dark-theme #home .suggestions .selected .keyword .matched {
+    color: #eeeeee;
+}
+
 #home .suggestions .selected .matched-substring {
     color: black;
+}
+
+body.dark-theme #home .suggestions .selected .matched-substring {
+    color: #ffffff;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -243,8 +304,13 @@
 #home .notification .header {
     padding: 0.4em;
     width: 100%;
-    background-color: #ffafaf;
+    background-color: #ffbfbf;
     border: 1px solid #ff5b5b;
+}
+
+body.dark-theme #home .notification .header {
+    background-color: #860000;
+    border: 1px solid #ff8b8b;
 }
 
 #home .notification .description {
@@ -254,8 +320,17 @@
     border-top: none;
 }
 
+body.dark-theme #home .notification .description {
+    border: 1px solid #ff8b8b;
+    border-top: none;
+}
+
 #home .notification .key {
     color: black;
+}
+
+body.dark-theme #home .notification .key {
+    color: #cccccc;
 }
 
 #home .notification .welcome p.example > .key:first-child {

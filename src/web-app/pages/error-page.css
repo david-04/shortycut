@@ -20,6 +20,14 @@
     border: 1px solid #ff5b5b;
 }
 
+body.dark-theme #error > div {
+    border: 1px solid #ff8b8b;
+}
+
+body.dark-theme #error > div:not(:first-child) {
+    border-top: none;
+}
+
 /* ------------------------------------------------------------------------------------------------------------------ */
 /* Row, cursor and content                                                                                            */
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -28,6 +36,10 @@
     width: 100%;
     background-color: #ffafaf;
     border-bottom: none;
+}
+
+body.dark-theme #error .title {
+    background-color: #680000;
 }
 
 #error .message {
@@ -39,9 +51,22 @@
     font-weight: bold;
 }
 
+body.dark-theme #error .errorMessage {
+    color: #ff8888;
+}
+
 #error .jsonError {
+    padding: 0.2em;
+    border-radius: 0.2em;
     color: red;
+    border: 1px solid red;
     background-color: yellow;
+}
+
+body.dark-theme #error .jsonError {
+    color: yellow;
+    border: 1px solid yellow;
+    background-color: red;
 }
 
 pre {

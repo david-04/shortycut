@@ -6,3 +6,18 @@
     width: 100%;
     padding: 0.5em;
 }
+
+#browser-integration input[type="button"] {
+    border-radius: 0.25em;
+    padding: 0.5em;
+}
+
+#browser-integration input[type="button"]:hover {
+    cursor: pointer;
+}
+
+body.dark-theme #browser-integration input[type="button"] {
+    background: #000;
+    color: white;
+    border: 1px solid #999;
+}

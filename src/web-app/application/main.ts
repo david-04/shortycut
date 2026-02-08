@@ -51,6 +51,13 @@ function addLink(rel: string, type: string, href: string, title: string) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function startApplication() {
+    if (
+        queryParameters.theme === "dark" ||
+        (queryParameters.theme === undefined && globalThis.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+        document.body.classList.add("dark-theme");
+    }
+
     document.body.innerHTML = isDemo() ? HTML_BODY.replaceAll("resources/docs", "..") : HTML_BODY;
     const self = globalThis.location.href.replace(/[?#].*/, "");
     document.body.innerHTML = document.body.innerHTML.replaceAll("self://", self);

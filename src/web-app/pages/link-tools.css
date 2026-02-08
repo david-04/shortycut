@@ -5,6 +5,7 @@
 #link-tools .url-encoding input {
     width: 100%;
     padding: 0.5em;
+    margin-top: 0.5em;
 }
 
 #link-tools .url-encoding input.invalid {
@@ -12,9 +13,22 @@
     border: 1px solid red;
 }
 
+body.dark-theme #link-tools .url-encoding input.invalid {
+    background-color: #550000;
+    border: 1px solid #ff6060;
+}
+
 /* ------------------------------------------------------------------------------------------------------------------ */
 /* HAR parser                                                                                                         */
 /* ------------------------------------------------------------------------------------------------------------------ */
+
+#link-tools .har-parser {
+    margin-bottom: 2em;
+}
+
+#link-tools .har-parser .url {
+    word-break: break-all;
+}
 
 #link-tools .har-parser textarea {
     width: 100%;
@@ -26,10 +40,7 @@
     border: 1px solid red;
 }
 
-#link-tools .har-parser {
-    margin-bottom: 2em;
-}
-
-#link-tools .har-parser .url {
-    word-break: break-all;
+body.dark-theme #link-tools .har-parser textarea.invalid {
+    background-color: #550000;
+    border: 1px solid #ff6060;
 }
