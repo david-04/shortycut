@@ -143,9 +143,7 @@ export class FaviconManager {
         });
 
         return files.entries
-            .map(entry => {
-                return { filename: entry.key, url: entry.value };
-            })
+            .map(entry => ({ filename: entry.key, url: entry.value }))
             .sort((a, b) => a.filename.localeCompare(b.filename));
     }
 

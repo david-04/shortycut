@@ -237,6 +237,7 @@ body.dark-theme #home .suggestions .row:nth-child(even):not(.selected):not(.segm
 
 body.dark-theme #home .suggestions .description .key,
 body.dark-theme #home .suggestions .row .description .hotkey {
+    background-color: #eaeaea;
     border: 1px solid black;
 }
 

@@ -104,22 +104,37 @@ export class FaviconTools implements Page {
     }
 
     private refreshPageContentMissing() {
+        const fetchService = state.config.favicons.fetchService;
         const domains = state.faviconManager.getMissingDomains();
-        if (domains.length) {
+        if (!fetchService && domains.length) {
             this.dom.missingListing.innerHTML = create(
                 "div",
                 domains.map(domain => create("div.row", sanitize(domain)))
             ).innerHTML;
         }
-        this.dom.missing.style.display = domains.length ? "block" : "none";
+        this.dom.missing.style.display = !fetchService && domains.length ? "block" : "none";
     }
 
     private refreshPageContentOnline() {
+        const fetchService = state.config.favicons.fetchService;
         const icons = state.faviconManager.getOnlineDomains();
-        if (icons.length) {
+        const missingDomains = state.faviconManager.getMissingDomains();
+
+        const allIcons = [...icons];
+        if (fetchService) {
+            missingDomains.forEach(domain => {
+                const encodedDomain = encodeURIComponent(domain.replace(/:\d+$/, ""));
+                const url = fetchService.replace("%s", encodedDomain);
+                allIcons.push({ filename: `${domain.replaceAll(":", "!")}.ico`, url });
+            });
+        }
+
+        allIcons.sort((a, b) => a.filename.localeCompare(b.filename));
+
+        if (allIcons.length) {
             this.dom.curlTextarea.value =
-                icons.map(item => `curl -s -L -o "${item.filename}" "${item.url}"`).join("\n") + "\n";
-            this.dom.onlineListing.innerHTML = icons
+                allIcons.map(item => `curl -s -L -o "${item.filename}" "${item.url}"`).join("\n") + "\n";
+            this.dom.onlineListing.innerHTML = allIcons
                 .map(item =>
                     create("div.row", [
                         create(
@@ -135,7 +150,7 @@ export class FaviconTools implements Page {
                 .map(element => element.outerHTML)
                 .join("");
         }
-        this.dom.online.style.display = icons.length ? "block" : "none";
+        this.dom.online.style.display = allIcons.length ? "block" : "none";
     }
 
     private refreshPageContentOffline() {
