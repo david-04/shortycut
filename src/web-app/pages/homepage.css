@@ -339,6 +339,12 @@ body.dark-theme #home .notification .key {
     display: inline-block;
 }
 
+body.dark-theme #home .notification .welcome .key {
+    background-color: #ddd;
+    border: 1px solid black;
+    color: black;
+}
+
 #home .description.spacing {
     line-height: 1.5em;
 }

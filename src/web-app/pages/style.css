@@ -99,7 +99,7 @@ body.dark-theme .utility-page :is(input, textarea):focus {
     border: 1px solid #ffffff88;
 }
 
-body.dark-theme .utility-page a,
-body.dark-theme .utility-page a:visited {
+body.dark-theme a,
+body.dark-theme a:visited {
     color: rgb(37, 199, 254);
 }
