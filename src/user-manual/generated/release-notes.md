@@ -1,11 +1,12 @@
 # ![](../img/arrow.svg) Release notes
 
-## [Version 1.4.4](https://github.com/david-04/shortycut/releases/tag/v1.4.4) (2026-02-20)
+## [Version 1.5.0](https://github.com/david-04/shortycut/releases/tag/v1.5.0) (2026-02-20)
 
-- Fixed an issue that prevented the caching of discovered favicons in the local storage
-- Enabled dynamic link functions to return multi-line strings (in addition to arrays of strings/URLs)
+- Added dark mode
+- Enabled dynamic link functions to return multi-line strings (in addition to arrays of URLs)
 - Enhanced the favicon tools/download page to use the favicon fetch service (if configured) as a fallback
-- Performed technical maintenance (migrate to launchpad, switch to ECMAScript modules, fixed linting issues)
+- Fixed an issue that prevented the caching of discovered favicons in the local storage
+- Performed technical maintenance (migrated to launchpad, switched to ECMAScript modules, fixed linting issues)
 
 ## [Version 1.4.3](https://github.com/david-04/shortycut/releases/tag/v1.4.3) (2024-06-14)
 

@@ -92,9 +92,9 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="api.html">API</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="license.html">License</a>
+                  <li class="toctree-l1"><a class="reference internal" href="generated/license.html">License</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a>
+                  <li class="toctree-l1"><a class="reference internal" href="generated/release-notes.html">Release notes</a>
                   </li>
               </ul>
       </div>
@@ -208,6 +208,21 @@ shortycut.addShortcuts('[n] News' + mkDocsIssuesUrl);
     }
 }
 </code></pre>
+<p>Multiple links can also be returned as a single multi-line string, which may contain comments as well:</p>
+<pre><code class="language-ts">
+function searchMkDocsRepository(searchTerm) {
+    if (searchTerm.match(/^[0-9]+$/)) {
+        return `
+            // returns multiple links
+            https://github.com/mkdocs/mkdocs/issues/%s
+            https://github.com/mkdocs/mkdocs/pulls/%s
+        ` ];
+    } else {
+        return 'https://github.com/mkdocs/mkdocs/search?q=%s';
+    }
+}
+
+</code></pre>
 <p>Using the shortcut with a number as the search term causes ShortyCut to open both links in new tabs. Closing the wrong page might be easier than having separate keywords and having to enter two search terms (one after the other).</p>
 <p>Dynamic link functions can also return multiple links that should be displayed as a list to choose from (see <a href="multi-link-shortcuts.html">Multi-link shortcuts</a> for an example). This is done by returning an array of objects that contain the URL and a description as separate properties:</p>
 <pre><code class="language-js">function searchMkDocsRepository(searchTerm) {
@@ -278,8 +293,8 @@ shortycut.addShortcuts('[n] News' + mkDocsIssuesUrl);
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="post-links.html" class="btn btn-neutral float-left" title="POST links">&#x25C4;  Previous</a>
-        <a href="hotkeys.html" class="btn btn-neutral float-right" title="Hotkeys">Next  &#x25BA;</a>
+        <a href="post-links.html" class="btn btn-neutral float-left" title="POST links"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="hotkeys.html" class="btn btn-neutral float-right" title="Hotkeys">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
