@@ -54,7 +54,9 @@ mkd mkdocs : ;
 doc docs : build/mkdocs/index.html;
 
 build/mkdocs/index.html : $(wildcard $(foreach GLOB, * */* */*/* */*/*/* */*/*/*/*, src/user-manual/$(GLOB)))
-	echo "Building the user manual..." && mkdocs build -f src/user-manual/mkdocs.yml -c -q
+	   echo "Building the user manual..." \
+	&& mkdocs build -f src/user-manual/mkdocs.yml -c -q \
+	&& rm -rf $(patsubst %, build/mkdocs/%, css/fonts search sitemap* mkdocs.yml) \
 
 src/user-manual/generated/license.md : LICENSE
 	echo Updating $@...  && echo -e "# ![](../img/arrow.svg) License\n" > $@ && cat LICENSE >> $@

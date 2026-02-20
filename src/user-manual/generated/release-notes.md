@@ -1,6 +1,6 @@
 # ![](../img/arrow.svg) Release notes
 
-## [Version 1.4.4](https://github.com/david-04/shortycut/releases/tag/v1.4.4) (2026-02-01)
+## [Version 1.4.4](https://github.com/david-04/shortycut/releases/tag/v1.4.4) (2026-02-20)
 
 - Fixed an issue that prevented the caching of discovered favicons in the local storage
 - Enabled dynamic link functions to return multi-line strings (in addition to arrays of strings/URLs)
