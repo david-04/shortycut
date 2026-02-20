@@ -1,5 +1,4 @@
 declare namespace shortycut {
-
     //------------------------------------------------------------------------------------------------------------------
     // Configure ShortyCut
     //------------------------------------------------------------------------------------------------------------------
@@ -17,7 +16,6 @@ declare namespace shortycut {
     }
 
     namespace Config {
-
         /** Settings to customize how shortcuts are defined (syntax, placeholders, default characteristics) */
         interface ShortcutFormat {
             /** The symbol that introduces end-of-line comments (default: "//") */
@@ -33,7 +31,6 @@ declare namespace shortycut {
         }
 
         export namespace ShortcutFormat {
-
             /** Settings to customize how keywords are defined */
             export interface Keyword {
                 /** Treat keywords as case-sensitive (default: false) */
@@ -132,14 +129,15 @@ declare namespace shortycut {
      * @return A virtual URL that can be used like any other regular http(s) URL when defining shortcuts
      */
     export function toUrl(
-        urlGenerator: (searchTerm: string) => string
+        urlGenerator: (searchTerm: string) =>
+            | string
             | ReadonlyArray<string>
             | ReadonlyArray<{
-                /* The description to display when showing multiple links in an interactive list */
-                description: string,
-                /** The URL may contain the placeholder for the keyword ("%s" if not configured otherwise) */
-                url: string;
-            }>
+                  /* The description to display when showing multiple links in an interactive list */
+                  description: string;
+                  /** The URL may contain the placeholder for the keyword ("%s" if not configured otherwise) */
+                  url: string;
+              }>
     ): string;
 
     /**
@@ -148,14 +146,15 @@ declare namespace shortycut {
      * @return A virtual URL that can be used like any other regular http(s) URL when defining shortcuts
      */
     export function toQueryUrl(
-        urlGenerator: (searchTerm: string) => string
+        urlGenerator: (searchTerm: string) =>
+            | string
             | ReadonlyArray<string>
             | ReadonlyArray<{
-                /* The description to display when showing multiple links in an interactive list */
-                description: string,
-                /** The URL may contain the placeholder for the keyword ("%s" if not configured otherwise) */
-                url: string;
-            }>
+                  /* The description to display when showing multiple links in an interactive list */
+                  description: string;
+                  /** The URL may contain the placeholder for the keyword ("%s" if not configured otherwise) */
+                  url: string;
+              }>
     ): string;
 
     /**
@@ -164,14 +163,15 @@ declare namespace shortycut {
      * @return A virtual URL that can be used like any other regular http(s) URL when defining shortcuts
      */
     export function toBookmarkUrl(
-        urlGenerator: () => string
+        urlGenerator: () =>
+            | string
             | ReadonlyArray<string>
             | ReadonlyArray<{
-                /* The description to display when showing multiple links in an interactive list */
-                description: string,
-                /** The URL may contain the placeholder for the keyword ("%s" if not configured otherwise) */
-                url: string;
-            }>
+                  /* The description to display when showing multiple links in an interactive list */
+                  description: string;
+                  /** The URL may contain the placeholder for the keyword ("%s" if not configured otherwise) */
+                  url: string;
+              }>
     ): string;
 
     //------------------------------------------------------------------------------------------------------------------
