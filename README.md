@@ -1,4 +1,4 @@
-# ![](src/docs/img/arrow.svg) ShortyCut
+# ![](src/user-manual/img/arrow.svg) ShortyCut
 
 ShortyCut is a JavaScript application to quickly navigate to websites using keywords. Unlike browser bookmarks, the links and keywords are stored as plain text in a simple file:
 
@@ -16,15 +16,15 @@ shortycut.addShortcuts(`
 
 Links are opened by entering the corresponding keyword (e.g. `ta` or `tr`). Using ShortyCut's homepage is the easiest way to do this because it works in all browsers and provides suggestions while typing:
 
-![](src/docs/img/favicons-suggestions.png)
+![](src/user-manual/img/favicons-suggestions.png)
 
 ShortyCut can also be set up as the browser's default search engine so that keywords can be entered directly in the address bar:
 
-![](src/docs/img/web-server-address-bar.png)
+![](src/user-manual/img/web-server-address-bar.png)
 
 ShortyCut makes keywords available in all browsers, including those that don't natively support it. It enhances their capabilities with additional features like keywords with multiple links, support for `POST` pages, and the ability to dynamically generate shortcuts via JavaScript.
 
-# ![](src/docs/img/arrow.svg) Resources
+# ![](src/user-manual/img/arrow.svg) Resources
 
 **Try out the demo:**<br>
 <https://david-04.github.io/shortycut/demo/index.html>
